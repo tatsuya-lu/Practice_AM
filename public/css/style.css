@@ -1,0 +1,746 @@
+@charset "UTF-8";
+
+body {
+    margin: 0;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 18px;
+    background-color: #fff;
+    color: #666363;
+}
+
+select {
+    color: #666363;
+}
+
+main {
+    margin: 0 15px;
+}
+
+a {
+    text-decoration: none;
+    color: #666363;
+}
+
+
+li {
+    list-style: none;
+}
+
+.page-title {
+    font-size: 23px;
+    margin: 10px 0 20px 0;
+    border-bottom: 1px solid #666363;
+}
+
+.sub-title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.main-content-aria {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    padding: 8px;
+}
+
+.error-message {
+    color: #ff0000;
+    white-space: nowrap;
+    margin: 5px 0 0 0;
+}
+
+.success {
+    border-radius: 6px;
+    margin-bottom: 20px;
+    padding: 5px 0;
+    max-width: 100%;
+    text-align: center;
+    align-items: center;
+    background: #5bc8ac;
+    color: #fff;
+}
+
+/*--ここからログイン画面--*/
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #dcfcf3;
+}
+
+.login-container div {
+    margin-bottom: 16px;
+}
+
+.login-container form {
+    width: 100%;
+    max-width: 320px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+
+.login-container label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.login-container input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    border-radius: 3px;
+    border: 1px solid #a0a0a0;
+}
+
+.login-container button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #fff;
+    background-color: #5bc8ac;
+}
+
+.login-container button:hover {
+    background-color: #4ca594;
+}
+
+/*--ここまでログイン画面--*/
+
+/*--ここからナビゲーションメニュー--*/
+
+header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.logo img {
+    max-width: 50px;
+    max-height: 50px;
+}
+
+.logo {
+    max-width: 50px;
+    max-height: 50px;
+    float: left;
+}
+
+.header-content-left {
+    margin-left: 15px;
+    margin-top: 5px;
+    display: flex;
+}
+
+.header-content-right {
+    margin-right: 15px;
+    margin-top: 10px;
+}
+
+.header-content-left nav {
+    margin-left: 10px;
+}
+
+.header-content-left li {
+    display: inline;
+    border-right: 1px solid #666363;
+    padding: 10px 5px 10px 0;
+}
+
+.header-content-left button {
+    padding: 10px 10px;
+    border-radius: 6px;
+}
+
+.header-content-left button:hover {
+    background-color: #e5e7eb;
+}
+
+.header-content-left span {
+    margin-right: 8px;
+    color: #666363;
+}
+
+.header-content-right {
+    display: flex;
+}
+
+.user-control-aria {
+    text-align: right;
+}
+
+.user-control-aria li {
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.logged-in-user-text {
+    font-size: 20px;
+}
+
+.logout-btn {
+    border-radius: 6px;
+    padding: 5px 0;
+    background-color: #f08080;
+}
+
+.logout-btn:hover {
+    background-color: #be7676;
+}
+
+.user-control-aria button {
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 6px;
+}
+
+/*--ここまでナビゲーションメニュー--*/
+
+/*--ここからお知らせ機能--*/
+
+.notification-aria {
+    position: relative;
+    margin: 0px 30px 0px 0px;
+}
+
+.notification-aria li {
+    list-style: none;
+    font-size: 18px;
+    padding: 5px;
+    border-bottom: 1px solid #666363;
+}
+
+.notification-aria .fa-bell {
+    font-size: 1.5em;
+}
+
+.notification-count-badge {
+    position: absolute;
+    top: 8px;
+    left: 17px;
+    background-color: #ff0000;
+    color: #fff;
+    border-radius: 50%;
+    padding: 4px 5px;
+    font-size: 12px;
+}
+
+.notification-list {
+    position: absolute;
+    top: calc(50% + 10px);
+    right: 0;
+    z-index: 999;
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    width: 700px;
+}
+
+.notification-list li:hover {
+    background-color: #e5e7eb;
+}
+
+.notification-date {
+    float: right;
+}
+
+/*--ここまでお知らせ機能--*/
+
+/*--ここからダッシュボード画面--*/
+
+.dashboard {
+    max-height: fit-content;
+    display: flex;
+    justify-content: space-between;
+}
+
+.dashboard-content-left {
+    max-height: fit-content;
+    display: flex;
+}
+
+.dashboard button {
+    margin-right: 20px;
+    border-radius: 6px;
+    padding: 0 8px;
+    letter-spacing: 0.05em;
+    background-color: #5bc8ac;
+    text-align: center;
+    max-width: fit-content;
+    height: 40px;
+}
+
+.dashboard button:hover {
+    background-color: #4ca594;
+}
+
+.dashboard button a {
+    color: #fff;
+}
+
+.dashboard button span {
+    margin-right: 5px;
+}
+
+.notification-list-aria {
+    padding: 0 20px 0 10px;
+    margin-right: 20px;
+    border-right: 1px solid #666363;
+}
+
+.notification-list-aria .sub-title {
+    margin-bottom: 10px;
+}
+
+.notification-title {
+    font-weight: bold;
+    margin: 8px 0 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notification-title-date {
+    font-weight: bold;
+}
+
+.notification-content {
+    border-bottom: 1px solid #a0a0a0;
+    padding-bottom: 5px;
+}
+
+.notification-content:hover {
+    background-color: #e5e7eb;
+    border-radius: 3px;
+}
+
+.notification-read-status {
+    background-color: #ddd;
+    padding: 3px 8px;
+    border-radius: 6px;
+    margin-left: 15px;
+}
+
+.notification-not-read-status {
+    background-color: #f08080;
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 6px;
+    margin-left: 15px;
+}
+
+.unresolved-inquiry-list-aria .notification-title {
+    margin-top: 15px;
+}
+
+.button-aria {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.button-aria button {
+    margin-bottom: 15px;
+    color: #fff;
+    white-space: nowrap;
+}
+
+@media screen and (max-width: 1300px) {
+    .button-aria {
+        grid-template-columns: 1fr;
+    }
+}
+
+/*--ここまでダッシュボード画面--*/
+
+/*--ここからアカウント登録画面--*/
+
+.register-form-container {
+    margin-right: 25px;
+}
+
+.form-item {
+    padding-top: 24px;
+    padding-bottom: 24px;
+}
+
+
+.form-item label {
+    width: 100%;
+    max-width: 248px;
+    letter-spacing: 0.05em;
+    font-weight: bold;
+}
+
+
+.required {
+    border-radius: 6px;
+    margin: 0 8px 0px 0;
+    padding: 5px 0;
+    width: 48px;
+    display: inline-block;
+    text-align: center;
+    background: #5bc8ac;
+    color: #fff;
+    font-size: 15px;
+}
+
+
+.form-item-input {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-top: 15px;
+    padding-left: 1em;
+    padding-right: 1em;
+    height: 45px;
+    width: 100%;
+    background: #fff;
+}
+
+.form-item textarea {
+    padding-top: 0.8em;
+    height: 216px;
+}
+
+.form-btn {
+    border-radius: 6px;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+    width: fit-content;
+    letter-spacing: 0.05em;
+    background-color: #5bc8ac;
+    color: #fff;
+}
+
+.form-btn:hover {
+    background-color: #4ca594;
+}
+
+
+/*--ここまでアカウント登録画面--*/
+
+/*--ここからアカウント・お問い合わせ一覧画面--*/
+
+.table-container {
+    display: flex;
+    justify-content: center;
+}
+
+table {
+    border-spacing: 0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    margin-top: 10px;
+}
+
+table th {
+    border: 0.5px solid #a0a0a0;
+    text-align: center;
+    padding: 5px 15px;
+    background-color: #ddd;
+}
+
+table td {
+    border: 0.5px solid #a0a0a0;
+    background-color: #fff;
+    padding: 10px 8px 10px 8px;
+}
+
+.fa-trash-can {
+    color: #ff0000;
+    font-size: 1.2em;
+}
+
+.fa-pen-to-square {
+    font-size: 1.2em;
+}
+
+.table-text-center {
+    text-align: center;
+}
+
+.pagenation {
+    display: flex;
+    justify-content: end;
+    margin: 10px 0 15px 10px;
+}
+
+.current-page {
+    background-color: #5bc8ac;
+    color: #fff;
+    padding: 0 8px;
+    border-radius: 4px;
+}
+
+.page-link {
+    background-color: #fff;
+    color: #666363;
+    padding: 0 8px;
+    border-radius: 4px;
+}
+
+.page-link:hover {
+    background-color: #e5e7eb;
+}
+
+.arrow-link-next,
+.arrow-link-prev {
+    padding: 0 5px;
+}
+
+.arrow-link-next:hover,
+.arrow-link-prev:hover {
+    background-color: #e5e7eb;
+}
+
+.item-float-right {
+    float: right;
+    margin-left: 30px;
+}
+
+.item-float-right2 {
+    float: right;
+}
+
+/*--ここまでアカウント・お問い合わせ一覧画面--*/
+
+/*--ここからお問い合わせ編集--*/
+
+.inquiry-edit-container {
+    margin-right: 25px;
+    display: flex;
+}
+
+.inquiry-form-content {
+    flex: 1;
+}
+
+.form-item {
+    max-width: 720px;
+}
+
+.form-item-textarea {
+    padding-top: 0.8em;
+    height: 216px;
+}
+
+.inquiry-info-content {
+    border-left: 1px solid #a0a0a0;
+    max-width: 720px;
+    padding: 10px 20px;
+    margin-top: 25px;
+    max-height: 720px;
+    flex: 2;
+}
+
+.inquiry-info-content p {
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.inquiry-info-content label {
+    font-weight: bold;
+}
+
+.inquiry-info-content .sub-title {
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.inquiry-info-content .info-item {
+    margin-bottom: 15px;
+}
+
+/*--ここまでお問い合わせ編集--*/
+
+/*--ここから検索機能--*/
+
+.new-register-btn {
+    display: flex;
+    justify-content: end;
+    border-radius: 6px;
+    padding: 0 8px;
+    letter-spacing: 0.05em;
+    background-color: #5bc8ac;
+    align-items: center;
+    max-width: fit-content;
+    height: 40px;
+    white-space: nowrap;
+}
+
+.new-register-btn:hover {
+    background-color: #4ca594;
+}
+
+.new-register-btn button {
+    color: #fff;
+}
+
+.new-register-btn span {
+    margin-right: 5px;
+}
+
+.sort-btn {
+    background-color: #5bc8ac;
+    border-radius: 6px;
+    padding: 3px;
+    width: 100px;
+    margin-top: 5px;
+    color: #fff;
+}
+
+.sort-btn:hover {
+    background-color: #4ca594;
+}
+
+.search-form-container {
+    display: flex;
+    justify-content: center;
+}
+
+.search-form {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.search-form form {
+    display: flex;
+}
+
+.search-form-item {
+    margin-right: 22px;
+}
+
+.search-form select {
+    width: 270px;
+}
+
+.search-form input[type="search"],
+.search-form select {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+    height: 42px;
+}
+
+.search-form input[type="submit"] {
+    border: none;
+    border-radius: 6px;
+    padding: 6px 18px;
+    background-color: #5bc8ac;
+    color: #fff;
+    cursor: pointer;
+}
+
+.search-form input[type="submit"]:hover {
+    background-color: #4ca594;
+}
+
+select.minimal {
+    background-image:
+        linear-gradient(45deg, transparent 50%, #666363 50%),
+        linear-gradient(135deg, #666363 50%, transparent 50%),
+        linear-gradient(to right, #e5e7eb, #e5e7eb);
+    background-position:
+        calc(100% - 20px) calc(1em + 2px),
+        calc(100% - 15px) calc(1em + 2px),
+        calc(100% - 2.5em) 0.5em;
+    background-size:
+        5px 5px,
+        5px 5px,
+        1px 1.5em;
+    background-repeat: no-repeat;
+}
+
+select.minimal:focus {
+    background-image:
+        linear-gradient(45deg, #5bc8ac 50%, transparent 50%),
+        linear-gradient(135deg, transparent 50%, #5bc8ac 50%),
+        linear-gradient(to right, #e5e7eb, #e5e7eb);
+    background-position:
+        calc(100% - 15px) 1em,
+        calc(100% - 20px) 1em,
+        calc(100% - 2.5em) 0.5em;
+    background-size:
+        5px 5px,
+        5px 5px,
+        1px 1.5em;
+    background-repeat: no-repeat;
+    border-color: #5bc8ac;
+    outline: 0;
+}
+
+
+select:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 #000;
+}
+
+@media screen and (max-width: 1300px) {
+    .search-form-container {
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .search-form-item {
+        margin-right: 18px;
+    }
+}
+
+/*--ここまで検索機能--*/
+
+/*--ここからお問い合わせフォーム--*/
+.contact-form-container {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 720px;
+}
+
+.contact-form-container .form-item {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.contact-form-container .form-item-input,
+.contact-form-container .form-btn {
+    font-size: 18px;
+}
+
+.contact-form-container .form-item-check {
+    margin-top: 15px;
+    width: 100%;
+}
+
+.contact-form-container .form-btn {
+    max-width: fit-content;
+    margin-top: 15px;
+    padding: 5px 10px;
+    border: 1px solid #a0a0a0;
+}
+
+.contact-form-container .form-item:nth-child(9) {
+    border-bottom: 1px solid #ddd;
+}
+
+.contact-thanks .form-item {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.contact-form-container .under-line {
+    border-bottom: 1px solid #ddd;
+}
+
+/*--ここまでお問い合わせフォーム--*/
