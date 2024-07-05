@@ -27,7 +27,7 @@
             <img class="logo" src="{{ asset('img/testlogo.png') }}" alt="ロゴ画像">
             <nav>
                 <ul>
-                    
+
 
                     <li><a href="{{ route('dashboard') }}"><button><span
                                     class="fa-solid fa-house"></span>HOME</button></a></li>
@@ -65,7 +65,8 @@
             <ul class="user-control-aria">
                 <li class="logged-in-user-text">
                     ログイン中： {{ Auth::guard('admin')->user()->name }}
-                    <img src="{{ Auth::guard('admin')->user()->profile_image ? asset('img/profile/' . Auth::guard('admin')->user()->profile_image) : asset('img/noimage.png') }}" alt="プロフィール画像">
+                    <img src="{{ Auth::guard('admin')->user()->profile_image ? asset('img/profile/' . Auth::guard('admin')->user()->profile_image) : asset('img/noimage.png') }}"
+                        alt="プロフィール画像">
                 </li>
                 <li><a href="{{ route('logout') }}"><button class="logout-btn">ログアウト</button></a></li>
             </ul>
@@ -98,13 +99,20 @@
                         .catch(error => {
                             console.error('Error fetching notifications:', error);
                         });
+                },
+                markAsRead(notificationId) {
+                    const markUrl = '{{ route('notification.show', ':id') }}'.replace(':id', notificationId);
+                    axios.post(markUrl)
+                        .then(response => {
+                            this.fetchNotifications();
+                        })
+                        .catch(error => {
+                            console.error('Error marking notification as read:', error);
+                        });
                 }
             },
             mounted() {
                 this.fetchNotifications();
-                setInterval(() => {
-                    this.fetchNotifications();
-                }, 60000);
             }
         });
 
