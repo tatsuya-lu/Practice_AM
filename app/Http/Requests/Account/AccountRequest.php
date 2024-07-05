@@ -32,6 +32,7 @@ class AccountRequest extends FormRequest
             'prefecture' => 'required',
             'city' => 'required|string',
             'street' => 'required|string',
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'admin_level' => 'required',
         ];
     }
@@ -60,6 +61,9 @@ class AccountRequest extends FormRequest
             'city.string' => '市区町村は文字列で入力してください。',
             'street.required' => '番地は必須項目です。',
             'street.string' => '番地は文字列で入力してください。',
+            'profile_image.image' => 'プロフィール画像は画像ファイルでなければなりません。',
+            'profile_image.mimes' => 'プロフィール画像はjpeg, png, jpg, gif, svgのいずれかの形式でなければなりません。',
+            'profile_image.max' => 'プロフィール画像のサイズは2048KB以下でなければなりません。',
             'admin_level.required' => '管理者レベルは必須項目です。',
         ];
     }

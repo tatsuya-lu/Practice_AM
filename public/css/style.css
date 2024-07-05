@@ -180,7 +180,17 @@ header {
 }
 
 .logged-in-user-text {
+    display: flex;
+    align-items: center;
     font-size: 20px;
+}
+
+.logged-in-user-text img {
+    width: 75px;
+    height: 75px;
+    margin-left: 10px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 .logout-btn {

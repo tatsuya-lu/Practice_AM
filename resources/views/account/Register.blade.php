@@ -19,7 +19,7 @@
 
     <div class="register-form-container">
 
-        <form method="POST"
+        <form method="POST" enctype="multipart/form-data"
             action="{{ $user->id ? route('account.update', ['user' => $user->id]) : route('account.register.form') }}">
             @csrf
             @if ($user->id)
@@ -142,6 +142,20 @@
                     <p class="error-message">{{ $errors->first('comment', '') }}</p>
                 @endif
             </div>
+
+            @if (isset($user))
+                <div>
+                    <label for="profile_image">プロフィール画像:</label>
+                    <input type="file" name="profile_image" id="profile_image">
+                    @if ($user->profile_image)
+                        <img src="{{ asset('images/profile/' . $user->profile_image) }}" alt="プロフィール画像"
+                            style="width: 200px; height: 200px; border-radius: 50%; object-fit: cover;">
+                    @else
+                        <img src="{{ asset('images/noimage.png') }}" alt="プロフィール画像"
+                            style="width: 200px; height: 200px; border-radius: 50%; object-fit: cover;">
+                    @endif
+                </div>
+            @endif
 
             <div class="form-item">
                 <label><span class="required">必須</span>アカウントの種類</label>

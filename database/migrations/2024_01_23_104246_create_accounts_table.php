@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('city');
             $table->string('street');
             $table->text('comment')->nullable();
+            $table->string('profile_image')->nullable();
             $table->integer('admin_level');
             $table->rememberToken();
             $table->timestamps();

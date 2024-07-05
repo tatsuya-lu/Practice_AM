@@ -26,6 +26,7 @@ class Account extends Model implements Authenticatable
         'city',
         'street',
         'comment',
+        'profile_image',
         'admin_level',
     ];
 

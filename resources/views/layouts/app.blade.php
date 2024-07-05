@@ -63,7 +63,10 @@
                 </nav>
             </div>
             <ul class="user-control-aria">
-                <li class="logged-in-user-text">ログイン中： {{ Auth::guard('admin')->user()->name }}</li>
+                <li class="logged-in-user-text">
+                    ログイン中： {{ Auth::guard('admin')->user()->name }}
+                    <img src="{{ Auth::guard('admin')->user()->profile_image ? asset('img/profile/' . Auth::guard('admin')->user()->profile_image) : asset('img/noimage.png') }}" alt="プロフィール画像">
+                </li>
                 <li><a href="{{ route('logout') }}"><button class="logout-btn">ログアウト</button></a></li>
             </ul>
         </div>
