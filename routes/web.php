@@ -56,6 +56,7 @@ Route::prefix('account')->middleware(['auth:admin'])->group(function () {
     //お知らせ登録処理
     Route::get('/notifications/create', [NotificationController::class, 'create'])->name('notification.create')->middleware('account.authorization');
     Route::post('/notifications', [NotificationController::class, 'store'])->name('notification.store');
+    Route::get('/notifications/read-status', [NotificationController::class, 'getReadStatus'])->name('notification.read-status');
 });
 
 Route::prefix('contact')->group(function () {

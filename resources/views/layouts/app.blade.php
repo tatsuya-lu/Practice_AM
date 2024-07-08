@@ -46,7 +46,7 @@
         <div class="header-content-right">
             <div class="notification-aria" id="app">
                 <nav>
-                    <button @click="toggleDropdown">
+                    <button v-on:click="toggleDropdown">
                         <span class="far fa-bell"></span>
                         <span v-if="notifications.total > 0"
                             class="notification-count-badge">@{{ notifications.total }}</span>
@@ -100,23 +100,35 @@
                             console.error('Error fetching notifications:', error);
                         });
                 },
-                markAsRead(notificationId) {
-                    const markUrl = '{{ route('notification.show', ':id') }}'.replace(':id', notificationId);
-                    axios.post(markUrl)
-                        .then(response => {
-                            this.fetchNotifications();
-                        })
-                        .catch(error => {
-                            console.error('Error marking notification as read:', error);
-                        });
+                updateNotificationStatus(notificationId) {
+                    if (this.notifications.data) {
+                        const notification = this.notifications.data.find(n => n.id === notificationId);
+                        if (notification && !notification.read) {
+                            notification.read = true;
+                            this.notifications.total = Math.max(0, this.notifications.total - 1);
+                        }
+                    }
                 }
             },
             mounted() {
                 this.fetchNotifications();
+
+                // ブラウザの「戻る」ボタンでページに戻ってきた時の処理
+                window.addEventListener('pageshow', (event) => {
+                    if (event.persisted || (window.performance && window.performance.navigation.type ===
+                        2)) {
+                        this.fetchNotifications();
+                    }
+                });
+
+                // 履歴の状態変更時の処理
+                window.addEventListener('popstate', (event) => {
+                    this.fetchNotifications();
+                });
             }
         });
 
-        app.mount('#app');
+        window.app = app.mount('#app');
     </script>
 </body>
 

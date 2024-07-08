@@ -13,4 +13,12 @@
         <p class="sub-title">{{ $notification->title }}</p>
         <p class="form-item-input form-item-textarea">{{ $notification->description }}</p>
     </div>
+    @if (session('notificationsUpdated'))
+        <script>
+            // 履歴の状態を更新
+            history.replaceState({
+                notificationsUpdated: Date.now()
+            }, document.title);
+        </script>
+    @endif
 @endsection

@@ -27,6 +27,10 @@ class NotificationController extends Controller
             abort(403, '権限がないためこの操作を実行できません。');
         }
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true]);
+        }
+
         return view('account.Notification', compact('notification'));
     }
 
@@ -44,6 +48,20 @@ class NotificationController extends Controller
         })
             ->orderBy('id', 'desc')
             ->paginate(7);
+    }
+
+    public function getReadStatus(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json([], 403);
+        }
+
+        $readNotifications = NotificationRead::where('user_id', $user->id)
+            ->where('read', true)
+            ->pluck('notification_id');
+
+        return response()->json($readNotifications);
     }
 
     public function create()

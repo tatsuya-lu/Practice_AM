@@ -331,14 +331,14 @@ header {
     border-radius: 3px;
 }
 
-.notification-read-status {
+.notification-status[data-status="read"] {
     background-color: #ddd;
     padding: 3px 8px;
     border-radius: 6px;
     margin-left: 15px;
 }
 
-.notification-not-read-status {
+.notification-status[data-status="unread"] {
     background-color: #f08080;
     color: #fff;
     padding: 3px 8px;
