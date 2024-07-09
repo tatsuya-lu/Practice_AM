@@ -109,17 +109,6 @@
             window.addEventListener('popstate', function(event) {
                 updateNotificationStatuses();
             });
-
-            window.addEventListener('appNotificationRead', function(event) {
-                const notificationId = event.detail.notificationId;
-                const notificationElement = document.querySelector(
-                    `ul[data-notification-id="${notificationId}"]`);
-                if (notificationElement) {
-                    const statusElement = notificationElement.querySelector('.notification-status');
-                    statusElement.textContent = '既読済み';
-                    statusElement.dataset.status = 'read';
-                }
-            });
         });
     </script>
 @endsection
