@@ -10,11 +10,11 @@
     <div class="search-form-container">
         <div class="search-form">
             <div class="search-form-item">
-                <a href="{{ route('account.list', ['sort' => 'newest']) }}"><button class="sort-btn">新しい順</button></a>
+                <a href="{{ route('account.list', array_merge(request()->all(), ['sort' => 'newest'])) }}"><button class="sort-btn">新しい順</button></a>
             </div>
 
             <div class="search-form-item">
-                <a href="{{ route('account.list', ['sort' => 'oldest']) }}"><button class="sort-btn">古い順</button></a>
+                <a href="{{ route('account.list', array_merge(request()->all(), ['sort' => 'oldest'])) }}"><button class="sort-btn">古い順</button></a>
             </div>
             <form>
                 <div class="search-form-item">

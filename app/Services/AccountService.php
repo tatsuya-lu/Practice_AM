@@ -23,6 +23,21 @@ class AccountService
 
         $query = Account::query();
 
+        if ($searchName = $this->request->input('search_name')) {
+            $query->where('name', 'LIKE', '%' . $searchName . '%');
+        }
+
+        if ($searchAdminLevel = $this->request->input('search_admin_level')) {
+            $adminLevelValue = is_numeric($searchAdminLevel) ? $searchAdminLevel : ($searchAdminLevel == '社員' ? 1 : ($searchAdminLevel == '管理者' ? 2 : null));
+            if ($adminLevelValue !== null) {
+                $query->where('admin_level', $adminLevelValue);
+            }
+        }
+
+        if ($searchEmail = $this->request->input('search_email')) {
+            $query->where('email', 'LIKE', '%' . $searchEmail . '%');
+        }
+
         switch ($sort) {
             case 'newest':
                 $query->orderBy('created_at', 'desc');
@@ -35,25 +50,11 @@ class AccountService
                 break;
         }
 
-        $users = $query->where(function ($query) {
-            if ($searchName = $this->request->input('search_name')) {
-                $query->where('name', 'LIKE', '%' . $searchName . '%');
-            }
-
-            if ($searchAdminLevel = $this->request->input('search_admin_level')) {
-                $adminLevelValue = is_numeric($searchAdminLevel) ? $searchAdminLevel : ($searchAdminLevel == '社員' ? 1 : ($searchAdminLevel == '管理者' ? 2 : null));
-                if ($adminLevelValue !== null) {
-                    $query->where('admin_level', $adminLevelValue);
-                }
-            }
-
-            if ($searchEmail = $this->request->input('search_email')) {
-                $query->where('email', 'LIKE', '%' . $searchEmail . '%');
-            }
-        })->paginate(20);
+        $users = $query->paginate(20);
 
         return $users;
     }
+
 
     public function register(array $data)
     {

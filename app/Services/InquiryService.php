@@ -8,13 +8,48 @@ use Illuminate\Http\Request;
 class InquiryService
 {
 
-    public function __construct(private Request $request){}
+    public function __construct(private Request $request)
+    {
+    }
 
     public function index()
     {
         $sort = $this->request->input('sort', 'newest');
 
         $query = Post::query();
+
+        if ($searchStatus = $this->request->input('search_status')) {
+            $statusValue = null;
+
+            switch ($searchStatus) {
+                case '未対応':
+                    $statusValue = 'default';
+                    break;
+                case '対応中':
+                    $statusValue = 'checking';
+                    break;
+                case '対応済み':
+                    $statusValue = 'checked';
+                    break;
+                case 'default':
+                case 'checking':
+                case 'checked':
+                    $statusValue = $searchStatus;
+                    break;
+            }
+
+            if ($statusValue !== null) {
+                $query->where('status', $statusValue);
+            }
+        }
+
+        if ($searchCompany = $this->request->input('search_company')) {
+            $query->where('company', 'LIKE', "%{$searchCompany}%");
+        }
+
+        if ($searchTel = $this->request->input('search_tel')) {
+            $query->where('tel', 'LIKE', "%{$searchTel}%");
+        }
 
         switch ($sort) {
             case 'newest':
@@ -28,44 +63,10 @@ class InquiryService
                 break;
         }
 
-        $inquiries = $query->where(function ($query) {
-            if ($searchStatus = $this->request->input('search_status')) {
-                $statusValue = null;
-
-                switch ($searchStatus) {
-                    case '未対応':
-                        $statusValue = 'default';
-                        break;
-                    case '対応中':
-                        $statusValue = 'checking';
-                        break;
-                    case '対応済み':
-                        $statusValue = 'checked';
-                        break;
-                    case 'default':
-                    case 'checking':
-                    case 'checked':
-                        $statusValue = $searchStatus;
-                        break;
-                }
-
-                if ($statusValue !== null) {
-                    $query->where('status', $statusValue);
-                }
-            }
-
-            if ($searchCompany = $this->request->input('search_company')) {
-                $query->where('company', 'LIKE', "%{$searchCompany}%");
-            }
-
-            if ($searchTel = $this->request->input('search_tel')) {
-                $query->where('tel', 'LIKE', "%{$searchTel}%");
-            }
-        })->paginate(20);
-
+        $inquiries = $query->paginate(20);
         return $inquiries;
     }
-    
+
     public function unresolvedInquiryCount()
     {
         return Post::where('status', 'default')->count();
