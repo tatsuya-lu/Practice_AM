@@ -109,20 +109,18 @@
                     }
                 }
             },
-            mounted() {
-                this.fetchNotifications();
+            async mounted() {
+                await this.fetchNotifications();
 
-                // ブラウザの「戻る」ボタンでページに戻ってきた時の処理
-                window.addEventListener('pageshow', (event) => {
-                    if (event.persisted || (window.performance && window.performance.navigation.type ===
-                        2)) {
-                        this.fetchNotifications();
+                window.addEventListener('pageshow', async (event) => {
+                    if (event.persisted || (window.performance && window.performance.navigation
+                            .type === 2)) {
+                        await this.fetchNotifications();
                     }
                 });
 
-                // 履歴の状態変更時の処理
-                window.addEventListener('popstate', (event) => {
-                    this.fetchNotifications();
+                window.addEventListener('popstate', async () => {
+                    await this.fetchNotifications();
                 });
             }
         });

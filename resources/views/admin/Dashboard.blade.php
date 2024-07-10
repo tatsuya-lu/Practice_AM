@@ -111,18 +111,18 @@
                     });
                 }
             },
-            mounted() {
-                this.fetchNotificationReadStatuses();
+            async mounted() {
+                await this.fetchNotificationReadStatuses();
 
-                window.addEventListener('pageshow', (event) => {
-                    if (event.persisted || (window.performance && window.performance.navigation.type ===
-                        2)) {
-                        this.fetchNotificationReadStatuses();
+                window.addEventListener('pageshow', async (event) => {
+                    if (event.persisted || (window.performance && window.performance.navigation
+                            .type === 2)) {
+                        await this.fetchNotificationReadStatuses();
                     }
                 });
 
-                window.addEventListener('popstate', () => {
-                    this.fetchNotificationReadStatuses();
+                window.addEventListener('popstate', async () => {
+                    await this.fetchNotificationReadStatuses();
                 });
             }
         });
