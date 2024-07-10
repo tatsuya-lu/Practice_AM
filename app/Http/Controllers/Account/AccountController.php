@@ -36,7 +36,7 @@ class AccountController extends Controller
         $unresolvedInquiryCount = $this->inquiryService->unresolvedInquiryCount();
         $unresolvedInquiries = $this->inquiryService->unresolvedInquiries();
 
-        return view('account.Dashboard', compact('notificationData', 'unresolvedInquiryCount', 'unresolvedInquiries'));
+        return view('admin.Dashboard', compact('notificationData', 'unresolvedInquiryCount', 'unresolvedInquiries'));
     }
 
     public function registerForm(Request $request)
@@ -45,7 +45,7 @@ class AccountController extends Controller
         $prefectures = $this->prefectures;
         $adminLevels = $this->adminLevels;
 
-        return view('account.Register', compact('user', 'prefectures', 'adminLevels'));
+        return view('admin.Register', compact('user', 'prefectures', 'adminLevels'));
     }
 
     public function register(AccountRequest $request)
@@ -55,9 +55,9 @@ class AccountController extends Controller
         if ($user) {
             session()->flash('registered_message', 'アカウントが正常に登録されました。');
             session()->flash('registered_email', $user->email);
-            return redirect()->route('account.list');
+            return redirect()->route('admin.list');
         } else {
-            return redirect()->route('account.list')->with('error', 'ユーザーの登録に失敗しました。');
+            return redirect()->route('admin.list')->with('error', 'ユーザーの登録に失敗しました。');
         }
     }
 
@@ -70,14 +70,14 @@ class AccountController extends Controller
             $user->admin_level = $user->admin_level == 1 ? '管理者' : ($user->admin_level == 2 ? '社員' : '');
         }
 
-        return view('account.AccountList', compact('users'));
+        return view('admin.AccountList', compact('users'));
     }
 
     public function update(AccountRequest $request, Account $user)
     {
         $this->accountService->update($user, $request->all());
 
-        return redirect()->route('account.list')->with('success', 'ユーザーが正常に更新されました。');
+        return redirect()->route('admin.list')->with('success', 'ユーザーが正常に更新されました。');
     }
 
     public function edit(Account $user)
@@ -85,13 +85,13 @@ class AccountController extends Controller
         $prefectures = $this->prefectures;
         $adminLevels = $this->adminLevels;
 
-        return view('account.Register', compact('user', 'prefectures', 'adminLevels'));
+        return view('admin.Register', compact('user', 'prefectures', 'adminLevels'));
     }
 
     public function destroy(Account $user)
     {
         $this->accountService->destroy($user);
 
-        return redirect()->route('account.list')->with('success', 'ユーザーが正常に削除されました。');
+        return redirect()->route('admin.list')->with('success', 'ユーザーが正常に削除されました。');
     }
 }

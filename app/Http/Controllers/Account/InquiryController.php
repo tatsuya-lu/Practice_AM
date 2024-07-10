@@ -27,7 +27,7 @@ class InquiryController extends Controller
             $inquiry->status = config('const.status')[$inquiry->status] ?? $inquiry->status;
         }
 
-        return view('account.InquiryList', compact('inquiries'));
+        return view('admin.InquiryList', compact('inquiries'));
     }
 
     public function edit(Post $inquiry)
@@ -37,7 +37,7 @@ class InquiryController extends Controller
         $inquiry->gender = config('const.gender.' . $inquiry->gender);
         $inquiry->profession = config('const.profession.' . $inquiry->profession);
 
-        return view('account.InquiryEdit', compact('inquiry', 'statusOptions', 'inquiryStatus'));
+        return view('admin.InquiryEdit', compact('inquiry', 'statusOptions', 'inquiryStatus'));
     }
 
 

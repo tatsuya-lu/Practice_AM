@@ -31,7 +31,7 @@ class NotificationController extends Controller
             return response()->json(['success' => true]);
         }
 
-        return view('account.Notification', compact('notification'));
+        return view('admin.Notification', compact('notification'));
     }
 
     public function list(Request $request)
@@ -66,7 +66,7 @@ class NotificationController extends Controller
 
     public function create()
     {
-        return view('account.NotificationRegister');
+        return view('admin.NotificationRegister');
     }
 
     public function store(NotificationRequest $request)
