@@ -16,25 +16,25 @@
     <div class="main-content-aria dashboard">
         <div class="dashboard-content-left">
 
-            <div class="notification-list-aria">
+            <div id="notification-app" class="notification-list-aria">
                 <p class="sub-title">お知らせ一覧</p>
-                @foreach ($notificationData['notifications'] as $notification)
-                    <ul data-notification-id="{{ $notification->id }}">
-                        <li class="notification-title">{{ $notification->title }}
-                            <div class="notification-status"
-                                data-status="{{ in_array($notification->id, $notificationData['readNotificationIds']) ? 'read' : 'unread' }}">
-                                {{ in_array($notification->id, $notificationData['readNotificationIds']) ? '既読済み' : '未読' }}
+                <template v-if="notifications && notifications.length > 0">
+                    <ul v-for="notification in notifications" :key="notification.id" :data-notification-id="notification.id">
+                        <li class="notification-title">@{{ notification.title }}
+                            <div class="notification-status" :data-status="getNotificationStatusClass(notification.id)">
+                                @{{ getNotificationStatus(notification.id) }}
                             </div>
                         </li>
                         <li class="notification-title-date">
-                            {{ \Carbon\Carbon::parse($notification->created_at)->format('m月d日') }}
+                            @{{ formatDate(notification.created_at) }}
                         </li>
-                        <a href="{{ route('notification.show', ['notification' => $notification->id]) }}"
-                            class="notification-link">
-                            <li class="notification-content">{{ $notification->description }}</li>
+                        <a :href="'{{ route('notification.show', '') }}/' + notification.id" class="notification-link"
+                            @click="updateNotificationStatus(notification.id)">
+                            <li class="notification-content">@{{ notification.description }}</li>
                         </a>
                     </ul>
-                @endforeach
+                </template>
+                <p v-else>お知らせはありません。</p>
                 <div class="pagenation">
                     {{ $notificationData['notifications']->appends(Request::except('notifications'))->links('') }}
                 </div>
@@ -75,40 +75,58 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            function updateNotificationStatuses() {
-                fetch('{{ route('notification.read-status') }}')
-                    .then(response => response.json())
-                    .then(readNotifications => {
-                        document.querySelectorAll('[data-notification-id]').forEach(el => {
-                            const notificationId = parseInt(el.dataset.notificationId);
-                            const statusElement = el.querySelector('.notification-status');
-                            if (readNotifications.includes(notificationId)) {
-                                statusElement.textContent = '既読済み';
-                                statusElement.dataset.status = 'read';
-                            } else {
-                                statusElement.textContent = '未読';
-                                statusElement.dataset.status = 'unread';
-                            }
-                        });
-                    })
-                    .catch(error => console.error('Error fetching read statuses:', error));
-            }
-
-            // ページロード時に既読状態を更新
-            updateNotificationStatuses();
-
-            // ブラウザの「戻る」ボタンでページに戻ってきた時の処理
-            window.addEventListener('pageshow', function(event) {
-                if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
-                    updateNotificationStatuses();
+        const notificationApp = Vue.createApp({
+            data() {
+                return {
+                    notifications: @json($notificationData['notifications']->items()) ?? [],
+                    notificationReadStatuses: @json($notificationData['readNotificationIds']) ?? {}
                 }
-            });
+            },
+            methods: {
+                async fetchNotificationReadStatuses() {
+                    try {
+                        const response = await fetch('{{ route('notification.read-status') }}');
+                        const readNotifications = await response.json();
+                        this.notificationReadStatuses = readNotifications.reduce((acc, id) => {
+                            acc[id] = true;
+                            return acc;
+                        }, {});
+                    } catch (error) {
+                        console.error('Error fetching read statuses:', error);
+                    }
+                },
+                updateNotificationStatus(notificationId) {
+                    this.$set(this.notificationReadStatuses, notificationId, true);
+                },
+                getNotificationStatus(notificationId) {
+                    return this.notificationReadStatuses[notificationId] ? '既読済み' : '未読';
+                },
+                getNotificationStatusClass(notificationId) {
+                    return this.notificationReadStatuses[notificationId] ? 'read' : 'unread';
+                },
+                formatDate(dateString) {
+                    return new Date(dateString).toLocaleDateString('ja-JP', {
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                }
+            },
+            mounted() {
+                this.fetchNotificationReadStatuses();
 
-            // 履歴の状態変更時の処理
-            window.addEventListener('popstate', function(event) {
-                updateNotificationStatuses();
-            });
+                window.addEventListener('pageshow', (event) => {
+                    if (event.persisted || (window.performance && window.performance.navigation.type ===
+                        2)) {
+                        this.fetchNotificationReadStatuses();
+                    }
+                });
+
+                window.addEventListener('popstate', () => {
+                    this.fetchNotificationReadStatuses();
+                });
+            }
         });
+
+        notificationApp.mount('#notification-app');
     </script>
 @endsection
