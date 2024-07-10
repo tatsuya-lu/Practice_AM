@@ -78,8 +78,8 @@
         const notificationApp = Vue.createApp({
             data() {
                 return {
-                    notifications: @json($notificationData['notifications']->items()) ?? [],
-                    notificationReadStatuses: @json($notificationData['readNotificationIds']) ?? {}
+                    notifications: @json($notificationData['notifications']->items()),
+                    notificationReadStatuses: @json($notificationData['readNotificationIds'])
                 }
             },
             methods: {
