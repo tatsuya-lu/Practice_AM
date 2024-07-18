@@ -1,6 +1,6 @@
 <template>
     <div class="login-container">
-        <form @submit.prevent="handleLogin">
+        <form @submit.prevent="login">
             <div>
                 <label for="email">メールアドレス</label>
                 <input type="text" id="email" v-model="email">
@@ -21,40 +21,46 @@
 </template>
 
 <script>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
 
 export default {
-    data() {
-        return {
-            email: '',
-            password: '',
-            errors: {}
-        }
-    },
-    methods: {
-        async handleLogin() {
+    setup() {
+        const email = ref('');
+        const password = ref('');
+        const errors = ref({});
+        const router = useRouter();
+
+        const login = async () => {
             try {
-                const response = await axios.post('/api/login', {
-                    email: this.email,
-                    password: this.password
+                const response = await axios.post('/login', {
+                    email: email.value,
+                    password: password.value
                 });
-                localStorage.setItem('authToken', response.data.token);
-                this.$router.push('/account/dashboard');
+                console.log(response.data); // レスポンスをログに出力
+                localStorage.setItem('token', response.data.token);
+                router.push('/dashboard');
             } catch (error) {
-                if (error.response && error.response.data) {
-                    this.errors = error.response.data.errors || {};
-                    this.errors.error = error.response.data.message;
-                } else {
-                    console.error('Login error: ', error);
-                }
+                console.error('Login error:', error.response ? error.response.data : error);
+                errors.value = error.response && error.response.data
+                    ? error.response.data.errors || { error: error.response.data.error }
+                    : { error: 'ログインに失敗しました。' };
             }
-        }
+        };
+
+        return {
+            email,
+            password,
+            errors,
+            login
+        };
     }
 }
 </script>
 
 <style scoped>
 .login-container {
-    /* Login.blade.phpと同じスタイルを適用 */
+    /* スタイルをここに追加 */
 }
 </style>

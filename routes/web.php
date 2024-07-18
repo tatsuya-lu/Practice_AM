@@ -7,6 +7,10 @@ use App\Http\Controllers\Account\NotificationController;
 use App\Http\Controllers\Contact\ContactsController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/{any}', function () {
+    return view('layouts.app');
+})->where('any', '.*');
+
 
 //ログイン処理
 Route::get('/', [LoginController::class, 'show'])->middleware('guest:admin');

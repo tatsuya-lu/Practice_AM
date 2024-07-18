@@ -2,6 +2,10 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Account\AccountController;
+use App\Http\Controllers\Account\LoginController;
+use App\Http\Controllers\Account\InquiryController;
+use App\Http\Controllers\Account\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,4 +20,18 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::post('/login', [LoginController::class, 'apiLogin']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [LoginController::class, 'apiLogout']);
+    Route::get('/dashboard', [AccountController::class, 'apiDashboard']);
+    Route::get('/account/list', [AccountController::class, 'apiAccountList']);
+    Route::post('/account/register', [AccountController::class, 'apiRegister']);
+    Route::put('/account/{user}', [AccountController::class, 'apiUpdate']);
+    Route::delete('/account/{user}', [AccountController::class, 'apiDestroy']);
+    Route::get('/inquiries', [InquiryController::class, 'apiIndex']);
+    Route::get('/inquiries/{inquiry}', [InquiryController::class, 'apiShow']);
+    Route::put('/inquiries/{inquiry}', [InquiryController::class, 'apiUpdate']);
 });

@@ -13,21 +13,43 @@ class LoginController extends Controller
 
     public function __construct()
     {
-        $this->middleware('guest:admin')->except('logout');
+        $this->middleware('guest:admin')->except(['logout', 'apiLogout']);
+    }
+
+    public function apiLogin(LoginRequest $request)
+    {
+        $credentials = $request->validated();
+
+        if (Auth::guard('admin')->attempt($credentials)) {
+            $user = Auth::guard('admin')->user();
+            $token = $user->createToken('auth-token')->plainTextToken;
+            return response()->json([
+                'token' => $token,
+                'user' => $user
+            ]);
+        }
+
+        return response()->json(['error' => '入力された内容が一致しませんでした。'], 401);
+    }
+
+    public function apiLogout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+        return response()->json(['message' => 'ログアウトしました。']);
     }
 
     public function show()
     {
         return view('admin.login');
     }
-    
+
     public function login(LoginRequest $request)
     {
         $credentials = $request->validated();
 
         if (Auth::guard('admin')->attempt($credentials)) {
             $request->session()->regenerate();
-    
+
             return redirect()->intended(RouteServiceProvider::ADMIN_HOME);
         }
 

@@ -30,6 +30,57 @@ class AccountController extends Controller
         $this->notificationService = $notificationService;
     }
 
+    public function apiDashboard(Request $request)
+    {
+        $notificationData = $this->notificationService->getNotificationsForDashboard();
+        $unresolvedInquiryCount = $this->inquiryService->unresolvedInquiryCount();
+        $unresolvedInquiries = $this->inquiryService->unresolvedInquiries();
+
+        return response()->json([
+            'notificationData' => $notificationData,
+            'unresolvedInquiryCount' => $unresolvedInquiryCount,
+            'unresolvedInquiries' => $unresolvedInquiries
+        ]);
+    }
+
+    public function apiRegister(AccountRequest $request)
+    {
+        $user = $this->accountService->register($request->all());
+
+        if ($user) {
+            return response()->json([
+                'message' => 'アカウントが正常に登録されました。',
+                'user' => $user
+            ], 201);
+        } else {
+            return response()->json(['error' => 'ユーザーの登録に失敗しました。'], 400);
+        }
+    }
+
+    public function apiAccountList(Request $request)
+    {
+        $users = $this->accountService->accountList();
+
+        foreach ($users as $user) {
+            $user->prefecture = config('const.prefecture.' . $user->prefecture);
+            $user->admin_level = $user->admin_level == 1 ? '管理者' : ($user->admin_level == 2 ? '社員' : '');
+        }
+
+        return response()->json($users);
+    }
+
+    public function apiUpdate(AccountRequest $request, Account $user)
+    {
+        $updatedUser = $this->accountService->update($user, $request->all());
+        return response()->json(['message' => 'ユーザーが正常に更新されました。', 'user' => $updatedUser]);
+    }
+
+    public function apiDestroy(Account $user)
+    {
+        $this->accountService->destroy($user);
+        return response()->json(['message' => 'ユーザーが正常に削除されました。']);
+    }
+
     public function index(Request $request)
     {
         $notificationData = $this->notificationService->getNotificationsForDashboard();
