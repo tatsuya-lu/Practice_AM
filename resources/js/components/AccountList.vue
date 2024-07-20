@@ -61,24 +61,24 @@
           <th>市町村</th>
           <th>番地・アパート名</th>
         </tr>
-        <tr v-for="user in users" :key="user.id">
+        <tr v-for="users in users" :key="users.id">
           <td class="table-text-center">
-            <router-link :to="{ name: 'account.edit', params: { id: user.id } }">
+            <router-link :to="{ name: 'account.edit', params: { id: users.id } }">
               <span class="fa-solid fa-pen-to-square"></span>
             </router-link>
           </td>
           <td class="table-text-center">
-            <button @click="deleteUser(user.id)">
+            <button @click="deleteUser(users.id)">
               <span class="fa-solid fa-trash-can"></span>
             </button>
           </td>
-          <td>{{ user.name }}</td>
-          <td>{{ user.admin_level }}</td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.tel }}</td>
-          <td>{{ user.prefecture }}</td>
-          <td>{{ user.city }}</td>
-          <td>{{ user.street }}</td>
+          <td>{{ users.name }}</td>
+          <td>{{ users.admin_level }}</td>
+          <td>{{ users.email }}</td>
+          <td>{{ users.tel }}</td>
+          <td>{{ users.prefecture }}</td>
+          <td>{{ users.city }}</td>
+          <td>{{ users.street }}</td>
         </tr>
       </table>
     </div>
@@ -90,10 +90,12 @@
 
 <script>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 
 export default {
   setup() {
+    const router = useRouter()
     const users = ref([])
     const registeredMessage = ref('')
     const registeredEmail = ref('')
@@ -111,15 +113,34 @@ export default {
             search_email: searchEmail.value
           }
         })
-        users.value = response.data
+        console.log('API response:', response.data); // レスポンスデータをログ出力
+        if (Array.isArray(response.data)) {
+          users.value = response.data.map(user => ({
+            ...user,
+            id: user.id.toString()
+          }))
+        } else if (response.data.data && Array.isArray(response.data.data)) {
+          users.value = response.data.data.map(user => ({
+            ...user,
+            id: user.id.toString()
+          }))
+        } else {
+          console.error('Unexpected data format:', response.data);
+          users.value = [];
+        }
+        console.log('Fetched users:', users.value)
       } catch (error) {
         console.error('Error fetching users:', error)
+        if (error.response) {
+          console.error('Response data:', error.response.data)
+          console.error('Response status:', error.response.status)
+        }
       }
     }
 
     const sortUsers = async (sortType) => {
       try {
-        const response = await axios.get('/api/users', {
+        const response = await axios.get('/api/account/list', {
           params: {
             sort: sortType,
             search_name: searchName.value,
@@ -127,7 +148,7 @@ export default {
             search_email: searchEmail.value
           }
         })
-        users.value = response.data.users
+        users.value = response.data
       } catch (error) {
         console.error('Error sorting users:', error)
       }
@@ -140,17 +161,23 @@ export default {
     const deleteUser = async (userId) => {
       if (confirm('削除します。よろしいですか？')) {
         try {
-          await axios.delete(`/account/${userId}`)
+          await axios.delete(`/api/account/${userId}`)
           successMessage.value = 'ユーザーが削除されました'
-          fetchUsers()
+          await fetchUsers()
         } catch (error) {
           console.error('Error deleting user:', error)
         }
       }
     }
 
-    onMounted(() => {
-      fetchUsers()
+    onMounted(async () => {
+      const token = localStorage.getItem('token')
+      if (!token) {
+        router.push('/login')
+        return
+      }
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      await fetchUsers()
     })
 
     return {

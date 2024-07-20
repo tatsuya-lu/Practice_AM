@@ -34,17 +34,22 @@ export default {
 
         const login = async () => {
             try {
-                const response = await axios.post('/login', {
+                // CSRFトークンを取得
+                await axios.get('/sanctum/csrf-cookie');
+
+                // ログイン処理
+                const response = await axios.post('/api/login', {
                     email: email.value,
                     password: password.value
                 });
-                console.log(response.data); // レスポンスをログに出力
+
+                console.log(response.data);
                 localStorage.setItem('token', response.data.token);
                 router.push('/dashboard');
             } catch (error) {
                 console.error('Login error:', error.response ? error.response.data : error);
                 errors.value = error.response && error.response.data
-                    ? error.response.data.errors || { error: error.response.data.error }
+                    ? error.response.data.errors || { error: error.response.data.message }
                     : { error: 'ログインに失敗しました。' };
             }
         };

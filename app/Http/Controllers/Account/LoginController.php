@@ -29,7 +29,7 @@ class LoginController extends Controller
             ]);
         }
 
-        return response()->json(['error' => '入力された内容が一致しませんでした。'], 401);
+        return response()->json(['message' => '入力された内容が一致しませんでした。'], 401);
     }
 
     public function apiLogout(Request $request)

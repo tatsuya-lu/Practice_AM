@@ -26,7 +26,7 @@ class AccountController extends Controller
         $this->prefectures = config('const.prefecture');
         $this->adminLevels = config('const.admin_level');
         $this->accountService = $accountService;
-        $this->inquiryService = $inquiryService; 
+        $this->inquiryService = $inquiryService;
         $this->notificationService = $notificationService;
     }
 
@@ -61,12 +61,27 @@ class AccountController extends Controller
     {
         $users = $this->accountService->accountList();
 
-        foreach ($users as $user) {
-            $user->prefecture = config('const.prefecture.' . $user->prefecture);
-            $user->admin_level = $user->admin_level == 1 ? '管理者' : ($user->admin_level == 2 ? '社員' : '');
-        }
+        // データを適切な形式に整形
+        $formattedUsers = $users->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'sub_name' => $user->sub_name,
+                'email' => $user->email,
+                'password' => $user->password,
+                'tel' => $user->tel,
+                'post_code' => $user->post_code,
+                'prefecture' => config('const.prefecture.' . $user->prefecture),
+                'city' => $user->city,
+                'street' => $user->street,
+                'comment' => $user->comment,
+                'admin_level' => $user->admin_level == 1 ? '管理者' : ($user->admin_level == 2 ? '社員' : ''),
 
-        return response()->json($users);
+                // 他の必要なフィールド
+            ];
+        });
+
+        return response()->json($formattedUsers);
     }
 
     public function apiUpdate(AccountRequest $request, Account $user)

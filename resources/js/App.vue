@@ -63,10 +63,9 @@ export default {
         const checkAuth = async () => {
             const token = localStorage.getItem('token')
             if (token) {
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
                 try {
-                    const response = await axios.get('/api/user', {
-                        headers: { Authorization: `Bearer ${token}` }
-                    })
+                    const response = await axios.get('/api/user')
                     user.value = response.data
                 } catch (error) {
                     console.error('Auth check failed', error)
