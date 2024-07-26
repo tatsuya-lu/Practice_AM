@@ -73,10 +73,10 @@
             </button>
           </td>
           <td>{{ user.name }}</td>
-          <td>{{ user.admin_level }}</td>
+          <td>{{ getAdminLevelLabel(user.admin_level) }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.tel }}</td>
-          <td>{{ user.prefecture }}</td>
+          <td>{{ getPrefectureLabel(user.prefecture) }}</td>
           <td>{{ user.city }}</td>
           <td>{{ user.street }}</td>
         </tr>
@@ -106,6 +106,8 @@ export default {
     const searchName = ref('')
     const searchAdminLevel = ref('')
     const searchEmail = ref('')
+    const adminLevels = ref({})
+    const prefectures = ref({})
 
     const fetchUsers = async () => {
       try {
@@ -128,6 +130,16 @@ export default {
       } catch (error) {
         console.error('Error fetching users:', error)
         users.value = []
+      }
+    }
+
+    const fetchFormData = async () => {
+      try {
+        const response = await axios.get('/api/form-data')
+        adminLevels.value = response.data.adminLevels
+        prefectures.value = response.data.prefectures
+      } catch (error) {
+        console.error('Error fetching form data:', error)
       }
     }
 
@@ -163,6 +175,14 @@ export default {
       }
     }
 
+    const getAdminLevelLabel = (level) => {
+      return adminLevels.value[level] || level
+    }
+
+    const getPrefectureLabel = (prefCode) => {
+      return prefectures.value[prefCode] || prefCode
+    }
+
     onMounted(async () => {
       const token = localStorage.getItem('token')
       if (!token) {
@@ -170,6 +190,7 @@ export default {
         return
       }
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      await fetchFormData()
       await fetchUsers()
     })
 
@@ -181,9 +202,13 @@ export default {
       searchName,
       searchAdminLevel,
       searchEmail,
+      adminLevels,
+      prefectures,
       sortUsers,
       searchUsers,
-      deleteUser
+      deleteUser,
+      getAdminLevelLabel,
+      getPrefectureLabel
     }
   }
 }
