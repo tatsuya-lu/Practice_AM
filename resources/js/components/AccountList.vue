@@ -83,7 +83,7 @@
       </table>
     </div>
     <div v-else>
-      ユーザーが見つかりません。
+      読み込み中...
     </div>
     <div class="pagenation">
       <!-- ページネーションコンポーネントをここに追加 -->

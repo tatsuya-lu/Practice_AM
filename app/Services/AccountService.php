@@ -100,11 +100,11 @@ class AccountService
         $user->comment = $data['comment'] ?? '';
         $user->admin_level = intval($data['admin_level']);
 
-        if (isset($data['password'])) {
+        if (isset($data['password']) && !empty($data['password'])) {
             $user->password = bcrypt($data['password']);
         }
 
-        if (isset($data['profile_image'])) {
+        if (isset($data['profile_image']) && $data['profile_image'] instanceof \Illuminate\Http\UploadedFile) {
             $this->processProfileImage($data['profile_image'], $user);
         }
 

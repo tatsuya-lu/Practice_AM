@@ -149,7 +149,9 @@ export default {
             try {
                 const formData = new FormData()
                 for (const key in user.value) {
-                    formData.append(key, user.value[key])
+                    if (key !== 'profile_image' || (key === 'profile_image' && user.value[key] instanceof File)) {
+                        formData.append(key, user.value[key])
+                    }
                 }
 
                 let response
@@ -168,15 +170,16 @@ export default {
                     })
                 }
 
-                router.push({ name: 'account.list', query: { success: response.data.message } }).catch(err => {
-                    console.error('Navigation failed', err)
-                    window.location.href = '/account/list'
-                })
-            } catch (error) {
-                if (error.response && error.response.data && error.response.data.errors) {
-                    errors.value = error.response.data.errors
+                if (response.data.success) {
+                    router.push({ name: 'account.list', query: { success: response.data.message } })
                 } else {
-                    console.error('Error submitting form:', error)
+                    console.error('Operation failed:', response.data.message)
+                    errors.value = response.data.errors || {}
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error)
+                if (error.response && error.response.data) {
+                    errors.value = error.response.data.errors || {}
                 }
             }
         }

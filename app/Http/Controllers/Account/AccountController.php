@@ -67,10 +67,18 @@ class AccountController extends Controller
     public function apiUpdate(AccountRequest $request, Account $user)
     {
         $updatedUser = $this->accountService->update($user, $request->all());
-        return response()->json([
-            'message' => 'ユーザーが正常に更新されました。',
-            'user' => $updatedUser
-        ]);
+        if ($updatedUser) {
+            return response()->json([
+                'success' => true,
+                'message' => 'ユーザーが正常に更新されました。',
+                'user' => $updatedUser
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'ユーザーの更新に失敗しました。'
+            ], 400);
+        }
     }
 
     public function apiFormData()

@@ -31,7 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/account/register', [AccountController::class, 'apiRegister']);
     Route::get('/form-data', [AccountController::class, 'apiFormData']);
     Route::get('/account/{user}', [AccountController::class, 'apiShow']);
-    Route::post('/account/{user}', [AccountController::class, 'apiUpdate']);
+    Route::match(['post', 'put'], '/account/{user}', [AccountController::class, 'apiUpdate']);
     Route::delete('/account/{user}', [AccountController::class, 'apiDestroy']);
     // Route::get('/inquiries', [InquiryController::class, 'apiIndex']);
     // Route::get('/inquiries/{inquiry}', [InquiryController::class, 'apiShow']);
