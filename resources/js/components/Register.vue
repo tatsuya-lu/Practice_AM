@@ -105,7 +105,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import axios from 'axios'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -117,6 +117,7 @@ export default {
         const prefectures = ref({})
         const adminLevels = ref({})
         const errors = ref({})
+        const isEditing = ref(false)
 
         const fetchFormData = async () => {
             try {
@@ -133,6 +134,7 @@ export default {
                 try {
                     const response = await axios.get(`/api/account/${route.params.id}`)
                     user.value = response.data
+                    isEditing.value = true
                 } catch (error) {
                     console.error('Error fetching user data:', error)
                 }
@@ -151,7 +153,7 @@ export default {
                 }
 
                 let response
-                if (user.value.id) {
+                if (isEditing.value) {
                     response = await axios.post(`/api/account/${user.value.id}`, formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
@@ -166,7 +168,10 @@ export default {
                     })
                 }
 
-                router.push({ name: 'account.list', query: { success: response.data.message } })
+                router.push({ name: 'account.list', query: { success: response.data.message } }).catch(err => {
+                    console.error('Navigation failed', err)
+                    window.location.href = '/account/list'
+                })
             } catch (error) {
                 if (error.response && error.response.data && error.response.data.errors) {
                     errors.value = error.response.data.errors
@@ -181,11 +186,16 @@ export default {
             fetchUserData()
         })
 
+        watch(() => route.params.id, () => {
+            fetchUserData()
+        })
+
         return {
             user,
             prefectures,
             adminLevels,
             errors,
+            isEditing,
             submitForm,
             handleFileUpload
         }

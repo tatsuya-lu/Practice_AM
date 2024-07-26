@@ -14,8 +14,8 @@ axios.defaults.withCredentials = true
 const routes = [
     { path: '/login', component: Login },
     { path: '/dashboard', component: Dashboard },
-    { path: '/account/list', component: AccountList },
-    { path: '/account/register', component: Register },
+    { path: '/account/list', component: AccountList, name: 'account.list' },
+    { path: '/account/register', component: Register, name: 'account.register' },
     { path: '/account/:id/edit', component: Register, name: 'account.edit' },
     { path: '/inquiry/list', component: InquiryList },
     { path: '/inquiry/:id/edit', component: InquiryEdit, name: 'inquiry.edit' },

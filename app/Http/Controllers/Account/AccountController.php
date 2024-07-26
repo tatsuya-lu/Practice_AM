@@ -81,6 +81,11 @@ class AccountController extends Controller
         ]);
     }
 
+    public function apiShow(Account $user)
+    {
+        return response()->json($user);
+    }
+
     public function apiDestroy(Account $user)
     {
         $this->accountService->destroy($user);
