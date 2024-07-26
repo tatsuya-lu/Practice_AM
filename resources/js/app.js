@@ -16,7 +16,7 @@ const routes = [
     { path: '/dashboard', component: Dashboard },
     { path: '/account/list', component: AccountList },
     { path: '/account/register', component: Register },
-    { path: '/account/:id/edit', component: Register },
+    { path: '/account/:id/edit', component: Register, name: 'account.edit' },
     { path: '/inquiry/list', component: InquiryList },
     { path: '/inquiry/:id/edit', component: InquiryEdit, name: 'inquiry.edit' },
 ]

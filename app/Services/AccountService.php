@@ -52,6 +52,14 @@ class AccountService
 
         $users = $query->paginate(20);
 
+        return [
+            'data' => $users->items(),
+            'current_page' => $users->currentPage(),
+            'last_page' => $users->lastPage(),
+            'per_page' => $users->perPage(),
+            'total' => $users->total(),
+        ];
+
         return $users;
     }
 

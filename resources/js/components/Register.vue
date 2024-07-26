@@ -118,27 +118,6 @@ export default {
         const adminLevels = ref({})
         const errors = ref({})
 
-        const fetchUserData = async () => {
-            if (route.params.id) {
-                try {
-                    const response = await axios.get(`/account/${route.params.id}/edit`)
-                    user.value = response.data.user
-                    prefectures.value = response.data.prefectures
-                    adminLevels.value = response.data.adminLevels
-                } catch (error) {
-                    console.error('Error fetching user data:', error)
-                }
-            } else {
-                try {
-                    const response = await axios.get('/account/register')
-                    prefectures.value = response.data.prefectures
-                    adminLevels.value = response.data.adminLevels
-                } catch (error) {
-                    console.error('Error fetching form data:', error)
-                }
-            }
-        }
-
         const fetchFormData = async () => {
             try {
                 const response = await axios.get('/api/form-data')
@@ -146,6 +125,17 @@ export default {
                 adminLevels.value = response.data.adminLevels
             } catch (error) {
                 console.error('Error fetching form data:', error)
+            }
+        }
+
+        const fetchUserData = async () => {
+            if (route.params.id) {
+                try {
+                    const response = await axios.get(`/api/account/${route.params.id}`)
+                    user.value = response.data
+                } catch (error) {
+                    console.error('Error fetching user data:', error)
+                }
             }
         }
 
@@ -160,13 +150,23 @@ export default {
                     formData.append(key, user.value[key])
                 }
 
+                let response
                 if (user.value.id) {
-                    await axios.put(`/account/${user.value.id}`, formData)
-                    router.push({ name: 'account.list', query: { success: 'アカウントが更新されました' } })
+                    response = await axios.post(`/api/account/${user.value.id}`, formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                            'X-HTTP-Method-Override': 'PUT'
+                        }
+                    })
                 } else {
-                    await axios.post('/account/register', formData)
-                    router.push({ name: 'account.list', query: { success: 'アカウントが登録されました' } })
+                    response = await axios.post('/api/account/register', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    })
                 }
+
+                router.push({ name: 'account.list', query: { success: response.data.message } })
             } catch (error) {
                 if (error.response && error.response.data && error.response.data.errors) {
                     errors.value = error.response.data.errors
@@ -177,6 +177,7 @@ export default {
         }
 
         onMounted(() => {
+            fetchFormData()
             fetchUserData()
         })
 

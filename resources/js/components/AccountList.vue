@@ -48,7 +48,7 @@
       {{ successMessage }}
     </div>
 
-    <div class="table-container">
+    <div class="table-container" v-if="users.length > 0">
       <table>
         <tr>
           <th>編集</th>
@@ -61,26 +61,29 @@
           <th>市町村</th>
           <th>番地・アパート名</th>
         </tr>
-        <tr v-for="users in users" :key="users.id">
+        <tr v-for="user in users" :key="user.id">
           <td class="table-text-center">
-            <router-link :to="{ name: 'account.edit', params: { id: users.id } }">
+            <router-link :to="{ name: 'account.edit', params: { id: user.id } }">
               <span class="fa-solid fa-pen-to-square"></span>
             </router-link>
           </td>
           <td class="table-text-center">
-            <button @click="deleteUser(users.id)">
+            <button @click="deleteUser(user.id)">
               <span class="fa-solid fa-trash-can"></span>
             </button>
           </td>
-          <td>{{ users.name }}</td>
-          <td>{{ users.admin_level }}</td>
-          <td>{{ users.email }}</td>
-          <td>{{ users.tel }}</td>
-          <td>{{ users.prefecture }}</td>
-          <td>{{ users.city }}</td>
-          <td>{{ users.street }}</td>
+          <td>{{ user.name }}</td>
+          <td>{{ user.admin_level }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.tel }}</td>
+          <td>{{ user.prefecture }}</td>
+          <td>{{ user.city }}</td>
+          <td>{{ user.street }}</td>
         </tr>
       </table>
+    </div>
+    <div v-else>
+      ユーザーが見つかりません。
     </div>
     <div class="pagenation">
       <!-- ページネーションコンポーネントをここに追加 -->
@@ -113,28 +116,18 @@ export default {
             search_email: searchEmail.value
           }
         })
-        console.log('API response:', response.data); // レスポンスデータをログ出力
-        if (Array.isArray(response.data)) {
-          users.value = response.data.map(user => ({
-            ...user,
-            id: user.id.toString()
-          }))
-        } else if (response.data.data && Array.isArray(response.data.data)) {
-          users.value = response.data.data.map(user => ({
-            ...user,
-            id: user.id.toString()
-          }))
+        console.log('API response:', response.data)
+        if (response.data && Array.isArray(response.data.data)) {
+          users.value = response.data.data
+        } else if (Array.isArray(response.data)) {
+          users.value = response.data
         } else {
-          console.error('Unexpected data format:', response.data);
-          users.value = [];
+          console.error('Unexpected data format:', response.data)
+          users.value = []
         }
-        console.log('Fetched users:', users.value)
       } catch (error) {
         console.error('Error fetching users:', error)
-        if (error.response) {
-          console.error('Response data:', error.response.data)
-          console.error('Response status:', error.response.status)
-        }
+        users.value = []
       }
     }
 
@@ -148,7 +141,7 @@ export default {
             search_email: searchEmail.value
           }
         })
-        users.value = response.data
+        users.value = response.data.data || response.data
       } catch (error) {
         console.error('Error sorting users:', error)
       }

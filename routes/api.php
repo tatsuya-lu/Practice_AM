@@ -29,9 +29,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard', [AccountController::class, 'apiDashboard']);
     Route::get('/account/list', [AccountController::class, 'apiAccountList']);
     Route::post('/account/register', [AccountController::class, 'apiRegister']);
-    Route::put('/account/{user}', [AccountController::class, 'apiUpdate']);
+    Route::get('/form-data', [AccountController::class, 'apiFormData']);
+    Route::get('/account/{user}', [AccountController::class, 'apiShow']);
+    Route::post('/account/{user}', [AccountController::class, 'apiUpdate']);
     Route::delete('/account/{user}', [AccountController::class, 'apiDestroy']);
-    Route::get('/inquiries', [InquiryController::class, 'apiIndex']);
-    Route::get('/inquiries/{inquiry}', [InquiryController::class, 'apiShow']);
-    Route::put('/inquiries/{inquiry}', [InquiryController::class, 'apiUpdate']);
+    // Route::get('/inquiries', [InquiryController::class, 'apiIndex']);
+    // Route::get('/inquiries/{inquiry}', [InquiryController::class, 'apiShow']);
+    // Route::put('/inquiries/{inquiry}', [InquiryController::class, 'apiUpdate']);
 });

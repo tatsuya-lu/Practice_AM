@@ -61,33 +61,24 @@ class AccountController extends Controller
     {
         $users = $this->accountService->accountList();
 
-        // データを適切な形式に整形
-        $formattedUsers = $users->map(function ($user) {
-            return [
-                'id' => $user->id,
-                'name' => $user->name,
-                'sub_name' => $user->sub_name,
-                'email' => $user->email,
-                'password' => $user->password,
-                'tel' => $user->tel,
-                'post_code' => $user->post_code,
-                'prefecture' => config('const.prefecture.' . $user->prefecture),
-                'city' => $user->city,
-                'street' => $user->street,
-                'comment' => $user->comment,
-                'admin_level' => $user->admin_level == 1 ? '管理者' : ($user->admin_level == 2 ? '社員' : ''),
-
-                // 他の必要なフィールド
-            ];
-        });
-
-        return response()->json($formattedUsers);
+        return response()->json($users);
     }
 
     public function apiUpdate(AccountRequest $request, Account $user)
     {
         $updatedUser = $this->accountService->update($user, $request->all());
-        return response()->json(['message' => 'ユーザーが正常に更新されました。', 'user' => $updatedUser]);
+        return response()->json([
+            'message' => 'ユーザーが正常に更新されました。',
+            'user' => $updatedUser
+        ]);
+    }
+
+    public function apiFormData()
+    {
+        return response()->json([
+            'prefectures' => config('const.prefecture'),
+            'adminLevels' => config('const.admin_level')
+        ]);
     }
 
     public function apiDestroy(Account $user)
