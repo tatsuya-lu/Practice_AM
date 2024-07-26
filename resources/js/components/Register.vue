@@ -170,8 +170,20 @@ export default {
                     })
                 }
 
-                if (response.data.success) {
-                    router.push({ name: 'account.list', query: { success: response.data.message } })
+                console.log('Response:', response.data) // レスポンスをログに出力
+
+                if (response.data.user) { // success フラグの代わりに user オブジェクトの存在をチェック
+                    // リダイレクト処理を統一
+                    router.push({
+                        name: 'account.list',
+                        query: {
+                            success: response.data.message,
+                            registered_email: isEditing.value ? null : response.data.user.email
+                        }
+                    }).catch(err => {
+                        console.error('Navigation failed', err)
+                        window.location.href = '/account/list'
+                    })
                 } else {
                     console.error('Operation failed:', response.data.message)
                     errors.value = response.data.errors || {}

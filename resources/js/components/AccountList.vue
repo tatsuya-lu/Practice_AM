@@ -93,16 +93,16 @@
 
 <script>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
 
 export default {
   setup() {
     const router = useRouter()
+    const route = useRoute()
     const users = ref([])
-    const registeredMessage = ref('')
-    const registeredEmail = ref('')
     const successMessage = ref('')
+    const registeredEmail = ref('')
     const searchName = ref('')
     const searchAdminLevel = ref('')
     const searchEmail = ref('')
@@ -190,15 +190,22 @@ export default {
         return
       }
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+
+      // URLクエリパラメータからメッセージを取得
+      successMessage.value = route.query.success || ''
+      registeredEmail.value = route.query.registered_email || ''
+
+      // クエリパラメータをクリア
+      router.replace({ query: {} })
+
       await fetchFormData()
       await fetchUsers()
     })
 
     return {
       users,
-      registeredMessage,
-      registeredEmail,
       successMessage,
+      registeredEmail,
       searchName,
       searchAdminLevel,
       searchEmail,
