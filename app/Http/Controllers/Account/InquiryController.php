@@ -19,9 +19,9 @@ class InquiryController extends Controller
         $this->inquiryService = $inquiryService;
     }
 
-    public function apiIndex()
+    public function apiIndex(Request $request)
     {
-        $inquiries = $this->inquiryService->index();
+        $inquiries = $this->inquiryService->index($request);
 
         foreach ($inquiries as $inquiry) {
             $inquiry->status = config('const.status')[$inquiry->status] ?? $inquiry->status;
@@ -30,19 +30,19 @@ class InquiryController extends Controller
         return response()->json(['inquiries' => $inquiries]);
     }
 
-    // public function apiShow(Post $inquiry)
-    // {
-    //     $statusOptions = Config::get('const.status');
-    //     $inquiryStatus = $statusOptions[$inquiry->status] ?? $inquiry->status;
-    //     $inquiry->gender = config('const.gender.' . $inquiry->gender);
-    //     $inquiry->profession = config('const.profession.' . $inquiry->profession);
+    public function apiShow(Post $inquiry)
+    {
+        $statusOptions = Config::get('const.status');
+        $inquiryStatus = $statusOptions[$inquiry->status] ?? $inquiry->status;
+        $inquiry->gender = config('const.gender.' . $inquiry->gender);
+        $inquiry->profession = config('const.profession.' . $inquiry->profession);
 
-    //     return response()->json([
-    //         'inquiry' => $inquiry,
-    //         'statusOptions' => $statusOptions,
-    //         'inquiryStatus' => $inquiryStatus
-    //     ]);
-    // }
+        return response()->json([
+            'inquiry' => $inquiry,
+            'statusOptions' => $statusOptions,
+            'inquiryStatus' => $inquiryStatus
+        ]);
+    }
 
     public function apiUpdate(InquiryRequest $request, Post $inquiry)
     {

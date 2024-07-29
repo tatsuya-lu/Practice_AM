@@ -104,7 +104,8 @@ export default {
             try {
                 const response = await axios.put(`/api/inquiries/${route.params.id}`, inquiry.value);
                 successMessage.value = response.data.message;
-                router.push({ name: 'inquiry.list', query: { success: 'お問い合わせが更新されました' } });
+                // リダイレクト先を変更
+                router.push({ path: '/inquiry/list', query: { success: 'お問い合わせが更新されました' } });
             } catch (error) {
                 console.error('Error updating inquiry:', error);
             }

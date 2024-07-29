@@ -91,7 +91,7 @@ export default {
                         search_tel: searchTel.value
                     }
                 });
-                inquiries.value = response.data.inquiries;
+                inquiries.value = response.data.inquiries.data; // ページネーション対応
             } catch (error) {
                 console.error('Error fetching inquiries:', error);
             }
@@ -107,7 +107,7 @@ export default {
                         search_tel: searchTel.value
                     }
                 });
-                inquiries.value = response.data.inquiries;
+                inquiries.value = response.data.inquiries.data; // ページネーション対応
             } catch (error) {
                 console.error('Error sorting inquiries:', error);
             }
@@ -118,10 +118,10 @@ export default {
         };
 
         onMounted(() => {
-            fetchInquiries();
             if (route.query.success) {
                 successMessage.value = route.query.success;
             }
+            fetchInquiries();
         });
 
         return {

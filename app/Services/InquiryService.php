@@ -12,13 +12,13 @@ class InquiryService
     {
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $sort = $this->request->input('sort', 'newest');
+        $sort = $request->input('sort', 'newest');
 
         $query = Post::query();
 
-        if ($searchStatus = $this->request->input('search_status')) {
+        if ($searchStatus = $request->input('search_status')) {
             $statusValue = null;
 
             switch ($searchStatus) {
@@ -43,11 +43,11 @@ class InquiryService
             }
         }
 
-        if ($searchCompany = $this->request->input('search_company')) {
+        if ($searchCompany = $request->input('search_company')) {
             $query->where('company', 'LIKE', "%{$searchCompany}%");
         }
 
-        if ($searchTel = $this->request->input('search_tel')) {
+        if ($searchTel = $request->input('search_tel')) {
             $query->where('tel', 'LIKE', "%{$searchTel}%");
         }
 
@@ -76,6 +76,6 @@ class InquiryService
     {
         return Post::where('status', 'default')
             ->orderBy('created_at', 'desc')
-            ->paginate(5, ['*'], 'page');
+            ->paginate(5);
     }
 }

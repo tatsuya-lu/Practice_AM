@@ -33,7 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/account/{user}', [AccountController::class, 'apiShow']);
     Route::match(['post', 'put'], '/account/{user}', [AccountController::class, 'apiUpdate']);
     Route::delete('/account/{user}', [AccountController::class, 'apiDestroy']);
-    // Route::get('/inquiries', [InquiryController::class, 'apiIndex']);
-    // Route::get('/inquiries/{inquiry}', [InquiryController::class, 'apiShow']);
-    // Route::put('/inquiries/{inquiry}', [InquiryController::class, 'apiUpdate']);
+    Route::get('/inquiries', [InquiryController::class, 'apiIndex']);
+    Route::get('/inquiries/{inquiry}', [InquiryController::class, 'apiShow']);
+    Route::put('/inquiries/{inquiry}', [InquiryController::class, 'apiUpdate']);
 });
