@@ -27,6 +27,9 @@ Route::post('/login', [LoginController::class, 'apiLogin']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [LoginController::class, 'apiLogout']);
     Route::get('/dashboard', [AccountController::class, 'apiDashboard']);
+    Route::get('/dashboard/notifications', [NotificationController::class, 'apiDashboardNotifications']);
+    Route::get('/notifications/{notification}', [NotificationController::class, 'show']);
+    Route::post('/notifications', [NotificationController::class, 'store']);
     Route::get('/account/list', [AccountController::class, 'apiAccountList']);
     Route::post('/account/register', [AccountController::class, 'apiRegister']);
     Route::get('/form-data', [AccountController::class, 'apiFormData']);

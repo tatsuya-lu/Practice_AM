@@ -19,6 +19,27 @@ class NotificationController extends Controller
         $this->notificationService = $notificationService;
     }
 
+    public function apiList(Request $request)
+    {
+        $notifications = Notification::orderBy('created_at', 'desc')
+            ->paginate(5);
+
+        return response()->json([
+            'notifications' => $notifications
+        ]);
+    }
+
+    public function apiDashboardNotifications(Request $request)
+    {
+        $user = $request->user();
+        $notificationData = $this->notificationService->getNotificationsForDashboard();
+
+        return response()->json([
+            'notifications' => $notificationData['notifications'],
+            'readNotificationIds' => $notificationData['readNotificationIds']
+        ]);
+    }
+
     public function show(Request $request, Notification $notification)
     {
         $notificationData = $this->notificationService->show($notification);

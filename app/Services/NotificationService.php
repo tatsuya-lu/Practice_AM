@@ -29,9 +29,9 @@ class NotificationService
         $user = Auth::user();
 
         if (!$user) {
-            return null; 
+            return null;
         }
-        
+
         $this->markNotificationAsRead($user, $notification);
         return $notification;
     }

@@ -82,11 +82,23 @@ export default {
 
         const fetchDashboardData = async () => {
             try {
-                const response = await axios.get('/api/dashboard', {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                });
-                notifications.value = response.data.notificationData.notifications.data;
-                notificationReadStatuses.value = response.data.notificationData.readNotificationIds;
+                const [dashboardResponse, notificationsResponse] = await Promise.all([
+                    axios.get('/api/dashboard', {
+                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                    }),
+                    axios.get('/api/dashboard/notifications', {
+                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                    })
+                ]);
+
+                unresolvedInquiryCount.value = dashboardResponse.data.unresolvedInquiryCount;
+                unresolvedInquiries.value = dashboardResponse.data.unresolvedInquiries;
+
+                notifications.value = notificationsResponse.data.notifications.data;
+                notificationReadStatuses.value = notificationsResponse.data.readNotificationIds.reduce((acc, id) => {
+                    acc[id] = true;
+                    return acc;
+                }, {});
             } catch (error) {
                 console.error('Error fetching dashboard data:', error);
             }

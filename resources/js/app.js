@@ -3,6 +3,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import App from './App.vue'
 import Login from './components/Login.vue'
 import Dashboard from './components/Dashboard.vue'
+import NotificationShow from './components/NotificationShow.vue';
+import NotificationRegister from './components/NotificationRegister.vue';
 import AccountList from './components/AccountList.vue'
 import Register from './components/Register.vue'
 import InquiryList from './components/InquiryList.vue'
@@ -14,6 +16,8 @@ axios.defaults.withCredentials = true
 const routes = [
     { path: '/login', component: Login },
     { path: '/dashboard', component: Dashboard },
+    { path: '/notifications/:id', component: NotificationShow, name: 'notification.show' },
+    { path: '/notifications/create', component: NotificationRegister, name: 'notification.create' },
     { path: '/account/list', component: AccountList, name: 'account.list' },
     { path: '/account/register', component: Register, name: 'account.register' },
     { path: '/account/:id/edit', component: Register, name: 'account.edit' },
