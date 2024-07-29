@@ -27,7 +27,13 @@ class InquiryController extends Controller
             $inquiry->status = config('const.status')[$inquiry->status] ?? $inquiry->status;
         }
 
-        return response()->json(['inquiries' => $inquiries]);
+        // ダッシュボード用のデータを追加
+        $unresolvedInquiryCount = $this->inquiryService->unresolvedInquiryCount();
+
+        return response()->json([
+            'inquiries' => $inquiries,
+            'unresolvedInquiryCount' => $unresolvedInquiryCount
+        ]);
     }
 
     public function apiShow(Post $inquiry)

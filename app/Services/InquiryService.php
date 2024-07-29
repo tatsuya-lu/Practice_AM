@@ -15,10 +15,14 @@ class InquiryService
     public function index(Request $request)
     {
         $sort = $request->input('sort', 'newest');
+        $limit = $request->input('limit', 20);
+        $isDashboard = $request->input('dashboard', false);
 
         $query = Post::query();
 
-        if ($searchStatus = $request->input('search_status')) {
+        if ($isDashboard) {
+            $query->where('status', 'default');
+        } elseif ($searchStatus = $request->input('search_status')) {
             $statusValue = null;
 
             switch ($searchStatus) {
@@ -63,7 +67,7 @@ class InquiryService
                 break;
         }
 
-        $inquiries = $query->paginate(20);
+        $inquiries = $query->paginate($limit);
         return $inquiries;
     }
 

@@ -87,8 +87,6 @@ export default {
                 });
                 notifications.value = response.data.notificationData.notifications.data;
                 notificationReadStatuses.value = response.data.notificationData.readNotificationIds;
-                unresolvedInquiryCount.value = response.data.unresolvedInquiryCount;
-                unresolvedInquiries.value = response.data.unresolvedInquiries.data;
             } catch (error) {
                 console.error('Error fetching dashboard data:', error);
             }
@@ -108,6 +106,22 @@ export default {
             }
         };
 
+        const fetchUnresolvedInquiries = async () => {
+            try {
+                const response = await axios.get('/api/inquiries', {
+                    params: {
+                        dashboard: true,
+                        limit: 5
+                    },
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+                unresolvedInquiryCount.value = response.data.unresolvedInquiryCount;
+                unresolvedInquiries.value = response.data.inquiries.data;
+            } catch (error) {
+                console.error('Error fetching unresolved inquiries:', error);
+            }
+        };
+
         const updateNotificationStatus = (notificationId) => {
             notificationReadStatuses.value[notificationId] = true;
         };
@@ -122,6 +136,7 @@ export default {
 
         const formatDate = (dateString) => {
             return new Date(dateString).toLocaleDateString('ja-JP', {
+                year: 'numeric',
                 month: 'long',
                 day: 'numeric'
             });
@@ -130,6 +145,7 @@ export default {
         onMounted(async () => {
             await fetchDashboardData();
             await fetchNotificationReadStatuses();
+            await fetchUnresolvedInquiries();
         });
 
         return {
