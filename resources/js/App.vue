@@ -16,13 +16,29 @@
             </div>
 
             <div class="header-content-right">
-                <div class="notification-aria">
-                    <!-- 通知コンポーネントをここに配置 -->
+                <div class="notification-area">
+                    <div class="notification-bell" @mouseover="showNotifications = true"
+                        @mouseleave="showNotifications = false">
+                        <i class="far fa-bell"></i>
+                        <span v-if="unreadNotificationsCount > 0" class="notification-count">{{ unreadNotificationsCount
+                            }}</span>
+                    </div>
+                    <div v-if="showNotifications" class="notification-dropdown">
+                        <ul v-if="notifications.length > 0">
+                            <li v-for="notification in notifications" :key="notification.id"
+                                @click="markAsRead(notification)">
+                                <router-link :to="{ name: 'notification.show', params: { id: notification.id } }">
+                                    {{ notification.title }}
+                                </router-link>
+                            </li>
+                        </ul>
+                        <p v-else>新しいお知らせはありません</p>
+                    </div>
                 </div>
                 <ul class="user-control-aria">
                     <li class="logged-in-user-text">
                         ログイン中： {{ user.name }}
-                        <img :src="user.profile_image" :alt="user.name + 'のプロフィール画像'">
+                        <img :src="userProfileImage" :alt="user.name + 'のプロフィール画像'" class="user-profile-image">
                     </li>
                     <li><button @click="logout" class="logout-btn">ログアウト</button></li>
                 </ul>
@@ -46,6 +62,13 @@ export default {
         const user = ref(null)
 
         const isLoggedIn = computed(() => !!user.value)
+
+        const userProfileImage = computed(() => {
+            if (user.value && user.value.profile_image) {
+                return `/img/profile/${user.value.profile_image}`
+            }
+            return '/img/noimage.png' // デフォルトのプロフィール画像
+        })
 
         const logout = async () => {
             try {
@@ -82,6 +105,7 @@ export default {
         return {
             user,
             isLoggedIn,
+            userProfileImage,
             logout
         }
     }
