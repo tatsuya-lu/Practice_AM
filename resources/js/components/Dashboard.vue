@@ -56,7 +56,7 @@
                                 class="fa-solid fa-circle-plus"></span>新規アカウント登録</button></router-link>
                     <router-link to="/account/list"><button><span
                                 class="fa-solid fa-envelopes-bulk"></span>アカウント一覧</button></router-link>
-                    <router-link to="/notification/create"><button><span
+                    <router-link to="/notifications/create"><button><span
                                 class="fa-solid fa-circle-plus"></span>新規お知らせの作成</button></router-link>
                     <router-link to="/inquiry/list"><button><span
                                 class="fa-solid fa-envelopes-bulk"></span>お問い合わせ一覧</button></router-link>

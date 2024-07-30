@@ -30,6 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard/notifications', [NotificationController::class, 'apiDashboardNotifications']);
     Route::get('/notifications/{notification}', [NotificationController::class, 'show']);
     Route::post('/notifications', [NotificationController::class, 'store']);
+    Route::get('/notifications/read-status', [NotificationController::class, 'apiReadStatus']);
     Route::get('/account/list', [AccountController::class, 'apiAccountList']);
     Route::post('/account/register', [AccountController::class, 'apiRegister']);
     Route::get('/form-data', [AccountController::class, 'apiFormData']);

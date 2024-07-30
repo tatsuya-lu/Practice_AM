@@ -1,0 +1,65 @@
+<template>
+    <div>
+        <p class="page-title">新規お知らせ登録</p>
+
+        <form @submit.prevent="submitForm">
+            <div class="form-item">
+                <label for="title"><span class="required">必須</span>タイトル</label>
+                <input class="form-item-input" id="title" type="text" v-model="title">
+                <p v-if="errors.title" class="error-message">{{ errors.title[0] }}</p>
+            </div>
+
+            <div class="form-item">
+                <label for="description"><span class="required">必須</span>内容</label>
+                <textarea class="form-item-input" id="description" v-model="description"></textarea>
+                <p v-if="errors.description" class="error-message">{{ errors.description[0] }}</p>
+            </div>
+
+            <div>
+                <button class="form-btn" type="submit">作成</button>
+            </div>
+        </form>
+    </div>
+</template>
+
+<script>
+import { ref } from 'vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
+
+export default {
+    setup() {
+        const router = useRouter();
+        const title = ref('');
+        const description = ref('');
+        const errors = ref({});
+
+        const submitForm = async () => {
+            try {
+                const response = await axios.post('/api/notifications', {
+                    title: title.value,
+                    description: description.value
+                }, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (response.data.success) {
+                    router.push('/dashboard');
+                }
+            } catch (error) {
+                if (error.response && error.response.data && error.response.data.errors) {
+                    errors.value = error.response.data.errors;
+                } else {
+                    console.error('Error creating notification:', error);
+                }
+            }
+        };
+
+        return {
+            title,
+            description,
+            errors,
+            submitForm
+        };
+    }
+}
+</script>

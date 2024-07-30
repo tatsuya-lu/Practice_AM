@@ -45,11 +45,11 @@ class NotificationController extends Controller
         $notificationData = $this->notificationService->show($notification);
 
         if ($notificationData === null) {
-            abort(403, '権限がないためこの操作を実行できません。');
+            return response()->json(['error' => '権限がないためこの操作を実行できません。'], 403);
         }
 
-        if ($request->ajax()) {
-            return response()->json(['success' => true]);
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json($notificationData);
         }
 
         return view('admin.Notification', compact('notification'));
@@ -97,6 +97,24 @@ class NotificationController extends Controller
             $request->description
         );
 
-        return redirect()->route('dashboard')->with('success', '新しくお知らせが作成されました。');
+        return response()->json([
+            'success' => true,
+            'message' => '新しくお知らせが作成されました。',
+            'notification' => $notification
+        ], 201);
+    }
+
+    public function apiReadStatus(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json([], 403);
+        }
+
+        $readNotifications = NotificationRead::where('user_id', $user->id)
+            ->where('read', true)
+            ->pluck('notification_id');
+
+        return response()->json($readNotifications);
     }
 }

@@ -33,7 +33,13 @@ class NotificationService
         }
 
         $this->markNotificationAsRead($user, $notification);
-        return $notification;
+        return [
+            'id' => $notification->id,
+            'title' => $notification->title,
+            'description' => $notification->description,
+            'created_at' => $notification->created_at->toDateTimeString(),
+            'updated_at' => $notification->updated_at->toDateTimeString(),
+        ];
     }
 
     private function markNotificationAsRead($user, $notification)
