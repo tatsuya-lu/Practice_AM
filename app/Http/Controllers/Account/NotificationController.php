@@ -117,4 +117,34 @@ class NotificationController extends Controller
 
         return response()->json($readNotifications);
     }
+
+    public function apiUnreadNotifications(Request $request)
+    {
+        $user = $request->user();
+        $notifications = Notification::whereDoesntHave('reads', function ($query) use ($user) {
+            $query->where('user_id', $user->id)->where('read', true);
+        })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'notifications' => $notifications
+        ]);
+    }
+
+    public function markAsRead(Request $request, Notification $notification)
+    {
+        $user = $request->user();
+        $notificationRead = NotificationRead::firstOrCreate(
+            ['user_id' => $user->id, 'notification_id' => $notification->id],
+            ['read' => true]
+        );
+
+        if (!$notificationRead->read) {
+            $notificationRead->read = true;
+            $notificationRead->save();
+        }
+
+        return response()->json(['success' => true]);
+    }
 }

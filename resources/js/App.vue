@@ -16,19 +16,20 @@
             </div>
 
             <div class="header-content-right">
-                <div class="notification-area">
-                    <div class="notification-bell" @mouseover="showNotifications = true"
-                        @mouseleave="showNotifications = false">
+                <div class="notification-aria" @mouseenter="showNotifications" @mouseleave="hideNotifications">
+                    <div class="notification-bell">
                         <i class="far fa-bell"></i>
-                        <span v-if="unreadNotificationsCount > 0" class="notification-count">{{ unreadNotificationsCount
-                            }}</span>
+                        <span v-if="unreadNotifications.length > 0" class="notification-count-badge">
+                            {{ unreadNotifications.length }}
+                        </span>
                     </div>
-                    <div v-if="showNotifications" class="notification-dropdown">
-                        <ul v-if="notifications.length > 0">
-                            <li v-for="notification in notifications" :key="notification.id"
+                    <div v-if="isNotificationVisible" class="notification-list">
+                        <ul v-if="unreadNotifications.length > 0">
+                            <li v-for="notification in unreadNotifications" :key="notification.id"
                                 @click="markAsRead(notification)">
                                 <router-link :to="{ name: 'notification.show', params: { id: notification.id } }">
                                     {{ notification.title }}
+                                    <span class="notification-date">{{ formatDate(notification.created_at) }}</span>
                                 </router-link>
                             </li>
                         </ul>
@@ -52,7 +53,7 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 
@@ -60,6 +61,9 @@ export default {
     setup() {
         const router = useRouter()
         const user = ref(null)
+        const unreadNotifications = ref([])
+        const isNotificationVisible = ref(false)
+        let hideTimeout = null
 
         const isLoggedIn = computed(() => !!user.value)
 
@@ -67,7 +71,7 @@ export default {
             if (user.value && user.value.profile_image) {
                 return `/img/profile/${user.value.profile_image}`
             }
-            return '/img/noimage.png' // デフォルトのプロフィール画像
+            return '/img/noimage.png'
         })
 
         const logout = async () => {
@@ -100,13 +104,68 @@ export default {
             }
         }
 
-        checkAuth()
+        const fetchUnreadNotifications = async () => {
+            try {
+                const response = await axios.get('/api/notifications', {
+                    params: { unread: true },
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                })
+                unreadNotifications.value = response.data.notifications
+            } catch (error) {
+                console.error('Error fetching unread notifications:', error)
+            }
+        }
+
+        const markAsRead = async (notification) => {
+            try {
+                await axios.post(`/api/notifications/${notification.id}/read`, {}, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                })
+                unreadNotifications.value = unreadNotifications.value.filter(n => n.id !== notification.id)
+            } catch (error) {
+                console.error('Error marking notification as read:', error)
+            }
+        }
+
+        const showNotifications = () => {
+            clearTimeout(hideTimeout)
+            isNotificationVisible.value = true
+        }
+
+        const hideNotifications = () => {
+            hideTimeout = setTimeout(() => {
+                isNotificationVisible.value = false
+            }, 300)
+        }
+
+        const formatDate = (dateString) => {
+            return new Date(dateString).toLocaleDateString('ja-JP', {
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric'
+            })
+        }
+
+        onMounted(() => {
+            checkAuth()
+            fetchUnreadNotifications()
+        })
+
+        onUnmounted(() => {
+            clearTimeout(hideTimeout)
+        })
 
         return {
             user,
             isLoggedIn,
             userProfileImage,
-            logout
+            logout,
+            unreadNotifications,
+            isNotificationVisible,
+            showNotifications,
+            hideNotifications,
+            markAsRead,
+            formatDate
         }
     }
 }
