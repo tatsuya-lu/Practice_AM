@@ -213,27 +213,20 @@ header {
 /*--ここまでナビゲーションメニュー--*/
 
 /*--ここからお知らせ機能--*/
-
 .notification-aria {
     position: relative;
     margin: 0px 30px 0px 0px;
 }
 
-.notification-aria li {
-    list-style: none;
-    font-size: 18px;
-    padding: 5px;
-    border-bottom: 1px solid #666363;
-}
-
 .notification-aria .fa-bell {
     font-size: 1.5em;
+    cursor: pointer;
 }
 
 .notification-count-badge {
     position: absolute;
-    top: 8px;
-    left: 17px;
+    top: -8px;
+    right: -8px;
     background-color: #ff0000;
     color: #fff;
     border-radius: 50%;
@@ -243,7 +236,6 @@ header {
 
 .notification-list {
     position: absolute;
-    top: calc(50% + 10px);
     top: 40px;
     right: -20px;
     z-index: 999;
@@ -252,20 +244,42 @@ header {
     border-radius: 15px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     padding: 10px 15px;
-    width: 500px;
+    min-width: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.notification-list ul {
+    padding: 0;
+    margin: 0;
 }
 
 .notification-list li {
-    margin: 5px 0;
+    list-style: none;
+    font-size: 14px;
+    padding: 10px 5px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.notification-list li:last-child {
+    border-bottom: none;
 }
 
 .notification-list li:hover {
-    background-color: #e5e7eb;
+    background-color: #f3f4f6;
     cursor: pointer;
+}
+
+.notification-list a {
+    text-decoration: none;
+    color: #333;
+    display: block;
 }
 
 .notification-date {
     float: right;
+    font-size: 12px;
+    color: #666;
 }
 
 /*--ここまでお知らせ機能--*/
@@ -308,7 +322,7 @@ header {
 
 .notification-list-aria {
     padding: 0 50px 0 10px;
-    margin:10px 0px 10px 20px;
+    margin: 10px 0px 10px 20px;
     border-right: 1px solid #666363;
 }
 
@@ -360,7 +374,7 @@ header {
 
 .unresolved-inquiry-list-aria {
     padding: 0 20px 0 50px;
-    margin:10px;
+    margin: 10px;
 }
 
 .unresolved-inquiry-list-aria .sub-title {
