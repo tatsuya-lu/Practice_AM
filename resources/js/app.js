@@ -14,8 +14,18 @@ axios.defaults.baseURL = 'http://localhost:8000'
 axios.defaults.withCredentials = true
 
 const routes = [
+    { 
+        path: '/', 
+        redirect: to => {
+            return { path: '/dashboard' }
+        }
+    },
     { path: '/login', component: Login },
-    { path: '/dashboard', component: Dashboard },
+    { 
+        path: '/dashboard', 
+        component: Dashboard,
+        meta: { requiresAuth: true }
+    },
     { path: '/notifications/:id', component: NotificationShow, name: 'notification.show' },
     { path: '/notifications/create', component: NotificationRegister, name: 'notification.create' },
     { path: '/account/list', component: AccountList, name: 'account.list' },
@@ -29,6 +39,23 @@ const router = createRouter({
     history: createWebHistory(),
     routes
 })
+
+router.beforeEach((to, from, next) => {
+    const isLoggedIn = !!localStorage.getItem('token') // または他の認証チェック方法
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+        if (!isLoggedIn) {
+            next('/login')
+        } else {
+            next()
+        }
+    } else if (to.path === '/login' && isLoggedIn) {
+        next('/dashboard')
+    } else {
+        next()
+    }
+})
+
+export default router
 
 const app = createApp(App)
 app.use(router)

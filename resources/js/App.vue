@@ -94,12 +94,17 @@ export default {
                 try {
                     const response = await axios.get('/api/user')
                     user.value = response.data
+                    if (router.currentRoute.value.path === '/login') {
+                        router.push('/dashboard')
+                    }
                 } catch (error) {
                     console.error('Auth check failed', error)
                     localStorage.removeItem('token')
-                    router.push('/login')
+                    if (router.currentRoute.value.meta.requiresAuth) {
+                        router.push('/login')
+                    }
                 }
-            } else {
+            } else if (router.currentRoute.value.meta.requiresAuth) {
                 router.push('/login')
             }
         }
