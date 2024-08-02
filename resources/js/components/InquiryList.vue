@@ -69,48 +69,37 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { useInquiryStore } from '../store/inquiry';
+import axios from 'axios';
 
 export default {
     setup() {
         const route = useRoute();
-        const inquiries = ref([]);
+        const inquiryStore = useInquiryStore();
         const successMessage = ref('');
         const searchStatus = ref('');
         const searchCompany = ref('');
         const searchTel = ref('');
 
+        const inquiries = computed(() => inquiryStore.getInquiries);
+
         const fetchInquiries = async () => {
-            try {
-                const response = await axios.get('/api/inquiries', {
-                    params: {
-                        search_status: searchStatus.value,
-                        search_company: searchCompany.value,
-                        search_tel: searchTel.value
-                    }
-                });
-                inquiries.value = response.data.inquiries.data; // ページネーション対応
-            } catch (error) {
-                console.error('Error fetching inquiries:', error);
-            }
+            await inquiryStore.fetchInquiries({
+                search_status: searchStatus.value,
+                search_company: searchCompany.value,
+                search_tel: searchTel.value
+            });
         };
 
         const sortInquiries = async (sortType) => {
-            try {
-                const response = await axios.get('/api/inquiries', {
-                    params: {
-                        sort: sortType,
-                        search_status: searchStatus.value,
-                        search_company: searchCompany.value,
-                        search_tel: searchTel.value
-                    }
-                });
-                inquiries.value = response.data.inquiries.data; // ページネーション対応
-            } catch (error) {
-                console.error('Error sorting inquiries:', error);
-            }
+            await inquiryStore.fetchInquiries({
+                sort: sortType,
+                search_status: searchStatus.value,
+                search_company: searchCompany.value,
+                search_tel: searchTel.value
+            });
         };
 
         const searchInquiries = () => {
@@ -121,7 +110,9 @@ export default {
             if (route.query.success) {
                 successMessage.value = route.query.success;
             }
-            fetchInquiries();
+            if (!inquiryStore.isLoaded) {
+                fetchInquiries();
+            }
         });
 
         return {
