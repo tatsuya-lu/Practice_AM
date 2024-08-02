@@ -1,10 +1,12 @@
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import { createRouter, createWebHistory } from 'vue-router'
+import { useUserStore } from './store/user'
 import App from './App.vue'
 import Login from './components/Login.vue'
 import Dashboard from './components/Dashboard.vue'
-import NotificationShow from './components/NotificationShow.vue';
-import NotificationRegister from './components/NotificationRegister.vue';
+import NotificationShow from './components/NotificationShow.vue'
+import NotificationRegister from './components/NotificationRegister.vue'
 import AccountList from './components/AccountList.vue'
 import Register from './components/Register.vue'
 import InquiryList from './components/InquiryList.vue'
@@ -40,8 +42,18 @@ const router = createRouter({
     routes
 })
 
-router.beforeEach((to, from, next) => {
-    const isLoggedIn = !!localStorage.getItem('token') // または他の認証チェック方法
+const pinia = createPinia() // Piniaインスタンスを作成
+
+router.beforeEach(async (to, from, next) => {
+    const isLoggedIn = !!localStorage.getItem('token')
+    
+    if (isLoggedIn) {
+        const userStore = useUserStore(pinia) // ここでPiniaインスタンスを渡す
+        if (!userStore.isLoaded) {
+            await userStore.fetchUsers()
+        }
+    }
+
     if (to.matched.some(record => record.meta.requiresAuth)) {
         if (!isLoggedIn) {
             next('/login')
@@ -55,8 +67,9 @@ router.beforeEach((to, from, next) => {
     }
 })
 
-export default router
-
 const app = createApp(App)
+app.use(pinia) // Piniaをアプリケーションにインストール
 app.use(router)
 app.mount('#app')
+
+export default router

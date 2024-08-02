@@ -47,8 +47,10 @@
     <div v-if="successMessage" class="success">
       {{ successMessage }}
     </div>
-
-    <div class="table-container" v-if="users.length > 0">
+    <div v-if="isLoading">
+      読み込み中...
+    </div>
+    <div v-else-if="users.length > 0" class="table-container">
       <table>
         <tr>
           <th>編集</th>
@@ -83,7 +85,7 @@
       </table>
     </div>
     <div v-else>
-      読み込み中...
+      ユーザーが見つかりません。
     </div>
     <div class="pagenation">
       <!-- ページネーションコンポーネントをここに追加 -->
@@ -92,15 +94,16 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useUserStore } from '../store/user'
 import axios from 'axios'
 
 export default {
   setup() {
     const router = useRouter()
     const route = useRoute()
-    const users = ref([])
+    const userStore = useUserStore()
     const successMessage = ref('')
     const registeredEmail = ref('')
     const searchName = ref('')
@@ -109,29 +112,7 @@ export default {
     const adminLevels = ref({})
     const prefectures = ref({})
 
-    const fetchUsers = async () => {
-      try {
-        const response = await axios.get('/api/account/list', {
-          params: {
-            search_name: searchName.value,
-            search_admin_level: searchAdminLevel.value,
-            search_email: searchEmail.value
-          }
-        })
-        console.log('API response:', response.data)
-        if (response.data && Array.isArray(response.data.data)) {
-          users.value = response.data.data
-        } else if (Array.isArray(response.data)) {
-          users.value = response.data
-        } else {
-          console.error('Unexpected data format:', response.data)
-          users.value = []
-        }
-      } catch (error) {
-        console.error('Error fetching users:', error)
-        users.value = []
-      }
-    }
+    const users = computed(() => userStore.getUsers)
 
     const fetchFormData = async () => {
       try {
@@ -153,14 +134,25 @@ export default {
             search_email: searchEmail.value
           }
         })
-        users.value = response.data.data || response.data
+        userStore.setUsers(response.data.data || response.data)
       } catch (error) {
         console.error('Error sorting users:', error)
       }
     }
 
-    const searchUsers = () => {
-      fetchUsers()
+    const searchUsers = async () => {
+      try {
+        const response = await axios.get('/api/account/list', {
+          params: {
+            search_name: searchName.value,
+            search_admin_level: searchAdminLevel.value,
+            search_email: searchEmail.value
+          }
+        })
+        userStore.setUsers(response.data.data || response.data)
+      } catch (error) {
+        console.error('Error searching users:', error)
+      }
     }
 
     const deleteUser = async (userId) => {
@@ -168,7 +160,7 @@ export default {
         try {
           await axios.delete(`/api/account/${userId}`)
           successMessage.value = 'ユーザーが削除されました'
-          await fetchUsers()
+          await userStore.fetchUsers()
         } catch (error) {
           console.error('Error deleting user:', error)
         }
@@ -191,15 +183,11 @@ export default {
       }
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
 
-      // URLクエリパラメータからメッセージを取得
       successMessage.value = route.query.success || ''
       registeredEmail.value = route.query.registered_email || ''
-
-      // クエリパラメータをクリア
       router.replace({ query: {} })
 
       await fetchFormData()
-      await fetchUsers()
     })
 
     return {
