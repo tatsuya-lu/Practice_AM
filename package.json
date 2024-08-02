@@ -17,6 +17,7 @@
         "vite": "^5.0.0"
     },
     "dependencies": {
+        "pinia": "^2.2.0",
         "vue": "^3.4.16",
         "vue-router": "^4.4.0",
         "vuex": "^4.0.2"
