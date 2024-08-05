@@ -2,15 +2,24 @@
     <div id="app">
         <header v-if="isLoggedIn">
             <div class="header-content-left">
-                <img class="logo" src="/img/testlogo.png" alt="ロゴ画像">
+                <img class="logo" src="/img/testlogo.png" alt="ロゴ画像" />
                 <nav>
                     <ul>
-                        <li><router-link to="/dashboard"><button><span
-                                        class="fa-solid fa-house"></span>HOME</button></router-link></li>
-                        <li><router-link to="/account/list"><button><span
-                                        class="fa-solid fa-envelopes-bulk"></span>アカウント一覧</button></router-link></li>
-                        <li><router-link to="/inquiry/list"><button><span
-                                        class="fa-solid fa-envelopes-bulk"></span>お問い合わせ一覧</button></router-link></li>
+                        <li>
+                            <router-link to="/dashboard"><button>
+                                    <span class="fa-solid fa-house"></span>HOME
+                                </button></router-link>
+                        </li>
+                        <li>
+                            <router-link to="/account/list"><button>
+                                    <span class="fa-solid fa-envelopes-bulk"></span>アカウント一覧
+                                </button></router-link>
+                        </li>
+                        <li>
+                            <router-link to="/inquiry/list"><button>
+                                    <span class="fa-solid fa-envelopes-bulk"></span>お問い合わせ一覧
+                                </button></router-link>
+                        </li>
                     </ul>
                 </nav>
             </div>
@@ -27,9 +36,14 @@
                         <ul v-if="unreadNotifications.length > 0">
                             <li v-for="notification in unreadNotifications" :key="notification.id"
                                 @click="markAsRead(notification)">
-                                <router-link :to="{ name: 'notification.show', params: { id: notification.id } }">
+                                <router-link :to="{
+                                    name: 'notification.show',
+                                    params: { id: notification.id },
+                                }">
                                     {{ notification.title }}
-                                    <span class="notification-date">{{ formatDate(notification.created_at) }}</span>
+                                    <span class="notification-date">{{
+                                        formatDate(notification.created_at)
+                                        }}</span>
                                 </router-link>
                             </li>
                         </ul>
@@ -39,9 +53,11 @@
                 <ul class="user-control-aria">
                     <li class="logged-in-user-text">
                         ログイン中： {{ user.name }}
-                        <img :src="userProfileImage" :alt="user.name + 'のプロフィール画像'" class="user-profile-image">
+                        <img :src="userProfileImage" :alt="user.name + 'のプロフィール画像'" class="user-profile-image" />
                     </li>
-                    <li><button @click="logout" class="logout-btn">ログアウト</button></li>
+                    <li>
+                        <button @click="logout" class="logout-btn">ログアウト</button>
+                    </li>
                 </ul>
             </div>
         </header>
@@ -53,127 +69,134 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
-import axios from 'axios'
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
+import axios from "axios";
+import { useNotificationStore } from "./store/notification";
 
 export default {
     setup() {
-        const router = useRouter()
-        const user = ref(null)
-        const unreadNotifications = ref([])
-        const isNotificationVisible = ref(false)
-        let hideTimeout = null
+        const router = useRouter();
+        const notificationStore = useNotificationStore();
+        const user = ref(null);
+        const isNotificationVisible = ref(false);
+        let hideTimeout = null;
 
-        const isLoggedIn = computed(() => !!user.value)
+        const isLoggedIn = computed(() => !!user.value);
 
         const userProfileImage = computed(() => {
             if (user.value && user.value.profile_image) {
-                return `/img/profile/${user.value.profile_image}`
+                return `/img/profile/${user.value.profile_image}`;
             }
-            return '/img/noimage.png'
-        })
+            return "/img/noimage.png";
+        });
 
         const logout = async () => {
             try {
-                await axios.post('/api/logout', {}, {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                })
-                localStorage.removeItem('token')
-                user.value = null
-                router.push('/login')
+                await axios.post(
+                    "/api/logout",
+                    {},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        },
+                    }
+                );
+                localStorage.removeItem("token");
+                user.value = null;
+                router.push("/login");
             } catch (error) {
-                console.error('Logout failed', error)
+                console.error("Logout failed", error);
             }
-        }
+        };
 
         const checkAuth = async () => {
-            const token = localStorage.getItem('token')
+            const token = localStorage.getItem("token");
             if (token) {
-                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+                axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
                 try {
-                    const response = await axios.get('/api/user')
-                    user.value = response.data
-                    if (router.currentRoute.value.path === '/login') {
-                        router.push('/dashboard')
+                    const response = await axios.get("/api/user");
+                    user.value = response.data;
+                    if (router.currentRoute.value.path === "/login") {
+                        router.push("/dashboard");
                     }
                 } catch (error) {
-                    console.error('Auth check failed', error)
-                    localStorage.removeItem('token')
+                    console.error("Auth check failed", error);
+                    localStorage.removeItem("token");
                     if (router.currentRoute.value.meta.requiresAuth) {
-                        router.push('/login')
+                        router.push("/login");
                     }
                 }
             } else if (router.currentRoute.value.meta.requiresAuth) {
-                router.push('/login')
+                router.push("/login");
             }
-        }
+        };
 
         const fetchUnreadNotifications = async () => {
-            try {
-                const response = await axios.get('/api/notifications', {
-                    params: { unread: true },
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                })
-                unreadNotifications.value = response.data.notifications
-            } catch (error) {
-                console.error('Error fetching unread notifications:', error)
-            }
-        }
+            await notificationStore.fetchUnreadNotifications();
+        };
 
         const markAsRead = async (notification) => {
             try {
-                await axios.post(`/api/notifications/${notification.id}/read`, {}, {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                })
-                unreadNotifications.value = unreadNotifications.value.filter(n => n.id !== notification.id)
+                await axios.post(
+                    `/api/notifications/${notification.id}/read`,
+                    {},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        },
+                    }
+                );
+                unreadNotifications.value = unreadNotifications.value.filter(
+                    (n) => n.id !== notification.id
+                );
             } catch (error) {
-                console.error('Error marking notification as read:', error)
+                console.error("Error marking notification as read:", error);
             }
-        }
+        };
 
         const showNotifications = () => {
-            clearTimeout(hideTimeout)
-            isNotificationVisible.value = true
-        }
+            clearTimeout(hideTimeout);
+            isNotificationVisible.value = true;
+        };
 
         const hideNotifications = () => {
             hideTimeout = setTimeout(() => {
-                isNotificationVisible.value = false
-            }, 300)
-        }
+                isNotificationVisible.value = false;
+            }, 300);
+        };
 
         const formatDate = (dateString) => {
-            return new Date(dateString).toLocaleDateString('ja-JP', {
-                year: 'numeric',
-                month: 'numeric',
-                day: 'numeric'
-            })
-        }
+            return new Date(dateString).toLocaleDateString("ja-JP", {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+            });
+        };
 
         onMounted(() => {
-            checkAuth()
-            fetchUnreadNotifications()
-        })
+            checkAuth();
+            fetchUnreadNotifications();
+        });
 
         onUnmounted(() => {
-            clearTimeout(hideTimeout)
-        })
+            clearTimeout(hideTimeout);
+        });
 
         return {
             user,
             isLoggedIn,
             userProfileImage,
             logout,
-            unreadNotifications,
+            unreadNotifications: computed(() => notificationStore.unreadNotifications),
             isNotificationVisible,
             showNotifications,
             hideNotifications,
             markAsRead,
-            formatDate
-        }
-    }
-}
+            formatDate,
+        };
+    },
+};
 </script>
 
 <style>
