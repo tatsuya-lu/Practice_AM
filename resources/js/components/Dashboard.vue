@@ -88,7 +88,6 @@
 <script>
 import { ref, onMounted } from "vue";
 import { useDashboardStore } from "../store/dashboard";
-import { storeToRefs } from "pinia";
 
 export default {
     setup() {
@@ -122,7 +121,6 @@ export default {
                 await Promise.all([
                     dashboardStore.fetchDashboardData(),
                     dashboardStore.fetchNotificationReadStatuses(),
-                    dashboardStore.fetchUnresolvedInquiries(),
                 ]);
                 console.log("All data fetched successfully");
             } catch (error) {

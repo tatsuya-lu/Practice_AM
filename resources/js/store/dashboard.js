@@ -7,10 +7,13 @@ export const useDashboardStore = defineStore("dashboard", {
         notificationReadStatuses: {},
         unresolvedInquiryCount: 0,
         unresolvedInquiries: [],
-        isLoaded: false,
+        isNotificationsLoaded: false,
+        isInquiriesLoaded: false,
     }),
     actions: {
         async fetchDashboardData() {
+            if (this.isNotificationsLoaded) return;
+
             try {
                 const [dashboardResponse, notificationsResponse] = await Promise.all([
                     axios.get("/api/dashboard", {
@@ -25,8 +28,6 @@ export const useDashboardStore = defineStore("dashboard", {
                     }),
                 ]);
 
-                this.unresolvedInquiryCount = dashboardResponse.data.unresolvedInquiryCount;
-                this.unresolvedInquiries = dashboardResponse.data.unresolvedInquiries;
                 this.notifications = notificationsResponse.data.notifications.data || [];
 
                 this.notificationReadStatuses = (dashboardResponse.data.readNotificationIds || []).reduce((acc, id) => {
@@ -34,7 +35,11 @@ export const useDashboardStore = defineStore("dashboard", {
                     return acc;
                 }, {});
 
-                this.isLoaded = true;
+                this.isNotificationsLoaded = true;
+
+                if (!this.isInquiriesLoaded) {
+                    await this.fetchUnresolvedInquiries();
+                }
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
             }
@@ -59,6 +64,8 @@ export const useDashboardStore = defineStore("dashboard", {
             }
         },
         async fetchUnresolvedInquiries() {
+            if (this.isInquiriesLoaded) return;
+
             try {
                 const response = await axios.get("/api/inquiries", {
                     params: {
@@ -71,6 +78,7 @@ export const useDashboardStore = defineStore("dashboard", {
                 });
                 this.unresolvedInquiryCount = response.data.unresolvedInquiryCount;
                 this.unresolvedInquiries = response.data.inquiries.data;
+                this.isInquiriesLoaded = true;
             } catch (error) {
                 console.error("Error fetching unresolved inquiries:", error);
             }
@@ -78,8 +86,17 @@ export const useDashboardStore = defineStore("dashboard", {
         updateNotificationStatus(notificationId) {
             this.notificationReadStatuses[notificationId] = true;
         },
+        clearDashboardData() {
+            this.notifications = [];
+            this.notificationReadStatuses = {};
+            this.unresolvedInquiryCount = 0;
+            this.unresolvedInquiries = [];
+            this.isNotificationsLoaded = false;
+            this.isInquiriesLoaded = false;
+        },
     },
     getters: {
         validNotifications: (state) => state.notifications.filter(notification => notification && notification.id),
+        isLoaded: (state) => state.isNotificationsLoaded && state.isInquiriesLoaded,
     },
 });
