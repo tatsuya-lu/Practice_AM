@@ -3,47 +3,31 @@ import axios from "axios";
 
 export const useNotificationStore = defineStore("notification", {
     state: () => ({
-        notifications: [],
         unreadNotifications: [],
+        isLoaded: false,
     }),
     actions: {
-        async fetchNotifications() {
-            try {
-                const response = await axios.get(
-                    "/api/dashboard/notifications",
-                    {
-                        headers: {
-                            Authorization: `Bearer ${localStorage.getItem(
-                                "token"
-                            )}`,
-                        },
-                    }
-                );
-                this.notifications = (
-                    response.data.notifications.data || []
-                ).filter((notification) => notification && notification.id);
-            } catch (error) {
-                console.error("Error fetching notifications:", error);
-                this.notifications = [];
-            }
-        },
         async fetchUnreadNotifications() {
+            if (this.isLoaded) return;
             try {
                 const response = await axios.get("/api/notifications", {
                     params: { unread: true },
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem(
-                            "token"
-                        )}`,
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
                 });
                 this.unreadNotifications = response.data.notifications.filter(
                     (notification) => notification && notification.id
                 );
+                this.isLoaded = true;
             } catch (error) {
                 console.error("Error fetching unread notifications:", error);
                 this.unreadNotifications = [];
             }
+        },
+        clearUnreadNotifications() {
+            this.unreadNotifications = [];
+            this.isLoaded = false;
         },
     },
 });
