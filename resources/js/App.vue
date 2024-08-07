@@ -28,22 +28,17 @@
                 <div class="notification-aria" @mouseenter="showNotifications" @mouseleave="hideNotifications">
                     <div class="notification-bell">
                         <i class="far fa-bell"></i>
-                        <span v-if="unreadNotifications.length > 0" class="notification-count-badge">
-                            {{ unreadNotifications.length }}
+                        <span v-if="unreadNotificationsCount > 0" class="notification-count-badge">
+                            {{ unreadNotificationsCount }}
                         </span>
                     </div>
                     <div v-if="isNotificationVisible" class="notification-list">
                         <ul v-if="unreadNotifications.length > 0">
                             <li v-for="notification in unreadNotifications" :key="notification.id"
                                 @click="markAsRead(notification)">
-                                <router-link :to="{
-                                    name: 'notification.show',
-                                    params: { id: notification.id },
-                                }">
+                                <router-link :to="{ name: 'notification.show', params: { id: notification.id } }">
                                     {{ notification.title }}
-                                    <span class="notification-date">{{
-                                        formatDate(notification.created_at)
-                                        }}</span>
+                                    <span class="notification-date">{{ formatDate(notification.created_at) }}</span>
                                 </router-link>
                             </li>
                         </ul>
@@ -92,9 +87,13 @@ export default {
             return "/img/noimage.png";
         });
 
+        const unreadNotifications = computed(() => notificationStore.unreadNotifications);
+        const unreadNotificationsCount = computed(() => unreadNotifications.value.length);
+
         const logout = async () => {
             try {
                 await authStore.clearUser();
+                notificationStore.clearUnreadNotifications();
                 router.push("/login");
             } catch (error) {
                 console.error("Logout failed", error);
@@ -107,29 +106,15 @@ export default {
                 if (router.currentRoute.value.path === "/login") {
                     router.push("/dashboard");
                 }
+                await notificationStore.fetchUnreadNotifications();
             } else if (router.currentRoute.value.meta.requiresAuth) {
                 router.push("/login");
             }
         };
 
-        const fetchUnreadNotifications = async () => {
-            await notificationStore.fetchUnreadNotifications();
-        };
-
         const markAsRead = async (notification) => {
             try {
-                await axios.post(
-                    `/api/notifications/${notification.id}/read`,
-                    {},
-                    {
-                        headers: {
-                            Authorization: `Bearer ${localStorage.getItem("token")}`,
-                        },
-                    }
-                );
-                unreadNotifications.value = unreadNotifications.value.filter(
-                    (n) => n.id !== notification.id
-                );
+                await notificationStore.markAsRead(notification.id);
             } catch (error) {
                 console.error("Error marking notification as read:", error);
             }
@@ -156,9 +141,6 @@ export default {
 
         onMounted(async () => {
             await checkAuth();
-            if (authStore.isLoggedIn) {
-                fetchUnreadNotifications();
-            }
         });
 
         onUnmounted(() => {
@@ -174,7 +156,8 @@ export default {
             user,
             userProfileImage,
             logout,
-            unreadNotifications: computed(() => notificationStore.unreadNotifications),
+            unreadNotifications,
+            unreadNotificationsCount,
             isNotificationVisible,
             showNotifications,
             hideNotifications,

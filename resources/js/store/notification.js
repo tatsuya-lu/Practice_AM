@@ -13,7 +13,9 @@ export const useNotificationStore = defineStore("notification", {
                 const response = await axios.get("/api/notifications", {
                     params: { unread: true },
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        Authorization: `Bearer ${localStorage.getItem(
+                            "token"
+                        )}`,
                     },
                 });
                 this.unreadNotifications = response.data.notifications.filter(
@@ -28,6 +30,26 @@ export const useNotificationStore = defineStore("notification", {
         clearUnreadNotifications() {
             this.unreadNotifications = [];
             this.isLoaded = false;
+        },
+        async markAsRead(notificationId) {
+            try {
+                await axios.post(
+                    `/api/notifications/${notificationId}/read`,
+                    {},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem(
+                                "token"
+                            )}`,
+                        },
+                    }
+                );
+                this.unreadNotifications = this.unreadNotifications.filter(
+                    (n) => n.id !== notificationId
+                );
+            } catch (error) {
+                console.error("Error marking notification as read:", error);
+            }
         },
     },
 });
