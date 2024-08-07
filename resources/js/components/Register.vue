@@ -170,10 +170,9 @@ export default {
                     })
                 }
 
-                console.log('Response:', response.data) // レスポンスをログに出力
+                console.log('Response:', response.data)
 
-                if (response.data.user) { // success フラグの代わりに user オブジェクトの存在をチェック
-                    // リダイレクト処理を統一
+                if (response.data.user) {
                     router.push({
                         name: 'account.list',
                         query: {

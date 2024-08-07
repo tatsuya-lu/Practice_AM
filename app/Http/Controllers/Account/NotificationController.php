@@ -40,6 +40,34 @@ class NotificationController extends Controller
         ]);
     }
 
+    public function apiReadStatus(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json([], 403);
+        }
+
+        $readNotifications = NotificationRead::where('user_id', $user->id)
+            ->where('read', true)
+            ->pluck('notification_id');
+
+        return response()->json($readNotifications);
+    }
+
+    public function apiUnreadNotifications(Request $request)
+    {
+        $user = $request->user();
+        $notifications = Notification::whereDoesntHave('reads', function ($query) use ($user) {
+            $query->where('user_id', $user->id)->where('read', true);
+        })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'notifications' => $notifications
+        ]);
+    }
+
     public function show(Request $request, Notification $notification)
     {
         $notificationData = $this->notificationService->show($notification);
@@ -85,6 +113,22 @@ class NotificationController extends Controller
         return response()->json($readNotifications);
     }
 
+    public function markAsRead(Request $request, Notification $notification)
+    {
+        $user = $request->user();
+        $notificationRead = NotificationRead::firstOrCreate(
+            ['user_id' => $user->id, 'notification_id' => $notification->id],
+            ['read' => true]
+        );
+
+        if (!$notificationRead->read) {
+            $notificationRead->read = true;
+            $notificationRead->save();
+        }
+
+        return response()->json(['success' => true]);
+    }
+
     public function create()
     {
         return view('admin.NotificationRegister');
@@ -102,49 +146,5 @@ class NotificationController extends Controller
             'message' => '新しくお知らせが作成されました。',
             'notification' => $notification
         ], 201);
-    }
-
-    public function apiReadStatus(Request $request)
-    {
-        $user = $request->user();
-        if (!$user) {
-            return response()->json([], 403);
-        }
-
-        $readNotifications = NotificationRead::where('user_id', $user->id)
-            ->where('read', true)
-            ->pluck('notification_id');
-
-        return response()->json($readNotifications);
-    }
-
-    public function apiUnreadNotifications(Request $request)
-    {
-        $user = $request->user();
-        $notifications = Notification::whereDoesntHave('reads', function ($query) use ($user) {
-            $query->where('user_id', $user->id)->where('read', true);
-        })
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return response()->json([
-            'notifications' => $notifications
-        ]);
-    }
-
-    public function markAsRead(Request $request, Notification $notification)
-    {
-        $user = $request->user();
-        $notificationRead = NotificationRead::firstOrCreate(
-            ['user_id' => $user->id, 'notification_id' => $notification->id],
-            ['read' => true]
-        );
-
-        if (!$notificationRead->read) {
-            $notificationRead->read = true;
-            $notificationRead->save();
-        }
-
-        return response()->json(['success' => true]);
     }
 }

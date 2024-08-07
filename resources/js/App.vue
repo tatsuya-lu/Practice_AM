@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, watch, onUnmounted } from "vue"; // onUnmounted を追加
+import { ref, computed, onMounted, watch, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { useNotificationStore } from "./store/notification";
 import { useAuthStore } from "./store/auth";
