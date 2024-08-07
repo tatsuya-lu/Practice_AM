@@ -24,6 +24,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+import { useAuthStore } from '../store/auth';
 
 export default {
     setup() {
@@ -31,21 +32,26 @@ export default {
         const password = ref('');
         const errors = ref({});
         const router = useRouter();
+        const authStore = useAuthStore();
 
         const login = async () => {
             try {
-                // CSRFトークンを取得
                 await axios.get('/sanctum/csrf-cookie');
-
-                // ログイン処理
                 const response = await axios.post('/api/login', {
                     email: email.value,
                     password: password.value
                 });
 
-                console.log(response.data);
                 localStorage.setItem('token', response.data.token);
-                router.push('/dashboard');
+
+                // ユーザー情報をフェッチしてストアに設定
+                await authStore.fetchUser();
+
+                if (authStore.isLoggedIn) {
+                    router.push('/dashboard');
+                } else {
+                    errors.value = { error: 'ログインに失敗しました。' };
+                }
             } catch (error) {
                 console.error('Login error:', error.response ? error.response.data : error);
                 errors.value = error.response && error.response.data

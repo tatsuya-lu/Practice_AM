@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <header v-if="isLoggedIn">
+        <header v-if="authStore.isLoggedIn">
             <div class="header-content-left">
                 <img class="logo" src="/img/testlogo.png" alt="ロゴ画像" />
                 <nav>
@@ -43,7 +43,7 @@
                                     {{ notification.title }}
                                     <span class="notification-date">{{
                                         formatDate(notification.created_at)
-                                        }}</span>
+                                    }}</span>
                                 </router-link>
                             </li>
                         </ul>
@@ -69,20 +69,20 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, watch, onUnmounted } from "vue"; // onUnmounted を追加
 import { useRouter } from "vue-router";
-import axios from "axios";
 import { useNotificationStore } from "./store/notification";
+import { useAuthStore } from "./store/auth";
 
 export default {
     setup() {
         const router = useRouter();
         const notificationStore = useNotificationStore();
-        const user = ref(null);
+        const authStore = useAuthStore();
         const isNotificationVisible = ref(false);
-        let hideTimeout = null;
+        let hideTimeout;
 
-        const isLoggedIn = computed(() => !!user.value);
+        const user = computed(() => authStore.user || {});
 
         const userProfileImage = computed(() => {
             if (user.value && user.value.profile_image) {
@@ -93,17 +93,7 @@ export default {
 
         const logout = async () => {
             try {
-                await axios.post(
-                    "/api/logout",
-                    {},
-                    {
-                        headers: {
-                            Authorization: `Bearer ${localStorage.getItem("token")}`,
-                        },
-                    }
-                );
-                localStorage.removeItem("token");
-                user.value = null;
+                await authStore.clearUser();
                 router.push("/login");
             } catch (error) {
                 console.error("Logout failed", error);
@@ -111,21 +101,10 @@ export default {
         };
 
         const checkAuth = async () => {
-            const token = localStorage.getItem("token");
-            if (token) {
-                axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-                try {
-                    const response = await axios.get("/api/user");
-                    user.value = response.data;
-                    if (router.currentRoute.value.path === "/login") {
-                        router.push("/dashboard");
-                    }
-                } catch (error) {
-                    console.error("Auth check failed", error);
-                    localStorage.removeItem("token");
-                    if (router.currentRoute.value.meta.requiresAuth) {
-                        router.push("/login");
-                    }
+            await authStore.fetchUser();
+            if (authStore.isLoggedIn) {
+                if (router.currentRoute.value.path === "/login") {
+                    router.push("/dashboard");
                 }
             } else if (router.currentRoute.value.meta.requiresAuth) {
                 router.push("/login");
@@ -174,18 +153,24 @@ export default {
             });
         };
 
-        onMounted(() => {
-            checkAuth();
-            fetchUnreadNotifications();
+        onMounted(async () => {
+            await checkAuth();
+            if (authStore.isLoggedIn) {
+                fetchUnreadNotifications();
+            }
         });
 
         onUnmounted(() => {
             clearTimeout(hideTimeout);
         });
 
+        watch(() => router.currentRoute.value.path, async () => {
+            await checkAuth();
+        });
+
         return {
+            authStore,
             user,
-            isLoggedIn,
             userProfileImage,
             logout,
             unreadNotifications: computed(() => notificationStore.unreadNotifications),
