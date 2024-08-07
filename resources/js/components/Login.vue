@@ -1,6 +1,6 @@
 <template>
     <div class="login-container">
-        <form @submit.prevent="login">
+        <form @submit.prevent="login" v-if="!isLoading">
             <div>
                 <label for="email">メールアドレス</label>
                 <input type="text" id="email" v-model="email">
@@ -17,13 +17,13 @@
 
             <button type="submit">ログイン</button>
         </form>
+        <div v-else class="loading">ログイン中...</div>
     </div>
 </template>
 
 <script>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import axios from 'axios';
 import { useAuthStore } from '../store/auth';
 
 export default {
@@ -33,8 +33,10 @@ export default {
         const errors = ref({});
         const router = useRouter();
         const authStore = useAuthStore();
+        const isLoading = ref(false);
 
         const login = async () => {
+            isLoading.value = true;
             try {
                 await axios.get('/sanctum/csrf-cookie');
                 const response = await axios.post('/api/login', {
@@ -43,12 +45,10 @@ export default {
                 });
 
                 localStorage.setItem('token', response.data.token);
-
-                // ユーザー情報をフェッチしてストアに設定
                 await authStore.fetchUser();
 
                 if (authStore.isLoggedIn) {
-                    router.push('/dashboard');
+                    await router.push('/dashboard');
                 } else {
                     errors.value = { error: 'ログインに失敗しました。' };
                 }
@@ -57,6 +57,8 @@ export default {
                 errors.value = error.response && error.response.data
                     ? error.response.data.errors || { error: error.response.data.message }
                     : { error: 'ログインに失敗しました。' };
+            } finally {
+                isLoading.value = false;
             }
         };
 
@@ -64,7 +66,8 @@ export default {
             email,
             password,
             errors,
-            login
+            login,
+            isLoading
         };
     }
 }

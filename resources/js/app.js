@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from './store/user'
+import { useAuthStore } from './store/auth'
 import App from './App.vue'
 import Login from './components/Login.vue'
 import Dashboard from './components/Dashboard.vue'
@@ -45,22 +46,19 @@ const router = createRouter({
 const pinia = createPinia() // Piniaインスタンスを作成
 
 router.beforeEach(async (to, from, next) => {
-    const isLoggedIn = !!localStorage.getItem('token')
+    const authStore = useAuthStore(pinia)
     
-    if (isLoggedIn) {
-        const userStore = useUserStore(pinia) // ここでPiniaインスタンスを渡す
-        if (!userStore.isLoaded) {
-            await userStore.fetchUsers()
-        }
+    if (!authStore.isLoaded) {
+        await authStore.fetchUser()
     }
 
     if (to.matched.some(record => record.meta.requiresAuth)) {
-        if (!isLoggedIn) {
+        if (!authStore.isLoggedIn) {
             next('/login')
         } else {
             next()
         }
-    } else if (to.path === '/login' && isLoggedIn) {
+    } else if (to.path === '/login' && authStore.isLoggedIn) {
         next('/dashboard')
     } else {
         next()

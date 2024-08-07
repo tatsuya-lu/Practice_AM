@@ -43,7 +43,7 @@
                                     {{ notification.title }}
                                     <span class="notification-date">{{
                                         formatDate(notification.created_at)
-                                    }}</span>
+                                        }}</span>
                                 </router-link>
                             </li>
                         </ul>
@@ -61,10 +61,11 @@
                 </ul>
             </div>
         </header>
-
-        <main>
-            <router-view></router-view>
-        </main>
+        <transition name="fade" mode="out-in">
+            <main>
+                <router-view></router-view>
+            </main>
+        </transition>
     </div>
 </template>
 
@@ -185,5 +186,13 @@ export default {
 </script>
 
 <style>
-/* グローバルスタイルをここに追加 */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
 </style>
