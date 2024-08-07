@@ -43,13 +43,18 @@ const router = createRouter({
     routes
 })
 
-const pinia = createPinia() // Piniaインスタンスを作成
+const pinia = createPinia()
 
 router.beforeEach(async (to, from, next) => {
     const authStore = useAuthStore(pinia)
+    const userStore = useUserStore(pinia)
     
     if (!authStore.isLoaded) {
         await authStore.fetchUser()
+    }
+
+    if (authStore.isLoggedIn && !userStore.isLoaded) {
+        await userStore.fetchUsers()
     }
 
     if (to.matched.some(record => record.meta.requiresAuth)) {
@@ -66,7 +71,7 @@ router.beforeEach(async (to, from, next) => {
 })
 
 const app = createApp(App)
-app.use(pinia) // Piniaをアプリケーションにインストール
+app.use(pinia)
 app.use(router)
 app.mount('#app')
 
