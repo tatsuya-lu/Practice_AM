@@ -25,6 +25,8 @@ export const useNotificationStore = defineStore("notification", {
             } catch (error) {
                 console.error("Error fetching unread notifications:", error);
                 this.unreadNotifications = [];
+            } finally {
+                this.isLoaded = true;
             }
         },
         clearUnreadNotifications() {

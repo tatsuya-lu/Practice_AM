@@ -56,16 +56,19 @@
                 </ul>
             </div>
         </header>
-        <transition name="fade" mode="out-in">
-            <main>
-                <router-view></router-view>
-            </main>
-        </transition>
+        <router-view v-slot="{ Component }">
+            <transition :name="transitionName" mode="out-in">
+                <component :is="Component" :key="$route.fullPath" />
+            </transition>
+        </router-view>
+        <div v-if="isInitialLoading" class="loading-overlay">
+            Loading...
+        </div>
     </div>
 </template>
 
 <script>
-import { ref, computed, onMounted, watch, onUnmounted } from "vue";
+import { ref, computed, onMounted, watch, onUnmounted, provide } from "vue";
 import { useRouter } from "vue-router";
 import { useNotificationStore } from "./store/notification";
 import { useAuthStore } from "./store/auth";
@@ -77,6 +80,12 @@ export default {
         const authStore = useAuthStore();
         const isNotificationVisible = ref(false);
         let hideTimeout;
+        const isInitialLoading = ref(false);
+        const transitionName = ref('');
+
+        provide('setInitialLoading', (value) => {
+            isInitialLoading.value = value;
+        });
 
         const user = computed(() => authStore.user || {});
 
@@ -104,11 +113,16 @@ export default {
             await authStore.fetchUser();
             if (authStore.isLoggedIn) {
                 if (router.currentRoute.value.path === "/login") {
-                    router.push("/dashboard");
+                    await router.push("/dashboard");
                 }
-                await notificationStore.fetchUnreadNotifications();
             } else if (router.currentRoute.value.meta.requiresAuth) {
-                router.push("/login");
+                await router.push("/login");
+            }
+        };
+
+        const fetchNotifications = async () => {
+            if (authStore.isLoggedIn && !notificationStore.isLoaded) {
+                await notificationStore.fetchUnreadNotifications();
             }
         };
 
@@ -141,14 +155,23 @@ export default {
 
         onMounted(async () => {
             await checkAuth();
+            await fetchNotifications();
         });
 
         onUnmounted(() => {
             clearTimeout(hideTimeout);
         });
 
-        watch(() => router.currentRoute.value.path, async () => {
-            await checkAuth();
+        watch(() => router.currentRoute.value, (to, from) => {
+            const toDepth = to.path.split('/').length;
+            const fromDepth = from.path.split('/').length;
+            transitionName.value = toDepth < fromDepth ? 'slide-right' : 'slide-left';
+        });
+
+        watch(() => authStore.isLoggedIn, async (newValue) => {
+            if (newValue) {
+                await fetchNotifications();
+            }
         });
 
         return {
@@ -163,19 +186,51 @@ export default {
             hideNotifications,
             markAsRead,
             formatDate,
+            isInitialLoading,
+            transitionName,
         };
     },
 };
 </script>
 
 <style>
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.5s ease;
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 9999;
 }
 
-.fade-enter-from,
-.fade-leave-to {
+.slide-left-enter-active,
+.slide-left-leave-active,
+.slide-right-enter-active,
+.slide-right-leave-active {
+    transition: all 0.2s ease-out;
+}
+
+.slide-left-enter-from {
     opacity: 0;
+    transform: translateX(30px);
+}
+
+.slide-left-leave-to {
+    opacity: 0;
+    transform: translateX(-30px);
+}
+
+.slide-right-enter-from {
+    opacity: 0;
+    transform: translateX(-30px);
+}
+
+.slide-right-leave-to {
+    opacity: 0;
+    transform: translateX(30px);
 }
 </style>

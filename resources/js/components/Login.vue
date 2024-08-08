@@ -22,9 +22,10 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, inject } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../store/auth';
+import { useNotificationStore } from '../store/notification';
 
 export default {
     setup() {
@@ -33,7 +34,9 @@ export default {
         const errors = ref({});
         const router = useRouter();
         const authStore = useAuthStore();
+        const notificationStore = useNotificationStore();
         const isLoading = ref(false);
+        const setInitialLoading = inject('setInitialLoading');
 
         const login = async () => {
             isLoading.value = true;
@@ -45,12 +48,17 @@ export default {
                 });
 
                 localStorage.setItem('token', response.data.token);
+                setInitialLoading(true); // ログイン成功時にのみローディングを開始
                 await authStore.fetchUser();
 
                 if (authStore.isLoggedIn) {
                     await router.push('/dashboard');
                 } else {
                     errors.value = { error: 'ログインに失敗しました。' };
+                }
+                if (authStore.isLoggedIn) {
+                    await notificationStore.fetchUnreadNotifications();
+                    await router.push('/dashboard');
                 }
             } catch (error) {
                 console.error('Login error:', error.response ? error.response.data : error);
@@ -59,6 +67,7 @@ export default {
                     : { error: 'ログインに失敗しました。' };
             } finally {
                 isLoading.value = false;
+                setInitialLoading(false); // ログイン処理完了時にローディングを終了
             }
         };
 
