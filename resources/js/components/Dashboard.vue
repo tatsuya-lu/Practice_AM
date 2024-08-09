@@ -86,13 +86,15 @@
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
+import { useRoute } from 'vue-router';
 import { useDashboardStore } from "../store/dashboard";
 
 export default {
     setup() {
         const dashboardStore = useDashboardStore();
         const successMessage = ref("");
+        const route = useRoute();
 
         const getNotificationStatus = (notificationId) => {
             return dashboardStore.notificationReadStatuses[notificationId] ? "既読済み" : "未読";
@@ -127,6 +129,22 @@ export default {
                 console.error("Error initializing dashboard:", error);
             }
         });
+
+        const fetchData = async () => {
+            try {
+                await Promise.all([
+                    dashboardStore.fetchDashboardData(),
+                    dashboardStore.fetchNotificationReadStatuses(),
+                ]);
+                console.log("All data fetched successfully");
+            } catch (error) {
+                console.error("Error initializing dashboard:", error);
+            }
+        };
+
+        onMounted(fetchData);
+
+        watch(() => route.fullPath, fetchData);
 
         return {
             dashboardStore,

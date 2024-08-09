@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import axios from 'axios';
+import axios from "axios";
 
 export const useDashboardStore = defineStore("dashboard", {
     state: () => ({
@@ -11,26 +11,41 @@ export const useDashboardStore = defineStore("dashboard", {
         isInquiriesLoaded: false,
     }),
     actions: {
+        async addNewNotification(notification) {
+            this.notifications.unshift(notification);
+            this.notificationReadStatuses[notification.id] = false;
+        },
         async fetchDashboardData() {
-            if (this.isNotificationsLoaded) return;
+            if (this.isNotificationsLoaded) {
+                // データが既にロードされている場合は再取得
+                this.isNotificationsLoaded = false;
+            }
 
             try {
-                const [dashboardResponse, notificationsResponse] = await Promise.all([
-                    axios.get("/api/dashboard", {
-                        headers: {
-                            Authorization: `Bearer ${localStorage.getItem("token")}`,
-                        },
-                    }),
-                    axios.get("/api/dashboard/notifications", {
-                        headers: {
-                            Authorization: `Bearer ${localStorage.getItem("token")}`,
-                        },
-                    }),
-                ]);
+                const [dashboardResponse, notificationsResponse] =
+                    await Promise.all([
+                        axios.get("/api/dashboard", {
+                            headers: {
+                                Authorization: `Bearer ${localStorage.getItem(
+                                    "token"
+                                )}`,
+                            },
+                        }),
+                        axios.get("/api/dashboard/notifications", {
+                            headers: {
+                                Authorization: `Bearer ${localStorage.getItem(
+                                    "token"
+                                )}`,
+                            },
+                        }),
+                    ]);
 
-                this.notifications = notificationsResponse.data.notifications.data || [];
+                this.notifications =
+                    notificationsResponse.data.notifications.data || [];
 
-                this.notificationReadStatuses = (dashboardResponse.data.readNotificationIds || []).reduce((acc, id) => {
+                this.notificationReadStatuses = (
+                    dashboardResponse.data.readNotificationIds || []
+                ).reduce((acc, id) => {
                     acc[id] = true;
                     return acc;
                 }, {});
@@ -46,16 +61,24 @@ export const useDashboardStore = defineStore("dashboard", {
         },
         async fetchNotificationReadStatuses() {
             try {
-                const response = await axios.get("/api/notifications/read-status", {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
-                });
+                const response = await axios.get(
+                    "/api/notifications/read-status",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem(
+                                "token"
+                            )}`,
+                        },
+                    }
+                );
                 if (response.data && Array.isArray(response.data)) {
-                    this.notificationReadStatuses = response.data.reduce((acc, id) => {
-                        acc[id] = true;
-                        return acc;
-                    }, {});
+                    this.notificationReadStatuses = response.data.reduce(
+                        (acc, id) => {
+                            acc[id] = true;
+                            return acc;
+                        },
+                        {}
+                    );
                 } else {
                     console.error("Unexpected response format:", response.data);
                 }
@@ -73,10 +96,13 @@ export const useDashboardStore = defineStore("dashboard", {
                         limit: 5,
                     },
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        Authorization: `Bearer ${localStorage.getItem(
+                            "token"
+                        )}`,
                     },
                 });
-                this.unresolvedInquiryCount = response.data.unresolvedInquiryCount;
+                this.unresolvedInquiryCount =
+                    response.data.unresolvedInquiryCount;
                 this.unresolvedInquiries = response.data.inquiries.data;
                 this.isInquiriesLoaded = true;
             } catch (error) {
@@ -96,7 +122,11 @@ export const useDashboardStore = defineStore("dashboard", {
         },
     },
     getters: {
-        validNotifications: (state) => state.notifications.filter(notification => notification && notification.id),
-        isLoaded: (state) => state.isNotificationsLoaded && state.isInquiriesLoaded,
+        validNotifications: (state) =>
+            state.notifications.filter(
+                (notification) => notification && notification.id
+            ),
+        isLoaded: (state) =>
+            state.isNotificationsLoaded && state.isInquiriesLoaded,
     },
 });

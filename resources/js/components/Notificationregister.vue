@@ -26,10 +26,12 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+import { useDashboardStore } from "../store/dashboard";
 
 export default {
     setup() {
         const router = useRouter();
+        const dashboardStore = useDashboardStore();
         const title = ref('');
         const description = ref('');
         const errors = ref({});
@@ -43,6 +45,7 @@ export default {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                 });
                 if (response.data.success) {
+                    await dashboardStore.addNewNotification(response.data.notification);
                     router.push('/dashboard');
                 }
             } catch (error) {
