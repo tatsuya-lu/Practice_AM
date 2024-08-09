@@ -26,11 +26,13 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+import { useNotificationStore } from "../store/notification"; 
 import { useDashboardStore } from "../store/dashboard";
 
 export default {
     setup() {
         const router = useRouter();
+        const notificationStore = useNotificationStore();
         const dashboardStore = useDashboardStore();
         const title = ref('');
         const description = ref('');
@@ -46,6 +48,7 @@ export default {
                 });
                 if (response.data.success) {
                     await dashboardStore.addNewNotification(response.data.notification);
+                    await notificationStore.addNewNotification(response.data.notification);
                     router.push('/dashboard');
                 }
             } catch (error) {

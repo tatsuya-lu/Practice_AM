@@ -7,8 +7,12 @@ export const useNotificationStore = defineStore("notification", {
         isLoaded: false,
     }),
     actions: {
-        async fetchUnreadNotifications() {
-            if (this.isLoaded) return;
+        async addNewNotification(notification) {
+            this.unreadNotifications.unshift(notification);
+            this.isLoaded = true;
+        },
+        async fetchUnreadNotifications(forceRefresh = false) {
+            if (this.isLoaded && !forceRefresh) return;
             try {
                 const response = await axios.get("/api/notifications", {
                     params: { unread: true },

@@ -61,6 +61,9 @@
                 <component :is="Component" :key="$route.fullPath" />
             </transition>
         </router-view>
+        <!-- <router-view v-slot="{ Component }">
+            <component :is="Component" :key="$route.fullPath" />
+        </router-view> -->
         <div v-if="isInitialLoading" class="loading-overlay">
             Loading...
         </div>
@@ -121,8 +124,8 @@ export default {
         };
 
         const fetchNotifications = async () => {
-            if (authStore.isLoggedIn && !notificationStore.isLoaded) {
-                await notificationStore.fetchUnreadNotifications();
+            if (authStore.isLoggedIn) {
+                await notificationStore.fetchUnreadNotifications(true);
             }
         };
 
@@ -168,8 +171,8 @@ export default {
             transitionName.value = toDepth < fromDepth ? 'slide-right' : 'slide-left';
         });
 
-        watch(() => authStore.isLoggedIn, async (newValue) => {
-            if (newValue) {
+        watch(() => router.currentRoute.value, async (to) => {
+            if (to.path === '/dashboard') {
                 await fetchNotifications();
             }
         });
