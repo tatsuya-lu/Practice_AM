@@ -75,10 +75,10 @@
             </button>
           </td>
           <td>{{ user.name }}</td>
-          <td>{{ getAdminLevelLabel(user.admin_level) }}</td>
+          <td>{{ userStore.getAdminLevelLabel(user.admin_level) }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.tel }}</td>
-          <td>{{ getPrefectureLabel(user.prefecture) }}</td>
+          <td>{{ userStore.getPrefectureLabel(user.prefecture) }}</td>
           <td>{{ user.city }}</td>
           <td>{{ user.street }}</td>
         </tr>
@@ -172,14 +172,6 @@ export default {
       }
     };
 
-    const getAdminLevelLabel = (level) => {
-      return adminLevels.value[level] || level
-    }
-
-    const getPrefectureLabel = (prefCode) => {
-      return prefectures.value[prefCode] || prefCode
-    }
-
     onMounted(async () => {
       const token = localStorage.getItem('token')
       if (!token) {
@@ -210,13 +202,10 @@ export default {
       searchName,
       searchAdminLevel,
       searchEmail,
-      adminLevels,
-      prefectures,
       sortUsers,
       searchUsers,
       deleteUser,
-      getAdminLevelLabel,
-      getPrefectureLabel
+      userStore,
     }
   }
 }

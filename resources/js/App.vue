@@ -75,12 +75,14 @@ import { ref, computed, onMounted, watch, onUnmounted, provide } from "vue";
 import { useRouter } from "vue-router";
 import { useNotificationStore } from "./store/notification";
 import { useAuthStore } from "./store/auth";
+import { useUserStore } from "./store/user";
 
 export default {
     setup() {
         const router = useRouter();
         const notificationStore = useNotificationStore();
         const authStore = useAuthStore();
+        const userStore = useUserStore();
         const isNotificationVisible = ref(false);
         let hideTimeout;
         const isInitialLoading = ref(false);
@@ -159,6 +161,7 @@ export default {
         onMounted(async () => {
             await checkAuth();
             await fetchNotifications();
+            await userStore.fetchMappings();
         });
 
         onUnmounted(() => {
@@ -191,6 +194,7 @@ export default {
             formatDate,
             isInitialLoading,
             transitionName,
+            userStore,
         };
     },
 };

@@ -5,6 +5,8 @@ export const useUserStore = defineStore("user", {
     state: () => ({
         users: [],
         isLoaded: false,
+        adminLevels: {},
+        prefectures: {},
     }),
     actions: {
         async fetchUsers(forceRefresh = false) {
@@ -39,8 +41,21 @@ export const useUserStore = defineStore("user", {
         removeUser(userId) {
             this.users = this.users.filter((user) => user.id !== userId);
         },
+        async fetchMappings() {
+            try {
+                const response = await axios.get("/api/form-data");
+                this.adminLevels = response.data.adminLevels;
+                this.prefectures = response.data.prefectures;
+            } catch (error) {
+                console.error("Error fetching mappings:", error);
+            }
+        },
     },
     getters: {
         getUsers: (state) => state.users,
+        getAdminLevelLabel: (state) => (level) =>
+            state.adminLevels[level] || level,
+        getPrefectureLabel: (state) => (prefCode) =>
+            state.prefectures[prefCode] || prefCode,
     },
 });
