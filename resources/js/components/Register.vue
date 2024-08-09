@@ -108,11 +108,13 @@
 import { ref, onMounted, watch } from 'vue'
 import axios from 'axios'
 import { useRoute, useRouter } from 'vue-router'
+import { useUserStore } from '../store/user'
 
 export default {
     setup() {
         const route = useRoute()
         const router = useRouter()
+        const userStore = useUserStore()
         const user = ref({})
         const prefectures = ref({})
         const adminLevels = ref({})
@@ -173,6 +175,12 @@ export default {
                 console.log('Response:', response.data)
 
                 if (response.data.user) {
+                    if (!isEditing.value) {
+                        await userStore.addUser(response.data.user)
+                    } else {
+                        await userStore.updateUser(response.data.user)
+                    }
+
                     router.push({
                         name: 'account.list',
                         query: {

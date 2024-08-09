@@ -94,7 +94,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '../store/user'
 import axios from 'axios'
@@ -113,6 +113,10 @@ export default {
     const prefectures = ref({})
 
     const users = computed(() => userStore.getUsers)
+
+    const fetchUsers = async () => {
+      await userStore.fetchUsers(true) // forceRefresh を true に設定
+    }
 
     const fetchFormData = async () => {
       try {
@@ -158,14 +162,15 @@ export default {
     const deleteUser = async (userId) => {
       if (confirm('削除します。よろしいですか？')) {
         try {
-          await axios.delete(`/api/account/${userId}`)
-          successMessage.value = 'ユーザーが削除されました'
-          await userStore.fetchUsers()
+          await axios.delete(`/api/account/${userId}`);
+          userStore.removeUser(userId);
+          successMessage.value = 'ユーザーが削除されました';
         } catch (error) {
-          console.error('Error deleting user:', error)
+          console.error('Error deleting user:', error);
+          alert('ユーザーの削除中にエラーが発生しました。');
         }
       }
-    }
+    };
 
     const getAdminLevelLabel = (level) => {
       return adminLevels.value[level] || level
@@ -188,10 +193,18 @@ export default {
       router.replace({ query: {} })
 
       await fetchFormData()
+      await fetchUsers()
+    })
+
+    watch(() => route.fullPath, async () => {
+      if (route.name === 'account.list') {
+        await fetchUsers()
+      }
     })
 
     return {
       users,
+      fetchUsers,
       successMessage,
       registeredEmail,
       searchName,
