@@ -9,52 +9,83 @@ export const useDashboardStore = defineStore("dashboard", {
         unresolvedInquiries: [],
         isNotificationsLoaded: false,
         isInquiriesLoaded: false,
+        isReadStatusesLoaded: false,
+        lastFetchTime: null,
     }),
     actions: {
         async addNewNotification(notification) {
             this.notifications.unshift(notification);
             this.notificationReadStatuses[notification.id] = false;
         },
-        async fetchDashboardData() {
-            if (this.isNotificationsLoaded) {
-                // データが既にロードされている場合は再取得
-                this.isNotificationsLoaded = false;
+        async fetchDashboardData(force = false) {
+            const now = Date.now();
+            const timeSinceLastFetch = now - (this.lastFetchTime || 0);
+
+            if (
+                !force &&
+                this.isNotificationsLoaded &&
+                this.isInquiriesLoaded &&
+                this.isReadStatusesLoaded &&
+                timeSinceLastFetch < 15 * 60 * 1000
+            ) {
+                return;
             }
 
             try {
-                const [dashboardResponse, notificationsResponse] =
-                    await Promise.all([
-                        axios.get("/api/dashboard", {
-                            headers: {
-                                Authorization: `Bearer ${localStorage.getItem(
-                                    "token"
-                                )}`,
-                            },
-                        }),
-                        axios.get("/api/dashboard/notifications", {
-                            headers: {
-                                Authorization: `Bearer ${localStorage.getItem(
-                                    "token"
-                                )}`,
-                            },
-                        }),
-                    ]);
+                const [
+                    dashboardResponse,
+                    notificationsResponse,
+                    inquiriesResponse,
+                    readStatusesResponse,
+                ] = await Promise.all([
+                    axios.get("/api/dashboard", {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem(
+                                "token"
+                            )}`,
+                        },
+                    }),
+                    axios.get("/api/dashboard/notifications", {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem(
+                                "token"
+                            )}`,
+                        },
+                    }),
+                    axios.get("/api/inquiries", {
+                        params: { dashboard: true, limit: 5 },
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem(
+                                "token"
+                            )}`,
+                        },
+                    }),
+                    axios.get("/api/notifications/read-status", {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem(
+                                "token"
+                            )}`,
+                        },
+                    }),
+                ]);
 
                 this.notifications =
                     notificationsResponse.data.notifications.data || [];
-
                 this.notificationReadStatuses = (
-                    dashboardResponse.data.readNotificationIds || []
+                    readStatusesResponse.data || []
                 ).reduce((acc, id) => {
                     acc[id] = true;
                     return acc;
                 }, {});
+                this.unresolvedInquiryCount =
+                    inquiriesResponse.data.unresolvedInquiryCount;
+                this.unresolvedInquiries =
+                    inquiriesResponse.data.inquiries.data;
 
                 this.isNotificationsLoaded = true;
-
-                if (!this.isInquiriesLoaded) {
-                    await this.fetchUnresolvedInquiries();
-                }
+                this.isInquiriesLoaded = true;
+                this.isReadStatusesLoaded = true;
+                this.lastFetchTime = now;
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
             }
@@ -109,8 +140,25 @@ export const useDashboardStore = defineStore("dashboard", {
                 console.error("Error fetching unresolved inquiries:", error);
             }
         },
-        updateNotificationStatus(notificationId) {
+        async updateNotificationStatus(notificationId) {
             this.notificationReadStatuses[notificationId] = true;
+            try {
+                await axios.post(
+                    `/api/notifications/${notificationId}/read`,
+                    {},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem(
+                                "token"
+                            )}`,
+                        },
+                    }
+                );
+            } catch (error) {
+                console.error("Error updating notification status:", error);
+                // エラーが発生した場合、ステータスを元に戻す
+                this.notificationReadStatuses[notificationId] = false;
+            }
         },
         clearDashboardData() {
             this.notifications = [];

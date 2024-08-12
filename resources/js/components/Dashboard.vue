@@ -131,14 +131,8 @@ export default {
         });
 
         const fetchData = async () => {
-            try {
-                await Promise.all([
-                    dashboardStore.fetchDashboardData(),
-                    dashboardStore.fetchNotificationReadStatuses(),
-                ]);
-                console.log("All data fetched successfully");
-            } catch (error) {
-                console.error("Error initializing dashboard:", error);
+            if (!dashboardStore.isNotificationsLoaded || !dashboardStore.isInquiriesLoaded || !dashboardStore.isReadStatusesLoaded) {
+                await dashboardStore.fetchDashboardData(true);
             }
         };
 
