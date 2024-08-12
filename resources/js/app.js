@@ -59,39 +59,38 @@ const router = createRouter({
 const pinia = createPinia();
 
 router.beforeEach(async (to, from, next) => {
-    const authStore = useAuthStore(pinia);
-    const userStore = useUserStore(pinia);
-    const dashboardStore = useDashboardStore(pinia);
-
+    const authStore = useAuthStore(pinia)
+    const userStore = useUserStore(pinia)
+    const dashboardStore = useDashboardStore(pinia)
+    
     if (!authStore.isLoaded) {
-        await authStore.fetchUser();
+        await authStore.fetchUser()
     }
 
-    if (authStore.isLoggedIn && !userStore.isLoaded) {
-        await userStore.fetchUsers();
-    }
-
-    if (
-        authStore.isLoggedIn &&
-        (to.path === "/dashboard" || !dashboardStore.isReadStatusesLoaded)
-    ) {
-        // ダッシュボードデータの先行取得
-        await dashboardStore.fetchDashboardData();
-    }
-
-    // 他のナビゲーションガードのロジックは変更なし
-    if (to.matched.some((record) => record.meta.requiresAuth)) {
-        if (!authStore.isLoggedIn) {
-            next("/login");
-        } else {
-            next();
+    if (authStore.isLoggedIn) {
+        if (!userStore.isLoaded) {
+            await userStore.fetchUsers()
         }
-    } else if (to.path === "/login" && authStore.isLoggedIn) {
-        next("/dashboard");
-    } else {
-        next();
+        if (!userStore.isMappingsLoaded) {
+            await userStore.fetchMappings()
+        }
+        if (to.path === '/dashboard' || !dashboardStore.isReadStatusesLoaded) {
+            await dashboardStore.fetchDashboardData()
+        }
     }
-});
+
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+        if (!authStore.isLoggedIn) {
+            next('/login')
+        } else {
+            next()
+        }
+    } else if (to.path === '/login' && authStore.isLoggedIn) {
+        next('/dashboard')
+    } else {
+        next()
+    }
+})
 
 const app = createApp(App);
 app.use(pinia);

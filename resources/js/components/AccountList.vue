@@ -184,7 +184,7 @@ export default {
       registeredEmail.value = route.query.registered_email || ''
       router.replace({ query: {} })
 
-      await fetchFormData()
+      await userStore.fetchMappings(true)
       await fetchUsers()
     })
 
