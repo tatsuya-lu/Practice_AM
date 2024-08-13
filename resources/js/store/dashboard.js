@@ -11,22 +11,33 @@ export const useDashboardStore = defineStore("dashboard", {
         isInquiriesLoaded: false,
         isReadStatusesLoaded: false,
         lastFetchTime: null,
-        isLoaded: false,
     }),
+
+    getters: {
+        isLoaded: (state) =>
+            state.isNotificationsLoaded &&
+            state.isInquiriesLoaded &&
+            state.isReadStatusesLoaded,
+
+        validNotifications: (state) =>
+            state.notifications.filter(
+                (notification) => notification && notification.id
+            ),
+    },
+
     actions: {
         async addNewNotification(notification) {
             this.notifications.unshift(notification);
             this.notificationReadStatuses[notification.id] = false;
         },
+
         async fetchDashboardData(force = false) {
             const now = Date.now();
             const timeSinceLastFetch = now - (this.lastFetchTime || 0);
 
             if (
                 !force &&
-                this.isNotificationsLoaded &&
-                this.isInquiriesLoaded &&
-                this.isReadStatusesLoaded &&
+                this.isLoaded &&
                 timeSinceLastFetch < 15 * 60 * 1000
             ) {
                 return;
@@ -86,12 +97,15 @@ export const useDashboardStore = defineStore("dashboard", {
                 this.isNotificationsLoaded = true;
                 this.isInquiriesLoaded = true;
                 this.isReadStatusesLoaded = true;
-                this.isLoaded = true;
                 this.lastFetchTime = now;
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
+                this.isNotificationsLoaded = false;
+                this.isInquiriesLoaded = false;
+                this.isReadStatusesLoaded = false;
             }
         },
+
         async fetchNotificationReadStatuses() {
             try {
                 const response = await axios.get(
@@ -119,6 +133,7 @@ export const useDashboardStore = defineStore("dashboard", {
                 console.error("Error fetching read statuses:", error);
             }
         },
+
         async fetchUnresolvedInquiries() {
             try {
                 const response = await axios.get("/api/inquiries", {
@@ -138,8 +153,10 @@ export const useDashboardStore = defineStore("dashboard", {
                 this.isInquiriesLoaded = true;
             } catch (error) {
                 console.error("Error fetching unresolved inquiries:", error);
+                this.isInquiriesLoaded = false;
             }
         },
+
         async updateNotificationStatus(notificationId) {
             this.notificationReadStatuses[notificationId] = true;
             try {
@@ -156,10 +173,10 @@ export const useDashboardStore = defineStore("dashboard", {
                 );
             } catch (error) {
                 console.error("Error updating notification status:", error);
-                // エラーが発生した場合、ステータスを元に戻す
                 this.notificationReadStatuses[notificationId] = false;
             }
         },
+
         clearDashboardData() {
             this.notifications = [];
             this.notificationReadStatuses = {};
@@ -167,14 +184,7 @@ export const useDashboardStore = defineStore("dashboard", {
             this.unresolvedInquiries = [];
             this.isNotificationsLoaded = false;
             this.isInquiriesLoaded = false;
+            this.isReadStatusesLoaded = false;
         },
-    },
-    getters: {
-        validNotifications: (state) =>
-            state.notifications.filter(
-                (notification) => notification && notification.id
-            ),
-        isLoaded: (state) =>
-            state.isNotificationsLoaded && state.isInquiriesLoaded,
     },
 });

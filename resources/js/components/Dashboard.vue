@@ -131,7 +131,7 @@ export default {
         });
 
         const fetchData = async () => {
-            if (!dashboardStore.isNotificationsLoaded || !dashboardStore.isInquiriesLoaded || !dashboardStore.isReadStatusesLoaded) {
+            if (!dashboardStore.isLoaded) {
                 await dashboardStore.fetchDashboardData(true);
             } else {
                 // 未解決のお問い合わせのみを再取得
