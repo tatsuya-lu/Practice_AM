@@ -81,6 +81,7 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRoute, useRouter } from 'vue-router';
+import { useDashboardStore } from "../store/dashboard";
 
 export default {
     setup() {
@@ -89,6 +90,7 @@ export default {
         const inquiry = ref({});
         const successMessage = ref('');
         const statusOptions = ref({});
+        const dashboardStore = useDashboardStore();
 
         const fetchInquiry = async () => {
             try {
@@ -104,6 +106,10 @@ export default {
             try {
                 const response = await axios.put(`/api/inquiries/${route.params.id}`, inquiry.value);
                 successMessage.value = response.data.message;
+
+                // ダッシュボードストアを更新
+                await dashboardStore.fetchUnresolvedInquiries();
+
                 router.push({ path: '/inquiry/list', query: { success: 'お問い合わせが更新されました' } });
             } catch (error) {
                 console.error('Error updating inquiry:', error);

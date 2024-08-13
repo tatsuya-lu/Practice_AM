@@ -11,6 +11,7 @@ export const useDashboardStore = defineStore("dashboard", {
         isInquiriesLoaded: false,
         isReadStatusesLoaded: false,
         lastFetchTime: null,
+        isLoaded: false,
     }),
     actions: {
         async addNewNotification(notification) {
@@ -85,6 +86,7 @@ export const useDashboardStore = defineStore("dashboard", {
                 this.isNotificationsLoaded = true;
                 this.isInquiriesLoaded = true;
                 this.isReadStatusesLoaded = true;
+                this.isLoaded = true;
                 this.lastFetchTime = now;
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
@@ -118,8 +120,6 @@ export const useDashboardStore = defineStore("dashboard", {
             }
         },
         async fetchUnresolvedInquiries() {
-            if (this.isInquiriesLoaded) return;
-
             try {
                 const response = await axios.get("/api/inquiries", {
                     params: {
