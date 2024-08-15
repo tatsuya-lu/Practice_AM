@@ -49,16 +49,13 @@ export default {
 
                 localStorage.setItem('token', response.data.token);
                 setInitialLoading(true); // ログイン成功時にのみローディングを開始
-                await authStore.fetchUser();
+                await authStore.fetchInitialData(); // 新しく追加した初期データ取得メソッド
 
-                if (authStore.isLoggedIn) {
-                    await router.push('/dashboard');
-                } else {
-                    errors.value = { error: 'ログインに失敗しました。' };
-                }
                 if (authStore.isLoggedIn) {
                     await notificationStore.fetchUnreadNotifications();
                     await router.push('/dashboard');
+                } else {
+                    errors.value = { error: 'ログインに失敗しました。' };
                 }
             } catch (error) {
                 console.error('Login error:', error.response ? error.response.data : error);

@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import axios from "axios";
+import { useInquiryStore } from "./inquiry";
 
 export const useAuthStore = defineStore("auth", {
     state: () => ({
@@ -34,6 +35,13 @@ export const useAuthStore = defineStore("auth", {
             this.isLoaded = true;
             localStorage.removeItem("token");
             delete axios.defaults.headers.common["Authorization"];
+        },
+        async fetchInitialData() {
+            const inquiryStore = useInquiryStore();
+            await Promise.all([
+                this.fetchUser(),
+                inquiryStore.fetchInquiries()
+            ]);
         },
     },
     getters: {

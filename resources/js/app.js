@@ -3,6 +3,7 @@ import { createPinia } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 import { useUserStore } from "./store/user";
 import { useAuthStore } from "./store/auth";
+import { useInquiryStore } from "./store/inquiry";
 import { useDashboardStore } from "./store/dashboard";
 import App from "./App.vue";
 import Login from "./components/Login.vue";
@@ -59,38 +60,42 @@ const router = createRouter({
 const pinia = createPinia();
 
 router.beforeEach(async (to, from, next) => {
-    const authStore = useAuthStore(pinia)
-    const userStore = useUserStore(pinia)
-    const dashboardStore = useDashboardStore(pinia)
-    
+    const authStore = useAuthStore(pinia);
+    const userStore = useUserStore(pinia);
+    const dashboardStore = useDashboardStore(pinia);
+    const inquiryStore = useInquiryStore(pinia);
+
     if (!authStore.isLoaded) {
-        await authStore.fetchUser()
+        await authStore.fetchUser();
     }
 
     if (authStore.isLoggedIn) {
         if (!userStore.isLoaded) {
-            await userStore.fetchUsers()
+            await userStore.fetchUsers();
         }
         if (!userStore.isMappingsLoaded) {
-            await userStore.fetchMappings()
+            await userStore.fetchMappings();
         }
-        if (to.path === '/dashboard' || !dashboardStore.isReadStatusesLoaded) {
-            await dashboardStore.fetchDashboardData()
+        if (to.path === "/dashboard" || !dashboardStore.isReadStatusesLoaded) {
+            await dashboardStore.fetchDashboardData();
+        }
+        if (!inquiryStore.isLoaded) {
+            await authStore.fetchInitialData();
         }
     }
 
-    if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (to.matched.some((record) => record.meta.requiresAuth)) {
         if (!authStore.isLoggedIn) {
-            next('/login')
+            next("/login");
         } else {
-            next()
+            next();
         }
-    } else if (to.path === '/login' && authStore.isLoggedIn) {
-        next('/dashboard')
+    } else if (to.path === "/login" && authStore.isLoggedIn) {
+        next("/dashboard");
     } else {
-        next()
+        next();
     }
-})
+});
 
 const app = createApp(App);
 app.use(pinia);
