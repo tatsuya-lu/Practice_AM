@@ -1,10 +1,9 @@
 import { defineStore } from "pinia";
-import axios from 'axios';
+import axios from "axios";
 
 export const useInquiryStore = defineStore("inquiry", {
     state: () => ({
-        inquiries: [],
-        currentInquiry: {},
+        inquiries: {}, // オブジェクトに変更
         statusOptions: {},
         isLoaded: false,
         isLoading: false,
@@ -14,24 +13,34 @@ export const useInquiryStore = defineStore("inquiry", {
         async fetchInquiries(params = {}) {
             this.isLoading = true;
             try {
-                const response = await axios.get('/api/inquiries', { params });
-                this.inquiries = response.data.inquiries.data;
+                const response = await axios.get("/api/inquiries", { params });
+                this.inquiries = response.data.inquiries.data.reduce(
+                    (acc, inquiry) => {
+                        acc[inquiry.id] = inquiry;
+                        return acc;
+                    },
+                    {}
+                );
+                this.statusOptions = response.data.statusOptions;
                 this.isLoaded = true;
             } catch (error) {
-                console.error('Error fetching inquiries:', error);
+                console.error("Error fetching inquiries:", error);
                 this.error = error.message;
             } finally {
                 this.isLoading = false;
             }
         },
         async fetchInquiry(id) {
+            if (this.inquiries[id]) {
+                return;
+            }
             this.isLoading = true;
             try {
                 const response = await axios.get(`/api/inquiries/${id}`);
-                this.currentInquiry = response.data.inquiry;
+                this.inquiries[id] = response.data.inquiry;
                 this.statusOptions = response.data.statusOptions;
             } catch (error) {
-                console.error('Error fetching inquiry:', error);
+                console.error("Error fetching inquiry:", error);
                 this.error = error.message;
             } finally {
                 this.isLoading = false;
@@ -44,7 +53,7 @@ export const useInquiryStore = defineStore("inquiry", {
                 this.currentInquiry = response.data.inquiry;
                 return response.data.message;
             } catch (error) {
-                console.error('Error updating inquiry:', error);
+                console.error("Error updating inquiry:", error);
                 this.error = error.message;
                 throw error;
             } finally {
@@ -65,7 +74,7 @@ export const useInquiryStore = defineStore("inquiry", {
         },
     },
     getters: {
-        getInquiries: (state) => state.inquiries,
-        getCurrentInquiry: (state) => state.currentInquiry,
+        getInquiries: (state) => Object.values(state.inquiries),
+        getCurrentInquiry: (state) => (id) => state.inquiries[id],
     },
 });

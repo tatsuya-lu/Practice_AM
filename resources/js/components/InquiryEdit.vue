@@ -8,7 +8,7 @@
             {{ successMessage }}
         </div>
 
-        <div v-if="inquiryStore.isLoading" class="loading">
+        <div v-if="!currentInquiry" class="loading">
             データを読み込んでいます...
         </div>
 
@@ -16,13 +16,12 @@
             エラーが発生しました: {{ inquiryStore.error }}
         </div>
 
-        <div v-else-if="inquiryStore.currentInquiry" class="inquiry-edit-container">
+        <div v-else class="inquiry-edit-container">
             <div class="inquiry-form-content">
                 <form @submit.prevent="updateInquiry">
                     <div class="form-item">
                         <label for="status">ステータス</label>
-                        <select v-model="inquiryStore.currentInquiry.status" id="status"
-                            class="form-item-input minimal">
+                        <select v-model="currentInquiry.status" id="status" class="form-item-input minimal">
                             <option v-for="(label, key) in inquiryStore.statusOptions" :key="key" :value="key">
                                 {{ label }}
                             </option>
@@ -31,12 +30,12 @@
 
                     <div class="form-item">
                         <label for="body">お問い合わせ内容</label>
-                        <p class="form-item-input form-item-textarea">{{ inquiryStore.currentInquiry.body }}</p>
+                        <p class="form-item-input form-item-textarea">{{ currentInquiry.body }}</p>
                     </div>
 
                     <div class="form-item">
                         <label for="comment">備考欄</label>
-                        <textarea v-model="inquiryStore.currentInquiry.comment" id="comment"
+                        <textarea v-model="currentInquiry.comment" id="comment"
                             class="form-item-input form-item-textarea"></textarea>
                     </div>
 
@@ -49,37 +48,37 @@
 
                 <div class="info-item">
                     <label for="company">会社名</label>
-                    <p>{{ inquiryStore.currentInquiry.company }}</p>
+                    <p>{{ currentInquiry.company }}</p>
                 </div>
 
                 <div class="info-item">
                     <label for="name">氏名</label>
-                    <p>{{ inquiryStore.currentInquiry.name }}</p>
+                    <p>{{ currentInquiry.name }}</p>
                 </div>
 
                 <div class="info-item">
                     <label for="tel">電話番号</label>
-                    <p>{{ inquiryStore.currentInquiry.tel }}</p>
+                    <p>{{ currentInquiry.tel }}</p>
                 </div>
 
                 <div class="info-item">
                     <label for="email">メールアドレス</label>
-                    <p>{{ inquiryStore.currentInquiry.email }}</p>
+                    <p>{{ currentInquiry.email }}</p>
                 </div>
 
                 <div class="info-item">
                     <label for="birthday">生年月日</label>
-                    <p>{{ inquiryStore.currentInquiry.birthday }}</p>
+                    <p>{{ currentInquiry.birthday }}</p>
                 </div>
 
                 <div class="info-item">
                     <label for="gender">性別</label>
-                    <p>{{ inquiryStore.currentInquiry.gender }}</p>
+                    <p>{{ currentInquiry.gender }}</p>
                 </div>
 
                 <div class="info-item">
                     <label for="profession">職業</label>
-                    <p>{{ inquiryStore.currentInquiry.profession }}</p>
+                    <p>{{ currentInquiry.profession }}</p>
                 </div>
             </div>
         </div>
@@ -87,7 +86,7 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useInquiryStore } from "../store/inquiry";
 import { useDashboardStore } from "../store/dashboard";
@@ -100,12 +99,13 @@ export default {
         const dashboardStore = useDashboardStore();
         const successMessage = ref('');
 
+        const currentInquiry = computed(() => inquiryStore.getCurrentInquiry(route.params.id));
+
         const updateInquiry = async () => {
             try {
-                const message = await inquiryStore.updateInquiry(route.params.id, inquiryStore.currentInquiry);
+                const message = await inquiryStore.updateInquiry(route.params.id, currentInquiry.value);
                 successMessage.value = message;
 
-                // ダッシュボードストアを更新
                 await dashboardStore.fetchUnresolvedInquiries();
 
                 router.push({ path: '/inquiry/list', query: { success: 'お問い合わせが更新されました' } });
@@ -115,15 +115,14 @@ export default {
         };
 
         onMounted(async () => {
-            await inquiryStore.fetchInquiry(route.params.id);
-        });
-
-        onUnmounted(() => {
-            inquiryStore.clearCurrentInquiry();
+            if (!currentInquiry.value) {
+                await inquiryStore.fetchInquiry(route.params.id);
+            }
         });
 
         return {
             inquiryStore,
+            currentInquiry,
             successMessage,
             updateInquiry
         };
