@@ -3,7 +3,7 @@ import axios from "axios";
 
 export const useInquiryStore = defineStore("inquiry", {
     state: () => ({
-        inquiries: {}, // オブジェクトに変更
+        inquiries: {},
         statusOptions: {},
         isLoaded: false,
         isLoading: false,
@@ -16,7 +16,10 @@ export const useInquiryStore = defineStore("inquiry", {
                 const response = await axios.get("/api/inquiries", { params });
                 this.inquiries = response.data.inquiries.data.reduce(
                     (acc, inquiry) => {
-                        acc[inquiry.id] = inquiry;
+                        acc[inquiry.id] = {
+                            ...inquiry,
+                            statusText: inquiry.statusText,
+                        };
                         return acc;
                     },
                     {}
@@ -37,7 +40,10 @@ export const useInquiryStore = defineStore("inquiry", {
             this.isLoading = true;
             try {
                 const response = await axios.get(`/api/inquiries/${id}`);
-                this.inquiries[id] = response.data.inquiry;
+                this.inquiries[id] = {
+                    ...response.data.inquiry,
+                    statusText: response.data.inquiry.statusText,
+                };
                 this.statusOptions = response.data.statusOptions;
             } catch (error) {
                 console.error("Error fetching inquiry:", error);

@@ -22,30 +22,31 @@ class InquiryController extends Controller
     public function apiIndex(Request $request)
     {
         $inquiries = $this->inquiryService->index($request);
+        $statusOptions = Config::get('const.status');
 
         foreach ($inquiries as $inquiry) {
-            $inquiry->status = config('const.status')[$inquiry->status] ?? $inquiry->status;
+            $inquiry->statusText = $statusOptions[$inquiry->status] ?? $inquiry->status;
         }
 
         $unresolvedInquiryCount = $this->inquiryService->unresolvedInquiryCount();
 
         return response()->json([
             'inquiries' => $inquiries,
-            'unresolvedInquiryCount' => $unresolvedInquiryCount
+            'unresolvedInquiryCount' => $unresolvedInquiryCount,
+            'statusOptions' => $statusOptions
         ]);
     }
 
     public function apiShow(Post $inquiry)
     {
         $statusOptions = Config::get('const.status');
-        $inquiryStatus = $statusOptions[$inquiry->status] ?? $inquiry->status;
+        $inquiry->statusText = $statusOptions[$inquiry->status] ?? $inquiry->status;
         $inquiry->gender = config('const.gender.' . $inquiry->gender);
         $inquiry->profession = config('const.profession.' . $inquiry->profession);
 
         return response()->json([
             'inquiry' => $inquiry,
-            'statusOptions' => $statusOptions,
-            'inquiryStatus' => $inquiryStatus
+            'statusOptions' => $statusOptions
         ]);
     }
 

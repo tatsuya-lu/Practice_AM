@@ -55,7 +55,7 @@
                             <span class="fa-solid fa-pen-to-square"></span>
                         </router-link>
                     </td>
-                    <td>{{ inquiry.status }}</td>
+                    <td>{{ inquiry.statusText }}</td>
                     <td>{{ inquiry.company }}</td>
                     <td>{{ inquiry.name }}</td>
                     <td>{{ inquiry.tel }}</td>

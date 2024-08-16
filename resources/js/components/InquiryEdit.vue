@@ -99,7 +99,10 @@ export default {
         const dashboardStore = useDashboardStore();
         const successMessage = ref('');
 
-        const currentInquiry = computed(() => inquiryStore.getCurrentInquiry(route.params.id));
+        const currentInquiry = computed(() => {
+            const inquiry = inquiryStore.getCurrentInquiry(route.params.id);
+            return inquiry ? { ...inquiry, statusText: inquiryStore.statusOptions[inquiry.status] } : null;
+        });
 
         const updateInquiry = async () => {
             try {
