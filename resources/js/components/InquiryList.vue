@@ -69,14 +69,14 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useInquiryStore } from '../store/inquiry';
-import axios from 'axios';
 
 export default {
     setup() {
         const route = useRoute();
+        const router = useRouter();
         const inquiryStore = useInquiryStore();
         const successMessage = ref('');
         const searchStatus = ref('');
@@ -109,8 +109,13 @@ export default {
         onMounted(() => {
             if (route.query.success) {
                 successMessage.value = route.query.success;
+                router.replace({ query: {} });
             }
-            if (!inquiryStore.isLoaded) {
+            fetchInquiries();
+        });
+
+        watch(() => route.fullPath, () => {
+            if (route.name === 'inquiry.list') {
                 fetchInquiries();
             }
         });

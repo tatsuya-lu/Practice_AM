@@ -111,7 +111,12 @@ export default {
 
                 await dashboardStore.fetchUnresolvedInquiries();
 
-                router.push({ path: '/inquiry/list', query: { success: 'お問い合わせが更新されました' } });
+                await inquiryStore.fetchInquiries();
+
+                router.push({
+                    path: '/inquiry/list',
+                    query: { success: 'お問い合わせが更新されました' }
+                });
             } catch (error) {
                 console.error('Error updating inquiry:', error);
             }

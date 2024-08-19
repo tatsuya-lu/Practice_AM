@@ -18,7 +18,7 @@ export const useInquiryStore = defineStore("inquiry", {
                     (acc, inquiry) => {
                         acc[inquiry.id] = {
                             ...inquiry,
-                            statusText: inquiry.statusText,
+                            statusText: this.statusOptions[inquiry.status],
                         };
                         return acc;
                     },
