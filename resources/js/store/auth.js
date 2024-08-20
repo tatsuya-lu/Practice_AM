@@ -40,8 +40,16 @@ export const useAuthStore = defineStore("auth", {
             const inquiryStore = useInquiryStore();
             await Promise.all([
                 this.fetchUser(),
-                inquiryStore.fetchInquiries()
+                inquiryStore.fetchInquiries(),
             ]);
+        },
+        async ensureAuthenticated() {
+            if (!this.isLoggedIn) {
+                await this.fetchUser();
+            }
+            if (!this.isLoggedIn) {
+                throw new Error("Authentication required");
+            }
         },
     },
     getters: {

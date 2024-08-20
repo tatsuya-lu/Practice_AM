@@ -10,16 +10,24 @@ export const useInquiryStore = defineStore("inquiry", {
         error: null,
     }),
     actions: {
+        async fetchStatusOptions() {
+            if (Object.keys(this.statusOptions).length > 0) return;
+            try {
+                const response = await axios.get(
+                    "/api/inquiries/status-options"
+                );
+                this.statusOptions = response.data.statusOptions;
+            } catch (error) {
+                console.error("Error fetching status options:", error);
+            }
+        },
         async fetchInquiries(params = {}) {
             this.isLoading = true;
             try {
                 const response = await axios.get("/api/inquiries", { params });
                 this.inquiries = response.data.inquiries.data.reduce(
                     (acc, inquiry) => {
-                        acc[inquiry.id] = {
-                            ...inquiry,
-                            statusText: this.statusOptions[inquiry.status],
-                        };
+                        acc[inquiry.id] = inquiry;
                         return acc;
                     },
                     {}
@@ -34,16 +42,10 @@ export const useInquiryStore = defineStore("inquiry", {
             }
         },
         async fetchInquiry(id) {
-            if (this.inquiries[id]) {
-                return;
-            }
             this.isLoading = true;
             try {
                 const response = await axios.get(`/api/inquiries/${id}`);
-                this.inquiries[id] = {
-                    ...response.data.inquiry,
-                    statusText: response.data.inquiry.statusText,
-                };
+                this.inquiries[id] = response.data.inquiry;
                 this.statusOptions = response.data.statusOptions;
             } catch (error) {
                 console.error("Error fetching inquiry:", error);
@@ -81,6 +83,8 @@ export const useInquiryStore = defineStore("inquiry", {
     },
     getters: {
         getInquiries: (state) => Object.values(state.inquiries),
+        getStatusText: (state) => (statusCode) =>
+            state.statusOptions[statusCode] || statusCode,
         getCurrentInquiry: (state) => (id) => state.inquiries[id],
     },
 });

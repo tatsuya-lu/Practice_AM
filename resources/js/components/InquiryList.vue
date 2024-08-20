@@ -72,12 +72,14 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useInquiryStore } from '../store/inquiry';
+import { useAuthStore } from '../store/auth';
 
 export default {
     setup() {
         const route = useRoute();
         const router = useRouter();
         const inquiryStore = useInquiryStore();
+        const authStore = useAuthStore();
         const successMessage = ref('');
         const searchStatus = ref('');
         const searchCompany = ref('');
@@ -106,12 +108,13 @@ export default {
             fetchInquiries();
         };
 
-        onMounted(() => {
+        onMounted(async () => {
             if (route.query.success) {
                 successMessage.value = route.query.success;
                 router.replace({ query: {} });
             }
-            fetchInquiries();
+            await authStore.ensureAuthenticated();
+            await fetchInquiries();
         });
 
         watch(() => route.fullPath, () => {
@@ -127,7 +130,8 @@ export default {
             searchCompany,
             searchTel,
             sortInquiries,
-            searchInquiries
+            searchInquiries,
+            inquiryStore,
         };
     }
 }
