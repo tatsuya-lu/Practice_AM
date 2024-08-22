@@ -105,8 +105,7 @@
 </template>
 
 <script>
-import { ref, onMounted, watch } from 'vue'
-import axios from 'axios'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '../store/user'
 
@@ -116,30 +115,28 @@ export default {
         const router = useRouter()
         const userStore = useUserStore()
         const user = ref({})
-        const prefectures = ref({})
-        const adminLevels = ref({})
         const errors = ref({})
-        const isEditing = ref(false)
+        const isEditing = computed(() => !!route.params.id)
 
-        const fetchFormData = async () => {
-            try {
-                const response = await axios.get('/api/form-data')
-                prefectures.value = response.data.prefectures
-                adminLevels.value = response.data.adminLevels
-            } catch (error) {
-                console.error('Error fetching form data:', error)
-            }
-        }
+        const prefectures = computed(() => userStore.prefectures)
+        const adminLevels = computed(() => userStore.adminLevels)
 
         const fetchUserData = async () => {
-            if (route.params.id) {
-                try {
-                    const response = await axios.get(`/api/account/${route.params.id}`)
-                    user.value = response.data
-                    isEditing.value = true
-                } catch (error) {
-                    console.error('Error fetching user data:', error)
+            if (isEditing.value) {
+                const userId = route.params.id
+                const existingUser = userStore.getUserById(userId)
+                if (existingUser) {
+                    user.value = { ...existingUser }
+                } else {
+                    try {
+                        const response = await userStore.fetchUserById(userId)
+                        user.value = response
+                    } catch (error) {
+                        console.error('Error fetching user data:', error)
+                    }
                 }
+            } else {
+                user.value = {}
             }
         }
 
@@ -158,42 +155,21 @@ export default {
 
                 let response
                 if (isEditing.value) {
-                    response = await axios.post(`/api/account/${user.value.id}`, formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                            'X-HTTP-Method-Override': 'PUT'
-                        }
-                    })
+                    response = await userStore.updateUser(user.value.id, formData)
                 } else {
-                    response = await axios.post('/api/account/register', formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data'
-                        }
-                    })
+                    response = await userStore.registerUser(formData)
                 }
 
-                console.log('Response:', response.data)
-
-                if (response.data.user) {
-                    if (!isEditing.value) {
-                        await userStore.addUser(response.data.user)
-                    } else {
-                        await userStore.updateUser(response.data.user)
-                    }
-
+                if (response.success) {
                     router.push({
                         name: 'account.list',
                         query: {
-                            success: response.data.message,
-                            registered_email: isEditing.value ? null : response.data.user.email
+                            success: response.message,
+                            registered_email: isEditing.value ? null : response.user.email
                         }
-                    }).catch(err => {
-                        console.error('Navigation failed', err)
-                        window.location.href = '/account/list'
                     })
                 } else {
-                    console.error('Operation failed:', response.data.message)
-                    errors.value = response.data.errors || {}
+                    errors.value = response.errors || {}
                 }
             } catch (error) {
                 console.error('Error submitting form:', error)
@@ -203,14 +179,12 @@ export default {
             }
         }
 
-        onMounted(() => {
-            fetchFormData()
+        onMounted(async () => {
+            await userStore.fetchMappings()
             fetchUserData()
         })
 
-        watch(() => route.params.id, () => {
-            fetchUserData()
-        })
+        watch(() => route.params.id, fetchUserData)
 
         return {
             user,

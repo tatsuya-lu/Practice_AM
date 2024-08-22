@@ -53,6 +53,66 @@ export const useUserStore = defineStore("user", {
                 console.error("Error fetching mappings:", error);
             }
         },
+        async fetchUserById(userId) {
+            try {
+                const response = await axios.get(`/api/account/${userId}`);
+                const userData = response.data;
+                this.updateUser(userData);
+                return userData;
+            } catch (error) {
+                console.error("Error fetching user by ID:", error);
+                throw error;
+            }
+        },
+        async registerUser(formData) {
+            try {
+                const response = await axios.post(
+                    "/api/account/register",
+                    formData,
+                    {
+                        headers: { "Content-Type": "multipart/form-data" },
+                    }
+                );
+                if (response.data.user) {
+                    this.addUser(response.data.user);
+                }
+                return {
+                    success: true,
+                    message: response.data.message,
+                    user: response.data.user,
+                };
+            } catch (error) {
+                console.error("Error registering user:", error);
+                return {
+                    success: false,
+                    errors: error.response?.data?.errors || {},
+                };
+            }
+        },
+        async updateUser(userId, formData) {
+            try {
+                const response = await axios.post(
+                    `/api/account/${userId}`,
+                    formData,
+                    {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                            "X-HTTP-Method-Override": "PUT",
+                        },
+                    }
+                );
+                if (response.data.user) {
+                    this.updateUser(response.data.user);
+                }
+                return { success: true, message: response.data.message };
+            } catch (error) {
+                console.error("Error updating user:", error);
+                return {
+                    success: false,
+                    errors: error.response?.data?.errors || {},
+                };
+            }
+        },
     },
     getters: {
         getUsers: (state) => state.users,
@@ -62,5 +122,8 @@ export const useUserStore = defineStore("user", {
             state.isMappingsLoaded
                 ? state.prefectures[prefCode] || prefCode
                 : prefCode,
+        getUserById: (state) => (userId) => {
+            return state.users.find((user) => user.id === userId);
+        },
     },
 });
