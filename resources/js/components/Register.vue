@@ -1,10 +1,10 @@
 <template>
     <div>
         <p class="page-title">
-            {{ user.id ? 'アカウント編集' : 'アカウント登録' }}
+            {{ isEditing ? 'アカウント編集' : 'アカウント登録' }}
         </p>
 
-        <div class="register-form-container">
+        <div class="register-form-container" v-show="isDataLoaded">
             <form @submit.prevent="submitForm" enctype="multipart/form-data">
                 <div class="form-item">
                     <label><span class="required">必須</span>会員名</label>
@@ -101,6 +101,7 @@
                 <button type="submit" class="form-btn">{{ user.id ? '更新する' : '確認する' }}</button>
             </form>
         </div>
+        <div v-if="!isDataLoaded" class="loading">読み込み中...</div>
     </div>
 </template>
 
@@ -117,27 +118,25 @@ export default {
         const user = ref({})
         const errors = ref({})
         const isEditing = computed(() => !!route.params.id)
+        const isDataLoaded = ref(false)
 
         const prefectures = computed(() => userStore.prefectures)
         const adminLevels = computed(() => userStore.adminLevels)
 
         const fetchUserData = async () => {
+            isDataLoaded.value = false
             if (isEditing.value) {
                 const userId = route.params.id
-                const existingUser = userStore.getUserById(userId)
-                if (existingUser) {
-                    user.value = { ...existingUser }
-                } else {
-                    try {
-                        const response = await userStore.fetchUserById(userId)
-                        user.value = response
-                    } catch (error) {
-                        console.error('Error fetching user data:', error)
-                    }
+                try {
+                    const response = await userStore.fetchUserById(userId)
+                    user.value = { ...response }
+                } catch (error) {
+                    console.error('Error fetching user data:', error)
                 }
             } else {
                 user.value = {}
             }
+            isDataLoaded.value = true
         }
 
         const handleFileUpload = (event) => {
@@ -180,8 +179,7 @@ export default {
         }
 
         onMounted(async () => {
-            await userStore.fetchMappings()
-            fetchUserData()
+            await Promise.all([userStore.fetchMappings(), fetchUserData()])
         })
 
         watch(() => route.params.id, fetchUserData)
@@ -192,6 +190,7 @@ export default {
             adminLevels,
             errors,
             isEditing,
+            isDataLoaded,
             submitForm,
             handleFileUpload
         }

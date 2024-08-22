@@ -92,7 +92,7 @@ export const useUserStore = defineStore("user", {
         async updateUser(userId, formData) {
             try {
                 const response = await axios.post(
-                    `/api/account/${userId}`,
+                    `/api/account/${userId}`, // ここを修正
                     formData,
                     {
                         headers: {
