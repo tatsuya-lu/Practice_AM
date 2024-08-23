@@ -35,11 +35,9 @@
                     <div v-if="isNotificationVisible" class="notification-list">
                         <ul v-if="unreadNotifications.length > 0">
                             <li v-for="notification in unreadNotifications" :key="notification.id"
-                                @click="markAsRead(notification)">
-                                <router-link :to="{ name: 'notification.show', params: { id: notification.id } }">
-                                    {{ notification.title }}
-                                    <span class="notification-date">{{ formatDate(notification.created_at) }}</span>
-                                </router-link>
+                                @click="openNotificationModal(notification)">
+                                {{ notification.title }}
+                                <span class="notification-date">{{ formatDate(notification.created_at) }}</span>
                             </li>
                         </ul>
                         <p v-else>新しいお知らせはありません</p>
@@ -67,6 +65,8 @@
         <div v-if="isInitialLoading" class="loading-overlay">
             Loading...
         </div>
+        <NotificationModal :show="showNotificationModal" :notification="selectedNotification"
+            @close="closeNotificationModal" />
     </div>
 </template>
 
@@ -76,8 +76,12 @@ import { useRouter } from "vue-router";
 import { useNotificationStore } from "./store/notification";
 import { useAuthStore } from "./store/auth";
 import { useUserStore } from "./store/user";
+import NotificationModal from "@/components/NotificationModal.vue";
 
 export default {
+    components: {
+        NotificationModal,
+    },
     setup() {
         const router = useRouter();
         const notificationStore = useNotificationStore();
@@ -100,6 +104,19 @@ export default {
             }
             return "/img/noimage.png";
         });
+
+        const showNotificationModal = ref(false);
+        const selectedNotification = ref(null);
+
+        const openNotificationModal = (notification) => {
+            selectedNotification.value = notification;
+            showNotificationModal.value = true;
+            markAsRead(notification);
+        };
+
+        const closeNotificationModal = () => {
+            showNotificationModal.value = false;
+        };
 
         const unreadNotifications = computed(() => notificationStore.unreadNotifications);
         const unreadNotificationsCount = computed(() => unreadNotifications.value.length);
@@ -195,6 +212,10 @@ export default {
             isInitialLoading,
             transitionName,
             userStore,
+            showNotificationModal,
+            selectedNotification,
+            openNotificationModal,
+            closeNotificationModal,
         };
     },
 };

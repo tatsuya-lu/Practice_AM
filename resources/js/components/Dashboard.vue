@@ -26,8 +26,8 @@
                                 <li class="notification-title-date">
                                     {{ formatDate(notification.created_at) }}
                                 </li>
-                                <a :href="`/notifications/${notification.id}`" class="notification-link"
-                                    @click="updateNotificationStatus(notification.id)">
+                                <a href="#" class="notification-link"
+                                    @click.prevent="openNotificationModal(notification)">
                                     <li class="notification-content">
                                         {{ notification.description }}
                                     </li>
@@ -82,6 +82,8 @@
                 </div>
             </div>
         </div>
+        <NotificationModal :show="showNotificationModal" :notification="selectedNotification"
+            @close="closeNotificationModal" />
     </div>
 </template>
 
@@ -89,12 +91,29 @@
 import { ref, onMounted, watch } from "vue";
 import { useRoute } from 'vue-router';
 import { useDashboardStore } from "../store/dashboard";
+import NotificationModal from "./NotificationModal.vue";
 
 export default {
+    components: {
+        NotificationModal,
+    },
     setup() {
         const dashboardStore = useDashboardStore();
         const successMessage = ref("");
         const route = useRoute();
+
+        const showNotificationModal = ref(false);
+        const selectedNotification = ref(null);
+
+        const openNotificationModal = (notification) => {
+            selectedNotification.value = notification;
+            showNotificationModal.value = true;
+            updateNotificationStatus(notification.id);
+        };
+
+        const closeNotificationModal = () => {
+            showNotificationModal.value = false;
+        };
 
         const getNotificationStatus = (notificationId) => {
             return dashboardStore.notificationReadStatuses[notificationId] ? "既読済み" : "未読";
@@ -134,7 +153,6 @@ export default {
             if (!dashboardStore.isLoaded) {
                 await dashboardStore.fetchDashboardData(true);
             } else {
-                // 未解決のお問い合わせのみを再取得
                 await dashboardStore.fetchUnresolvedInquiries();
             }
         };
@@ -150,6 +168,10 @@ export default {
             getNotificationStatusClass,
             formatDate,
             updateNotificationStatus,
+            showNotificationModal,
+            selectedNotification,
+            openNotificationModal,
+            closeNotificationModal,
         };
     },
 };

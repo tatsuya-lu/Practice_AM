@@ -32,11 +32,6 @@ const routes = [
         meta: { requiresAuth: true },
     },
     {
-        path: "/notifications/:id",
-        component: NotificationShow,
-        name: "notification.show",
-    },
-    {
         path: "/notifications/create",
         component: NotificationRegister,
         name: "notification.create",
