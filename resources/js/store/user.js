@@ -8,6 +8,7 @@ export const useUserStore = defineStore("user", {
         adminLevels: {},
         prefectures: {},
         isMappingsLoaded: false,
+        userCache: {},
     }),
     actions: {
         async fetchUsers(forceRefresh = false) {
@@ -54,10 +55,14 @@ export const useUserStore = defineStore("user", {
             }
         },
         async fetchUserById(userId) {
+            if (this.userCache[userId]) {
+                return this.userCache[userId];
+            }
             try {
                 const response = await axios.get(`/api/account/${userId}`);
                 const userData = response.data;
                 this.updateUser(userData);
+                this.userCache[userId] = userData;
                 return userData;
             } catch (error) {
                 console.error("Error fetching user by ID:", error);
@@ -92,7 +97,7 @@ export const useUserStore = defineStore("user", {
         async updateUser(userId, formData) {
             try {
                 const response = await axios.post(
-                    `/api/account/${userId}`, // ここを修正
+                    `/api/account/${userId}`,
                     formData,
                     {
                         headers: {
