@@ -3,7 +3,7 @@ import axios from "axios";
 
 export const useUserStore = defineStore("user", {
     state: () => ({
-        users: {},  // オブジェクトに変更
+        users: [],
         isLoaded: false,
         adminLevels: {},
         prefectures: {},
@@ -14,36 +14,31 @@ export const useUserStore = defineStore("user", {
             if (this.isLoaded && !forceRefresh) return;
             try {
                 const response = await axios.get("/api/account/list");
-                const users = Array.isArray(response.data) ? response.data : response.data.data;
-                this.users = users.reduce((acc, user) => {
-                    acc[user.id] = user;
-                    return acc;
-                }, {});
+                this.users = Array.isArray(response.data) ? response.data : response.data.data;
                 this.isLoaded = true;
-                console.log('Fetched users:', this.users); // デバッグ用
             } catch (error) {
                 console.error("Error fetching users:", error);
             }
         },
         setUsers(users) {
-            this.users = users.reduce((acc, user) => {
-                acc[user.id] = user;
-                return acc;
-            }, {});
+            this.users = users;
             this.isLoaded = true;
         },
         clearUsers() {
-            this.users = {};
+            this.users = [];
             this.isLoaded = false;
         },
         addUser(user) {
-            this.users = { [user.id]: user, ...this.users };
+            this.users.unshift(user);
         },
         updateUser(updatedUser) {
-            this.users[updatedUser.id] = updatedUser;
+            const index = this.users.findIndex(user => user.id === updatedUser.id);
+            if (index !== -1) {
+                this.users.splice(index, 1, updatedUser);
+            }
         },
         removeUser(userId) {
-            delete this.users[userId];
+            this.users = this.users.filter(user => user.id !== userId);
         },
         async fetchMappings(forceRefresh = false) {
             if (this.isMappingsLoaded && !forceRefresh) return;
@@ -62,8 +57,8 @@ export const useUserStore = defineStore("user", {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
                 if (response.data.user) {
-                    this.users[response.data.user.id] = response.data.user;
-                    this.isLoaded = false; // 強制的に再読み込みを促す
+                    this.addUser(response.data.user);
+                    this.isLoaded = false;
                 }
                 return {
                     success: true,
@@ -91,7 +86,7 @@ export const useUserStore = defineStore("user", {
                     }
                 );
                 if (response.data.user) {
-                    this.users[userId] = response.data.user;
+                    this.updateUser(response.data.user);
                 }
                 return { success: true, message: response.data.message, user: response.data.user };
             } catch (error) {
@@ -104,13 +99,22 @@ export const useUserStore = defineStore("user", {
         },
     },
     getters: {
-        getUsers: (state) => Object.values(state.users),
+        getUsers: (state) => state.users,
         getAdminLevelLabel: (state) => (level) =>
             state.isMappingsLoaded ? state.adminLevels[level] || level : level,
         getPrefectureLabel: (state) => (prefCode) =>
             state.isMappingsLoaded
                 ? state.prefectures[prefCode] || prefCode
                 : prefCode,
-        getUserById: (state) => (userId) => state.users[userId],
+        getUserById: (state) => (userId) => state.users.find(user => user.id === userId),
+        getSortedUsers: (state) => (sortType = 'newest') => {
+            return [...state.users].sort((a, b) => {
+                if (sortType === 'newest') {
+                    return new Date(b.created_at) - new Date(a.created_at);
+                } else {
+                    return new Date(a.created_at) - new Date(b.created_at);
+                }
+            });
+        },
     },
 });

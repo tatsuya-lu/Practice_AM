@@ -19,92 +19,88 @@
                     <p v-if="errors.email" class="error-message">{{ errors.email[0] }}</p>
                 </div>
 
-                <div v-if="isDataLoaded">
-                    <div class="form-item">
-                        <label><span class="required">必須</span>フリガナ</label>
-                        <input class="form-item-input" type="text" id="sub_name" v-model="user.sub_name"
-                            placeholder="例）ヤマダタロウ">
-                        <p v-if="errors.sub_name" class="error-message">{{ errors.sub_name[0] }}</p>
-                    </div>
-
-                    <div class="form-item">
-                        <label><span class="required">必須</span>パスワード</label>
-                        <input class="form-item-input" type="password" id="password" v-model="user.password"
-                            placeholder="八文字以上で入力してください。" autocomplete="new-password">
-                        <p v-if="errors.password" class="error-message">{{ errors.password[0] }}</p>
-                    </div>
-
-                    <div class="form-item">
-                        <label><span class="required">必須</span>パスワード(再入力)</label>
-                        <input class="form-item-input" type="password" id="password_confirmation"
-                            v-model="user.password_confirmation" placeholder="パスワードを再入力してください。">
-                    </div>
-
-                    <div class="form-item">
-                        <label><span class="required">必須</span>電話番号</label>
-                        <input class="form-item-input" type="text" id="tel" v-model="user.tel"
-                            placeholder="例）000 0000 0000   注:ハイフン無しで入力してください">
-                        <p v-if="errors.tel" class="error-message">{{ errors.tel[0] }}</p>
-                    </div>
-
-                    <div class="form-item">
-                        <label><span class="required">必須</span>郵便番号</label>
-                        <input class="form-item-input" type="text" id="post_code" v-model="user.post_code"
-                            placeholder="例）000 0000   注:ハイフン無しで入力してください">
-                        <p v-if="errors.post_code" class="error-message">{{ errors.post_code[0] }}</p>
-                    </div>
-
-                    <div class="form-item">
-                        <label><span class="required">必須</span>都道府県</label>
-                        <select class="form-item-input minimal" v-model="user.prefecture">
-                            <option value="" disabled>都道府県を選択してください</option>
-                            <option v-for="(value, key) in prefectures" :key="key" :value="key">{{ value }}</option>
-                        </select>
-                        <p v-if="errors.prefecture" class="error-message">{{ errors.prefecture[0] }}</p>
-                    </div>
-
-                    <div class="form-item">
-                        <label><span class="required">必須</span>市町村</label>
-                        <input class="form-item-input" type="text" id="city" v-model="user.city" placeholder="">
-                        <p v-if="errors.city" class="error-message">{{ errors.city[0] }}</p>
-                    </div>
-
-                    <div class="form-item">
-                        <label><span class="required">必須</span>番地・アパート名</label>
-                        <input class="form-item-input" type="text" id="street" v-model="user.street" placeholder="">
-                        <p v-if="errors.street" class="error-message">{{ errors.street[0] }}</p>
-                    </div>
-
-                    <div class="form-item">
-                        <label>備考欄</label>
-                        <textarea class="form-item-input" v-model="user.comment"></textarea>
-                        <p v-if="errors.comment" class="error-message">{{ errors.comment[0] }}</p>
-                    </div>
-
-                    <div v-if="user.id">
-                        <label for="profile_image">プロフィール画像:</label>
-                        <input type="file" name="profile_image" id="profile_image" @change="handleFileUpload">
-                        <img v-if="user.profile_image" :src="'/images/profile/' + user.profile_image" alt="プロフィール画像"
-                            style="width: 200px; height: 200px; border-radius: 50%; object-fit: cover;">
-                        <img v-else src="/images/noimage.png" alt="プロフィール画像"
-                            style="width: 200px; height: 200px; border-radius: 50%; object-fit: cover;">
-                    </div>
-
-                    <div class="form-item">
-                        <label><span class="required">必須</span>アカウントの種類</label>
-                        <select class="form-item-input minimal" v-model="user.admin_level">
-                            <option value="" disabled>アカウントの種類を選択してください</option>
-                            <option v-for="(value, key) in adminLevels" :key="key" :value="key">{{ value }}</option>
-                        </select>
-                        <p v-if="errors.admin_level" class="error-message">{{ errors.admin_level[0] }}</p>
-                    </div>
+                <div class="form-item">
+                    <label><span class="required">必須</span>フリガナ</label>
+                    <input class="form-item-input" type="text" id="sub_name" v-model="user.sub_name"
+                        placeholder="例）ヤマダタロウ">
+                    <p v-if="errors.sub_name" class="error-message">{{ errors.sub_name[0] }}</p>
                 </div>
 
-                <button type="submit" class="form-btn" :disabled="!isDataLoaded">{{ user.id ? '更新する' : '確認する'
-                    }}</button>
+                <div class="form-item">
+                    <label><span class="required">必須</span>パスワード</label>
+                    <input class="form-item-input" type="password" id="password" v-model="user.password"
+                        placeholder="八文字以上で入力してください。" autocomplete="new-password">
+                    <p v-if="errors.password" class="error-message">{{ errors.password[0] }}</p>
+                </div>
+
+                <div class="form-item">
+                    <label><span class="required">必須</span>パスワード(再入力)</label>
+                    <input class="form-item-input" type="password" id="password_confirmation"
+                        v-model="user.password_confirmation" placeholder="パスワードを再入力してください。">
+                </div>
+
+                <div class="form-item">
+                    <label><span class="required">必須</span>電話番号</label>
+                    <input class="form-item-input" type="text" id="tel" v-model="user.tel"
+                        placeholder="例）000 0000 0000   注:ハイフン無しで入力してください">
+                    <p v-if="errors.tel" class="error-message">{{ errors.tel[0] }}</p>
+                </div>
+
+                <div class="form-item">
+                    <label><span class="required">必須</span>郵便番号</label>
+                    <input class="form-item-input" type="text" id="post_code" v-model="user.post_code"
+                        placeholder="例）000 0000   注:ハイフン無しで入力してください">
+                    <p v-if="errors.post_code" class="error-message">{{ errors.post_code[0] }}</p>
+                </div>
+
+                <div class="form-item">
+                    <label><span class="required">必須</span>都道府県</label>
+                    <select class="form-item-input minimal" v-model="user.prefecture">
+                        <option value="" disabled>都道府県を選択してください</option>
+                        <option v-for="(value, key) in prefectures" :key="key" :value="key">{{ value }}</option>
+                    </select>
+                    <p v-if="errors.prefecture" class="error-message">{{ errors.prefecture[0] }}</p>
+                </div>
+
+                <div class="form-item">
+                    <label><span class="required">必須</span>市町村</label>
+                    <input class="form-item-input" type="text" id="city" v-model="user.city" placeholder="">
+                    <p v-if="errors.city" class="error-message">{{ errors.city[0] }}</p>
+                </div>
+
+                <div class="form-item">
+                    <label><span class="required">必須</span>番地・アパート名</label>
+                    <input class="form-item-input" type="text" id="street" v-model="user.street" placeholder="">
+                    <p v-if="errors.street" class="error-message">{{ errors.street[0] }}</p>
+                </div>
+
+                <div class="form-item">
+                    <label>備考欄</label>
+                    <textarea class="form-item-input" v-model="user.comment"></textarea>
+                    <p v-if="errors.comment" class="error-message">{{ errors.comment[0] }}</p>
+                </div>
+
+                <div v-if="user.id">
+                    <label for="profile_image">プロフィール画像:</label>
+                    <input type="file" name="profile_image" id="profile_image" @change="handleFileUpload">
+                    <img v-if="user.profile_image" :src="'/images/profile/' + user.profile_image" alt="プロフィール画像"
+                        style="width: 200px; height: 200px; border-radius: 50%; object-fit: cover;">
+                    <img v-else src="/images/noimage.png" alt="プロフィール画像"
+                        style="width: 200px; height: 200px; border-radius: 50%; object-fit: cover;">
+                </div>
+
+                <div class="form-item">
+                    <label><span class="required">必須</span>アカウントの種類</label>
+                    <select class="form-item-input minimal" v-model="user.admin_level">
+                        <option value="" disabled>アカウントの種類を選択してください</option>
+                        <option v-for="(value, key) in adminLevels" :key="key" :value="key">{{ value }}</option>
+                    </select>
+                    <p v-if="errors.admin_level" class="error-message">{{ errors.admin_level[0] }}</p>
+                </div>
+
+                <button type="submit" class="form-btn">{{ user.id ? '更新する' : '確認する' }}</button>
             </form>
         </div>
-        <div v-if="!isDataLoaded" class="loading">残りのデータを読み込み中...</div>
     </div>
 </template>
 
@@ -121,26 +117,28 @@ export default {
         const user = ref({})
         const errors = ref({})
         const isEditing = computed(() => !!route.params.id)
-        const isDataLoaded = ref(false)
 
         const prefectures = computed(() => userStore.prefectures)
         const adminLevels = computed(() => userStore.adminLevels)
 
         const fetchUserData = async () => {
             if (isEditing.value) {
-                const userId = route.params.id
-                await userStore.fetchUsers()
+                const userId = parseInt(route.params.id)
                 const userData = userStore.getUserById(userId)
                 if (userData) {
                     user.value = { ...userData }
-                    isDataLoaded.value = true
                 } else {
-                    console.error('User not found')
-                    router.push({ name: 'account.list' })
+                    await userStore.fetchUsers(true)
+                    const refreshedUserData = userStore.getUserById(userId)
+                    if (refreshedUserData) {
+                        user.value = { ...refreshedUserData }
+                    } else {
+                        console.error('User not found')
+                        router.push({ name: 'account.list' })
+                    }
                 }
             } else {
                 user.value = {}
-                isDataLoaded.value = true
             }
         }
 
@@ -165,10 +163,8 @@ export default {
                 }
 
                 if (response.success) {
-                    // ユーザーリストを強制的に再取得
                     await userStore.fetchUsers(true)
 
-                    // 成功メッセージとともにアカウント一覧ページへリダイレクト
                     router.push({
                         name: 'account.list',
                         query: {
@@ -177,7 +173,6 @@ export default {
                         }
                     })
                 } else {
-                    // エラーメッセージを設定
                     errors.value = response.errors || {}
                 }
             } catch (error) {
@@ -185,15 +180,16 @@ export default {
                 if (error.response && error.response.data) {
                     errors.value = error.response.data.errors || {}
                 } else {
-                    // ネットワークエラーなどの場合の一般的なエラーメッセージ
                     errors.value = { general: ['送信中にエラーが発生しました。もう一度お試しください。'] }
                 }
             }
         }
 
         onMounted(async () => {
-            await userStore.fetchMappings()
-            await fetchUserData()
+            await Promise.all([
+                userStore.fetchMappings(),
+                fetchUserData()
+            ])
         })
 
         watch(() => route.params.id, fetchUserData)
@@ -204,7 +200,6 @@ export default {
             adminLevels,
             errors,
             isEditing,
-            isDataLoaded,
             submitForm,
             handleFileUpload
         }

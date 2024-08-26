@@ -47,10 +47,7 @@
     <div v-if="successMessage" class="success">
       {{ successMessage }}
     </div>
-    <div v-if="isLoading">
-      読み込み中...
-    </div>
-    <div v-else-if="users.length > 0" class="table-container">
+    <div v-if="users.length > 0" class="table-container">
       <table>
         <tr>
           <th>編集</th>
@@ -111,11 +108,12 @@ export default {
     const searchEmail = ref('')
     const adminLevels = ref({})
     const prefectures = ref({})
+    const sortType = ref('newest')
 
-    const users = computed(() => Object.values(userStore.users));
+    const users = computed(() => userStore.getUsers)
 
     const fetchUsers = async () => {
-      await userStore.fetchUsers(true);
+      await userStore.fetchUsers(true)
     }
 
     const fetchFormData = async () => {
@@ -128,11 +126,12 @@ export default {
       }
     }
 
-    const sortUsers = async (sortType) => {
+    const sortUsers = async (newSortType) => {
+      sortType.value = newSortType
       try {
         const response = await axios.get('/api/account/list', {
           params: {
-            sort: sortType,
+            sort: newSortType,
             search_name: searchName.value,
             search_admin_level: searchAdminLevel.value,
             search_email: searchEmail.value
@@ -180,11 +179,12 @@ export default {
       }
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
 
-      successMessage.value = route.query.success || ''
-      registeredEmail.value = route.query.registered_email || ''
+      successMessage.value = route.query.success || '';
+      registeredEmail.value = route.query.registered_email || '';
       router.replace({ query: {} })
 
       await userStore.fetchMappings(true)
+      await fetchFormData()
       await fetchUsers()
     })
 
