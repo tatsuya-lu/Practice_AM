@@ -65,7 +65,7 @@
         </tr>
         <tr v-for="user in users" :key="user.id">
           <td class="table-text-center">
-            <router-link :to="{ name: 'account.edit', params: { id: user.id } }" @click.native="prefetchUser(user.id)">
+            <router-link :to="{ name: 'account.edit', params: { id: user.id } }">
               <span class="fa-solid fa-pen-to-square"></span>
             </router-link>
           </td>
@@ -112,15 +112,11 @@ export default {
     const adminLevels = ref({})
     const prefectures = ref({})
 
-    const users = computed(() => userStore.getUsers)
+    const users = computed(() => Object.values(userStore.users));
 
     const fetchUsers = async () => {
-      await userStore.fetchUsers(true) // forceRefresh を true に設定
+      await userStore.fetchUsers(true);
     }
-
-    const prefetchUser = async (userId) => {
-      await userStore.fetchUserById(userId);
-    };
 
     const fetchFormData = async () => {
       try {
@@ -210,7 +206,6 @@ export default {
       searchUsers,
       deleteUser,
       userStore,
-      prefetchUser,
     }
   }
 }

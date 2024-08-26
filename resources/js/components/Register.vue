@@ -127,19 +127,21 @@ export default {
         const adminLevels = computed(() => userStore.adminLevels)
 
         const fetchUserData = async () => {
-            isDataLoaded.value = false
             if (isEditing.value) {
                 const userId = route.params.id
-                try {
-                    const response = await userStore.fetchUserById(userId)
-                    user.value = { ...response }
-                } catch (error) {
-                    console.error('Error fetching user data:', error)
+                await userStore.fetchUsers()
+                const userData = userStore.getUserById(userId)
+                if (userData) {
+                    user.value = { ...userData }
+                    isDataLoaded.value = true
+                } else {
+                    console.error('User not found')
+                    router.push({ name: 'account.list' })
                 }
             } else {
                 user.value = {}
+                isDataLoaded.value = true
             }
-            isDataLoaded.value = true
         }
 
         const handleFileUpload = (event) => {
@@ -163,6 +165,10 @@ export default {
                 }
 
                 if (response.success) {
+                    // ユーザーリストを強制的に再取得
+                    await userStore.fetchUsers(true)
+
+                    // 成功メッセージとともにアカウント一覧ページへリダイレクト
                     router.push({
                         name: 'account.list',
                         query: {
@@ -171,18 +177,23 @@ export default {
                         }
                     })
                 } else {
+                    // エラーメッセージを設定
                     errors.value = response.errors || {}
                 }
             } catch (error) {
                 console.error('Error submitting form:', error)
                 if (error.response && error.response.data) {
                     errors.value = error.response.data.errors || {}
+                } else {
+                    // ネットワークエラーなどの場合の一般的なエラーメッセージ
+                    errors.value = { general: ['送信中にエラーが発生しました。もう一度お試しください。'] }
                 }
             }
         }
 
         onMounted(async () => {
-            await Promise.all([userStore.fetchMappings(), fetchUserData()])
+            await userStore.fetchMappings()
+            await fetchUserData()
         })
 
         watch(() => route.params.id, fetchUserData)

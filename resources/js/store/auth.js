@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import axios from "axios";
 import { useInquiryStore } from "./inquiry";
+import { useUserStore } from './user'
 
 export const useAuthStore = defineStore("auth", {
     state: () => ({
@@ -38,9 +39,12 @@ export const useAuthStore = defineStore("auth", {
         },
         async fetchInitialData() {
             const inquiryStore = useInquiryStore();
+            const userStore = useUserStore();
             await Promise.all([
                 this.fetchUser(),
                 inquiryStore.fetchInquiries(),
+                userStore.fetchUsers(),
+                userStore.fetchMappings(),
             ]);
         },
         async ensureAuthenticated() {

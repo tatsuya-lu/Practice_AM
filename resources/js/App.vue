@@ -135,6 +135,7 @@ export default {
             await authStore.fetchUser();
             if (authStore.isLoggedIn) {
                 if (router.currentRoute.value.path === "/login") {
+                    await authStore.fetchInitialData();// 初期データ取得メソッドを呼び出し
                     await router.push("/dashboard");
                 }
             } else if (router.currentRoute.value.meta.requiresAuth) {
