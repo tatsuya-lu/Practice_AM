@@ -1,46 +1,28 @@
 @charset "UTF-8";
 
 body {
-    margin: 0;
     font-family: 'Noto Sans JP', sans-serif;
-    font-size: 18px;
-    background-color: #fff;
+    background-color: #f5f5f5;
     color: #666363;
-}
-
-select {
-    color: #666363;
-}
-
-main {
-    margin: 0 15px;
-}
-
-a {
-    text-decoration: none;
-    color: #666363;
-}
-
-
-li {
-    list-style: none;
+    line-height: 1.6;
 }
 
 .page-title {
-    font-size: 23px;
-    margin: 10px 0 20px 0;
-    border-bottom: 1px solid #666363;
+    font-size: 25px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin: 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #a0a0a0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .sub-title {
-    font-size: 22px;
+    font-size: 20px;
+    margin-bottom: 15px;
     font-weight: bold;
-    color: #000;
-}
-
-.main-content-aria {
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    padding: 8px;
+    color: #4A4A4A;
 }
 
 .error-message {
@@ -114,100 +96,93 @@ li {
 
 /*--ここまでログイン画面--*/
 
-/*--ここからナビゲーションメニュー--*/
-
+/* ヘッダー */
 header {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 15px 30px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
-.logo img {
-    max-width: 50px;
-    max-height: 50px;
+.header-content-left,
+.header-content-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
 .logo {
     max-width: 50px;
     max-height: 50px;
-    float: left;
+    width: auto;
+    height: auto;
 }
 
-.header-content-left {
-    margin-left: 15px;
-    margin-top: 5px;
+nav ul {
     display: flex;
+    gap: 15px;
+    padding: 0;
+    margin: 0;
 }
 
-.header-content-right {
-    margin-right: 15px;
-    margin-top: 10px;
+nav li {
+    list-style: none;
 }
 
-.header-content-left nav {
-    margin-left: 10px;
+nav li span {
+    margin-right: 5px;
 }
 
-.header-content-left li {
-    display: inline;
-    border-right: 1px solid #666363;
-    padding: 10px 5px 10px 0;
+nav button {
+    background: none;
+    border: none;
+    color: #333;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    padding: 8px 15px;
+    border-radius: 4px;
 }
 
-.header-content-left button {
-    padding: 10px 10px;
-    border-radius: 6px;
-}
-
-.header-content-left button:hover {
-    background-color: #e5e7eb;
-}
-
-.header-content-left span {
-    margin-right: 8px;
-    color: #666363;
-}
-
-.header-content-right {
-    display: flex;
+nav button:hover {
+    color: #3498db;
+    background-color: #ecf0f1;
 }
 
 .user-control-aria {
-    text-align: right;
-}
-
-.user-control-aria li {
-    margin-bottom: 10px;
-    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
 .logged-in-user-text {
     display: flex;
     align-items: center;
-    font-size: 20px;
 }
 
 .logged-in-user-text img {
-    width: 75px;
-    height: 75px;
-    margin-left: 10px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     object-fit: cover;
+    margin-left: 10px;
 }
 
 .logout-btn {
-    border-radius: 6px;
-    padding: 5px 0;
-    background-color: #f08080;
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 .logout-btn:hover {
-    background-color: #be7676;
-}
-
-.user-control-aria button {
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 6px;
+    background-color: #c0392b;
 }
 
 /*--ここまでナビゲーションメニュー--*/
@@ -284,17 +259,115 @@ header {
 
 /*--ここまでお知らせ機能--*/
 
-/*--ここからダッシュボード画面--*/
-
+/* ダッシュボード全体のスタイル */
 .dashboard {
-    max-height: fit-content;
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    padding: 20px;
 }
 
-.dashboard-content-left {
-    max-height: fit-content;
+/* メインコンテンツエリア */
+.main-content-aria {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+/* 通知リストエリアと未解決のお問い合わせリストエリア */
+.notification-list-aria,
+.unresolved-inquiry-list-aria {
+    margin-bottom: 30px;
+    margin-top: 10px;
+}
+
+.unresolved-inquiry-list-aria {
+    margin-top: 50px;
+}
+
+.notification-list-aria .sub-title,
+.unresolved-inquiry-list-aria .sub-title {
+    margin-bottom: 30px;
+}
+
+/* 通知のコンテンツとリンク */
+.notification-content
+{
+background-color: #f9f9f9;
+border-radius: 4px;
+padding: 10px;
+margin-bottom: 10px;
+transition: background-color 0.3s;
+overflow: hidden;
+border-bottom: 1px solid #a0a0a0;
+padding-bottom: 5px;
+}
+
+.notification-content:hover
+{
+background-color: #eef2f7;
+}
+
+/* 通知のタイトルと日付 */
+.notification-title,
+.notification-title-date {
+    background-color: #fff;
+    padding: 5px 10px;
+    margin: -10px -10px 10px -10px;
+    font-weight: bold;
+}
+
+.notification-title {
+    margin: 8px 0 10px 0;
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+/* 通知のステータス */
+.notification-status {
+    padding: 3px 8px;
+    border-radius: 6px;
+    margin-left: 15px;
+    color: #fff;
+}
+
+.notification-status[data-status="unread"] {
+    background-color: #f08080;
+}
+
+
+.notification-status[data-status="read"] {
+    background-color: #ddd;
+}
+
+/* ボタンエリア */
+.button-aria {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.button-aria button {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    white-space: nowrap;
+    margin-bottom: 15px;
+}
+
+.button-aria button:hover {
+    background-color: #2980b9;
 }
 
 .dashboard button {
@@ -320,86 +393,13 @@ header {
     margin-right: 5px;
 }
 
-.notification-list-aria {
-    padding: 0 50px 0 10px;
-    margin: 10px 0px 10px 20px;
-    border-right: 1px solid #666363;
-}
-
-.notification-list-aria .sub-title {
-    margin-bottom: 30px;
-}
-
-.notification-title {
-    font-weight: bold;
-    margin: 8px 0 10px 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.notification-title-date {
-    font-weight: bold;
-}
-
-.notification-content {
-    border-bottom: 1px solid #a0a0a0;
-    padding-bottom: 5px;
-}
-
-.notification-content:hover {
-    background-color: #e5e7eb;
-    border-radius: 3px;
-}
-
-.notification-status[data-status="read"] {
-    background-color: #ddd;
-    padding: 3px 8px;
-    border-radius: 6px;
-    margin-left: 15px;
-}
-
-.notification-status[data-status="unread"] {
-    background-color: #f08080;
-    color: #fff;
-    padding: 3px 8px;
-    border-radius: 6px;
-    margin-left: 15px;
-}
-
-.notification-list-aria .pagenation {
-    margin-top: 20px;
-}
-
-
-.unresolved-inquiry-list-aria {
-    padding: 0 20px 0 50px;
-    margin: 10px;
-}
-
-.unresolved-inquiry-list-aria .sub-title {
-    margin-bottom: 30px;
-}
-
-.unresolved-inquiry-list-aria .notification-title {
-    margin-top: 15px;
-}
-
+/* ページネーション */
+.notification-list-aria .pagenation,
 .unresolved-inquiry-list-aria .pagenation {
     margin-top: 20px;
 }
 
-.button-aria {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-}
-
-.button-aria button {
-    margin-bottom: 15px;
-    color: #fff;
-    white-space: nowrap;
-}
-
+/* メディアクエリ */
 @media screen and (max-width: 1300px) {
     .button-aria {
         grid-template-columns: 1fr;
@@ -407,6 +407,7 @@ header {
 }
 
 /*--ここまでダッシュボード画面--*/
+
 
 /*--ここからアカウント登録画面--*/
 
@@ -793,3 +794,52 @@ select:-moz-focusring {
 }
 
 /*--ここまでお問い合わせフォーム--*/
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+
+    header {
+        flex-direction: column;
+        align-items: center;
+        padding: 15px;
+    }
+
+    nav button {
+        font-size: 16px;
+        padding: 6px 12px;
+    }
+
+    nav ul {
+        gap: 10px;
+    }
+
+    .header-content-left,
+    .header-content-right {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 15px;
+        gap: 15px;
+    }
+
+    nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    nav li {
+        margin: 5px;
+    }
+
+    .user-control-aria {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .logged-in-user-text {
+        margin-bottom: 10px;
+        text-align: center;
+    }
+}
