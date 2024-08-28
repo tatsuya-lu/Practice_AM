@@ -549,11 +549,11 @@ table td {
 
 /*--ここまでアカウント・お問い合わせ一覧画面--*/
 
-/*--ここからお問い合わせ編集--*/
+/*-- お問い合わせ編集 --*/
 
 .inquiry-edit-container {
-    margin-right: 25px;
     display: flex;
+    margin-right: 25px;
 }
 
 .inquiry-form-content {
@@ -570,12 +570,12 @@ table td {
 }
 
 .inquiry-info-content {
+    flex: 2;
     border-left: 1px solid #a0a0a0;
-    max-width: 720px;
     padding: 10px 20px;
     margin-top: 25px;
+    max-width: 720px;
     max-height: 720px;
-    flex: 2;
 }
 
 .inquiry-info-content p {
@@ -594,6 +594,28 @@ table td {
 
 .inquiry-info-content .info-item {
     margin-bottom: 15px;
+}
+
+@media screen and (max-width: 768px) {
+    .inquiry-edit-container {
+        flex-direction: column;
+        margin-right: 0;
+    }
+
+    .inquiry-info-content {
+        border-left: none;
+        border-top: 1px solid #a0a0a0;
+        margin-top: 20px;
+        padding-top: 20px;
+        max-width: 100%;
+        max-height: none;
+    }
+
+    .form-item,
+    .form-item-textarea {
+        width: 100%;
+        max-width: none;
+    }
 }
 
 /*--ここまでお問い合わせ編集--*/
