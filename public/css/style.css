@@ -280,10 +280,12 @@ nav button:hover {
 .unresolved-inquiry-list-aria {
     margin-bottom: 30px;
     margin-top: 10px;
+    padding-bottom: 25px;
+    border-bottom: 3px solid #666363;
 }
 
 .unresolved-inquiry-list-aria {
-    margin-top: 50px;
+    margin-top: 20px;
 }
 
 .notification-list-aria .sub-title,
@@ -292,21 +294,19 @@ nav button:hover {
 }
 
 /* 通知のコンテンツとリンク */
-.notification-content
-{
-background-color: #f9f9f9;
-border-radius: 4px;
-padding: 10px;
-margin-bottom: 10px;
-transition: background-color 0.3s;
-overflow: hidden;
-border-bottom: 1px solid #a0a0a0;
-padding-bottom: 5px;
+.notification-content {
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s;
+    overflow: hidden;
+    border-bottom: 1px solid #a0a0a0;
+    padding-bottom: 5px;
 }
 
-.notification-content:hover
-{
-background-color: #eef2f7;
+.notification-content:hover {
+    background-color: #eef2f7;
 }
 
 /* 通知のタイトルと日付 */
@@ -345,16 +345,18 @@ background-color: #eef2f7;
 
 /* ボタンエリア */
 .button-aria {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    padding: 20px;
 }
 
 .button-aria button {
-    background-color: #3498db;
+    background-color: #5bc8ac;
     color: #fff;
     border: none;
-    padding: 10px;
+    padding: 12px 20px;
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s;
@@ -363,46 +365,23 @@ background-color: #eef2f7;
     justify-content: center;
     gap: 10px;
     white-space: nowrap;
-    margin-bottom: 15px;
+    width: 100%;
+    max-width: 200px;
+    text-align: center;
 }
 
 .button-aria button:hover {
-    background-color: #2980b9;
-}
-
-.dashboard button {
-    margin-right: 20px;
-    border-radius: 6px;
-    padding: 0 8px;
-    letter-spacing: 0.05em;
-    background-color: #5bc8ac;
-    text-align: center;
-    max-width: fit-content;
-    height: 40px;
-}
-
-.dashboard button:hover {
     background-color: #4ca594;
 }
 
-.dashboard button a {
-    color: #fff;
-}
-
-.dashboard button span {
-    margin-right: 5px;
-}
-
-/* ページネーション */
-.notification-list-aria .pagenation,
-.unresolved-inquiry-list-aria .pagenation {
-    margin-top: 20px;
-}
-
-/* メディアクエリ */
-@media screen and (max-width: 1300px) {
+@media screen and (max-width: 768px) {
     .button-aria {
-        grid-template-columns: 1fr;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .button-aria button {
+        max-width: 100%;
     }
 }
 
@@ -478,24 +457,32 @@ background-color: #eef2f7;
 /*--ここまでアカウント登録画面--*/
 
 /*--ここからアカウント・お問い合わせ一覧画面--*/
-
-.table-container {
-    display: flex;
-    justify-content: center;
+.table-responsive {
+    overflow-x: auto;
+    margin-bottom: 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-table {
+/* テーブルのスタイル */
+.table-responsive table {
+    width: 100%;
+    min-width: 1000px;
     border-spacing: 0;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 100%;
     margin-top: 10px;
+    margin-bottom: 0;
 }
 
-table th {
+/* テーブルヘッダーのスタイル */
+.table-responsive th {
+    position: sticky;
+    top: 0;
     border: 0.5px solid #a0a0a0;
     text-align: center;
     padding: 5px 15px;
     background-color: #ddd;
+    z-index: 1;
 }
 
 table td {
@@ -613,58 +600,25 @@ table td {
 
 /*--ここから検索機能--*/
 
-.new-register-btn {
-    display: flex;
-    justify-content: end;
-    border-radius: 6px;
-    padding: 0 8px;
-    letter-spacing: 0.05em;
-    background-color: #5bc8ac;
-    align-items: center;
-    max-width: fit-content;
-    height: 40px;
-    white-space: nowrap;
-}
-
-.new-register-btn:hover {
-    background-color: #4ca594;
-}
-
-.new-register-btn button {
-    color: #fff;
-}
-
-.new-register-btn span {
-    margin-right: 5px;
-}
-
-.sort-btn {
-    background-color: #5bc8ac;
-    border-radius: 6px;
-    padding: 3px;
-    width: 100px;
-    margin-top: 5px;
-    color: #fff;
-}
-
-.sort-btn:hover {
-    background-color: #4ca594;
-}
-
 .search-form-container {
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
+    padding: 0 10px;
 }
 
 .search-form {
     flex: 1;
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     margin-bottom: 20px;
 }
 
 .search-form form {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .search-form-item {
@@ -736,16 +690,67 @@ select:-moz-focusring {
     text-shadow: 0 0 0 #000;
 }
 
-@media screen and (max-width: 1300px) {
-    .search-form-container {
-        flex-wrap: wrap;
-        justify-content: space-between;
-        margin-bottom: 10px;
+.btn {
+    display: inline-block;
+    padding: 0.375rem 0.75rem;
+    margin: 0 10px;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #5bc8ac;
+    border-color: #5bc8ac;
+}
+
+.btn-primary:hover {
+    background-color: #4ca594;
+    border-color: #4ca594;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    font-size: 1.2em;
+}
+
+.delete-icon {
+    color: #ff0000;
+}
+
+@media screen and (max-width: 768px) {
+    .search-form {
+        flex-direction: column;
+        align-items: stretch;
     }
 
     .search-form-item {
-        margin-right: 18px;
+        margin-right: 0;
+        margin-bottom: 15px;
+        width: 100%;
     }
+
+    .search-form select,
+    .search-form input[type="search"] {
+        width: 100%;
+    }
+
+    .search-form input[type="submit"] {
+        width: 100%;
+    }
+
 }
 
 /*--ここまで検索機能--*/

@@ -1,16 +1,9 @@
 <template>
     <div>
-        <div class="table-title">
-            <p class="page-title">お問い合わせ一覧</p>
+        <h1 class="page-title">お問い合わせ一覧</h1>
 
+        <div class="search-form-container">
             <div class="search-form">
-                <div class="search-form-item">
-                    <button @click="sortInquiries('newest')" class="sort-btn">新しい順</button>
-                </div>
-
-                <div class="search-form-item">
-                    <button @click="sortInquiries('oldest')" class="sort-btn">古い順</button>
-                </div>
                 <form @submit.prevent="searchInquiries">
                     <div class="search-form-item">
                         <select class="minimal" v-model="searchStatus">
@@ -30,9 +23,14 @@
                     </div>
 
                     <div class="search-form-item">
-                        <input type="submit" value="検索">
+                        <button type="submit" class="btn btn-primary">検索</button>
                     </div>
                 </form>
+            </div>
+
+            <div class="search-form-item">
+                <button @click="sortInquiries('newest')" class="btn btn-primary">新しい順</button>
+                <button @click="sortInquiries('oldest')" class="btn btn-primary">古い順</button>
             </div>
         </div>
 
@@ -40,26 +38,31 @@
             {{ successMessage }}
         </div>
 
-        <div class="table-container">
+        <div class="table-responsive">
             <table>
-                <tr>
-                    <th>編集</th>
-                    <th>ステータス</th>
-                    <th>会社名</th>
-                    <th>氏名</th>
-                    <th>電話番号</th>
-                </tr>
-                <tr v-for="inquiry in inquiries" :key="inquiry.id">
-                    <td class="table-text-center">
-                        <router-link :to="{ name: 'inquiry.edit', params: { id: inquiry.id } }">
-                            <span class="fa-solid fa-pen-to-square"></span>
-                        </router-link>
-                    </td>
-                    <td>{{ inquiry.statusText }}</td>
-                    <td>{{ inquiry.company }}</td>
-                    <td>{{ inquiry.name }}</td>
-                    <td>{{ inquiry.tel }}</td>
-                </tr>
+                <thead>
+                    <tr>
+                        <th>編集</th>
+                        <th>ステータス</th>
+                        <th>会社名</th>
+                        <th>氏名</th>
+                        <th>電話番号</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="inquiry in inquiries" :key="inquiry.id">
+                        <td class="table-text-center">
+                            <router-link :to="{ name: 'inquiry.edit', params: { id: inquiry.id } }"
+                                class="icon-btn edit-icon">
+                                <span class="fa-solid fa-pen-to-square"></span>
+                            </router-link>
+                        </td>
+                        <td>{{ inquiry.statusText }}</td>
+                        <td>{{ inquiry.company }}</td>
+                        <td>{{ inquiry.name }}</td>
+                        <td>{{ inquiry.tel }}</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
         <div class="pagenation">

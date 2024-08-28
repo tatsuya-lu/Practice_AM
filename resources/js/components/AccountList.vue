@@ -4,13 +4,6 @@
 
     <div class="search-form-container">
       <div class="search-form">
-        <div class="search-form-item">
-          <button @click="sortUsers('newest')" class="sort-btn">新しい順</button>
-        </div>
-
-        <div class="search-form-item">
-          <button @click="sortUsers('oldest')" class="sort-btn">古い順</button>
-        </div>
         <form @submit.prevent="searchUsers">
           <div class="search-form-item">
             <input type="search" v-model="searchName" placeholder="名前を入力" aria-label="名前を検索...">
@@ -29,14 +22,20 @@
           </div>
 
           <div class="search-form-item">
-            <input type="submit" value="検索">
+            <button type="submit" class="btn btn-primary">検索</button>
           </div>
         </form>
       </div>
 
+      <div class="search-form-item">
+        <button @click="sortUsers('newest')" class="btn btn-primary">新しい順</button>
+        <button @click="sortUsers('oldest')" class="btn btn-primary">古い順</button>
+      </div>
+
       <div class="new-register-btn">
-        <router-link to="/account/register"><button><span
-              class="fa-solid fa-circle-plus"></span>新規作成</button></router-link>
+        <router-link to="/account/register" class="btn btn-primary">
+          <span class="fa-solid fa-circle-plus"></span> 新規作成
+        </router-link>
       </div>
     </div>
 
@@ -47,38 +46,43 @@
     <div v-if="successMessage" class="success">
       {{ successMessage }}
     </div>
-    <div v-if="users.length > 0" class="table-container">
+
+    <div v-if="users.length > 0" class="table-responsive">
       <table>
-        <tr>
-          <th>編集</th>
-          <th>削除</th>
-          <th>名前</th>
-          <th>アカウントの種類</th>
-          <th>メールアドレス</th>
-          <th>電話番号</th>
-          <th>都道府県</th>
-          <th>市町村</th>
-          <th>番地・アパート名</th>
-        </tr>
-        <tr v-for="user in users" :key="user.id">
-          <td class="table-text-center">
-            <router-link :to="{ name: 'account.edit', params: { id: user.id } }">
-              <span class="fa-solid fa-pen-to-square"></span>
-            </router-link>
-          </td>
-          <td class="table-text-center">
-            <button @click="deleteUser(user.id)">
-              <span class="fa-solid fa-trash-can"></span>
-            </button>
-          </td>
-          <td>{{ user.name }}</td>
-          <td>{{ userStore.getAdminLevelLabel(user.admin_level) }}</td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.tel }}</td>
-          <td>{{ userStore.getPrefectureLabel(user.prefecture) }}</td>
-          <td>{{ user.city }}</td>
-          <td>{{ user.street }}</td>
-        </tr>
+        <thead>
+          <tr>
+            <th>編集</th>
+            <th>削除</th>
+            <th>名前</th>
+            <th>アカウントの種類</th>
+            <th>メールアドレス</th>
+            <th>電話番号</th>
+            <th>都道府県</th>
+            <th>市町村</th>
+            <th>番地・アパート名</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="user in users" :key="user.id">
+            <td class="table-text-center">
+              <router-link :to="{ name: 'account.edit', params: { id: user.id } }" class="icon-btn edit-icon">
+                <span class="fa-solid fa-pen-to-square"></span>
+              </router-link>
+            </td>
+            <td class="table-text-center">
+              <button @click="deleteUser(user.id)" class="icon-btn delete-icon">
+                <span class="fa-solid fa-trash-can"></span>
+              </button>
+            </td>
+            <td>{{ user.name }}</td>
+            <td>{{ userStore.getAdminLevelLabel(user.admin_level) }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.tel }}</td>
+            <td>{{ userStore.getPrefectureLabel(user.prefecture) }}</td>
+            <td>{{ user.city }}</td>
+            <td>{{ user.street }}</td>
+          </tr>
+        </tbody>
       </table>
     </div>
     <div v-else>
