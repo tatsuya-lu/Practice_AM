@@ -15,7 +15,9 @@
                     <p class="sub-title">お知らせ一覧</p>
                     <template v-if="dashboardStore.validNotifications.length > 0">
                         <ul>
-                            <template v-for="notification in dashboardStore.validNotifications" :key="notification.id">
+                            <!-- <template v-for="notification in dashboardStore.validNotifications" :key="notification.id"></template>
+どちらでも動いている？-->
+                            <template v-for="notification in dashboardStore.notifications" :key="notification.id">
                                 <li class="notification-title">
                                     {{ notification.title }}
                                     <div class="notification-status"
@@ -34,6 +36,13 @@
                                 </a>
                             </template>
                         </ul>
+                        <div v-if="dashboardStore.totalPages > 1" class="pagination">
+                            <button @click="changePage(dashboardStore.currentPage - 1)"
+                                :disabled="dashboardStore.currentPage === 1">前へ</button>
+                            <span>{{ dashboardStore.currentPage }} / {{ dashboardStore.totalPages }}</span>
+                            <button @click="changePage(dashboardStore.currentPage + 1)"
+                                :disabled="dashboardStore.currentPage === dashboardStore.totalPages">次へ</button>
+                        </div>
                     </template>
                     <p v-else>お知らせはありません。</p>
                 </div>
@@ -59,6 +68,13 @@
                         </li>
                     </ul>
                     <p v-else>未対応のお問い合わせはありません。</p>
+                    <div v-if="dashboardStore.inquiryTotalPages > 1" class="pagination">
+                        <button @click="changeInquiryPage(dashboardStore.inquiryCurrentPage - 1)"
+                            :disabled="dashboardStore.inquiryCurrentPage === 1">前へ</button>
+                        <span>{{ dashboardStore.inquiryCurrentPage }} / {{ dashboardStore.inquiryTotalPages }}</span>
+                        <button @click="changeInquiryPage(dashboardStore.inquiryCurrentPage + 1)"
+                            :disabled="dashboardStore.inquiryCurrentPage === dashboardStore.inquiryTotalPages">次へ</button>
+                    </div>
                 </div>
             </div>
 
@@ -104,6 +120,24 @@ export default {
 
         const showNotificationModal = ref(false);
         const selectedNotification = ref(null);
+
+        const prevPage = () => {
+            dashboardStore.prevPage();
+        };
+
+        const nextPage = () => {
+            dashboardStore.nextPage();
+        };
+
+        const changePage = async (page) => {
+            if (page >= 1 && page <= dashboardStore.totalPages) {
+                await dashboardStore.changePage(page);
+            }
+        };
+
+        const changeInquiryPage = async (page) => {
+            await dashboardStore.changeInquiryPage(page);
+        };
 
         const openNotificationModal = (notification) => {
             selectedNotification.value = notification;
@@ -167,6 +201,10 @@ export default {
             getNotificationStatus,
             getNotificationStatusClass,
             formatDate,
+            prevPage,
+            nextPage,
+            changePage,
+            changeInquiryPage,
             updateNotificationStatus,
             showNotificationModal,
             selectedNotification,

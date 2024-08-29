@@ -32,11 +32,19 @@ class NotificationController extends Controller
     public function apiDashboardNotifications(Request $request)
     {
         $user = $request->user();
-        $notificationData = $this->notificationService->getNotificationsForDashboard();
+        $page = $request->input('page', 1);
+        $perPage = $request->input('per_page', 10);
+
+        $notifications = Notification::orderBy('created_at', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
+
+        $readNotificationIds = NotificationRead::where('user_id', $user->id)
+            ->where('read', true)
+            ->pluck('notification_id');
 
         return response()->json([
-            'notifications' => $notificationData['notifications'],
-            'readNotificationIds' => $notificationData['readNotificationIds']
+            'notifications' => $notifications,
+            'readNotificationIds' => $readNotificationIds
         ]);
     }
 

@@ -11,6 +11,13 @@ export const useDashboardStore = defineStore("dashboard", {
         isInquiriesLoaded: false,
         isReadStatusesLoaded: false,
         lastFetchTime: null,
+        currentPage: 1,
+        perPage: 10,
+        totalNotifications: 0,
+        lastPage: 1,
+        inquiryCurrentPage: 1,
+        inquiryPerPage: 10,
+        inquiryTotalPages: 1,
     }),
 
     getters: {
@@ -23,6 +30,14 @@ export const useDashboardStore = defineStore("dashboard", {
             state.notifications.filter(
                 (notification) => notification && notification.id
             ),
+        paginatedNotifications: (state) => {
+            const start = (state.currentPage - 1) * state.perPage;
+            const end = start + state.perPage;
+            return state.validNotifications.slice(start, end);
+        },
+        totalPages() {
+            return this.lastPage;
+        },
     },
 
     actions: {
@@ -58,6 +73,10 @@ export const useDashboardStore = defineStore("dashboard", {
                         },
                     }),
                     axios.get("/api/dashboard/notifications", {
+                        params: {
+                            page: this.currentPage,
+                            per_page: this.perPage,
+                        },
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem(
                                 "token"
@@ -83,6 +102,10 @@ export const useDashboardStore = defineStore("dashboard", {
 
                 this.notifications =
                     notificationsResponse.data.notifications.data || [];
+                this.totalNotifications =
+                    notificationsResponse.data.notifications.total;
+                this.lastPage =
+                    notificationsResponse.data.notifications.last_page;
                 this.notificationReadStatuses = (
                     readStatusesResponse.data || []
                 ).reduce((acc, id) => {
@@ -134,26 +157,50 @@ export const useDashboardStore = defineStore("dashboard", {
             }
         },
 
+        prevPage() {
+            if (this.currentPage > 1) {
+                this.currentPage--;
+            }
+        },
+        nextPage() {
+            if (this.currentPage < this.totalPages) {
+                this.currentPage++;
+            }
+        },
+
+        async changePage(page) {
+            if (page >= 1 && page <= this.lastPage) {
+                this.currentPage = page;
+                await this.fetchDashboardData(true);
+            }
+        },
+
         async fetchUnresolvedInquiries() {
             try {
                 const response = await axios.get("/api/inquiries", {
                     params: {
                         dashboard: true,
-                        limit: 5,
+                        page: this.inquiryCurrentPage,
+                        per_page: this.inquiryPerPage,
                     },
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem(
-                            "token"
-                        )}`,
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
                 });
-                this.unresolvedInquiryCount =
-                    response.data.unresolvedInquiryCount;
+                this.unresolvedInquiryCount = response.data.unresolvedInquiryCount;
                 this.unresolvedInquiries = response.data.inquiries.data;
+                this.inquiryTotalPages = response.data.inquiries.last_page;
                 this.isInquiriesLoaded = true;
             } catch (error) {
                 console.error("Error fetching unresolved inquiries:", error);
                 this.isInquiriesLoaded = false;
+            }
+        },
+
+        async changeInquiryPage(page) {
+            if (page >= 1 && page <= this.inquiryTotalPages) {
+                this.inquiryCurrentPage = page;
+                await this.fetchUnresolvedInquiries();
             }
         },
 

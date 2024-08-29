@@ -100,68 +100,68 @@ class AccountController extends Controller
         return response()->json(['message' => 'ユーザーが正常に削除されました。']);
     }
 
-    public function index(Request $request)
-    {
-        $notificationData = $this->notificationService->getNotificationsForDashboard();
-        $unresolvedInquiryCount = $this->inquiryService->unresolvedInquiryCount();
-        $unresolvedInquiries = $this->inquiryService->unresolvedInquiries();
+    // public function index(Request $request)
+    // {
+    //     $notificationData = $this->notificationService->getNotificationsForDashboard();
+    //     $unresolvedInquiryCount = $this->inquiryService->unresolvedInquiryCount();
+    //     $unresolvedInquiries = $this->inquiryService->unresolvedInquiries();
 
-        return view('admin.Dashboard', compact('notificationData', 'unresolvedInquiryCount', 'unresolvedInquiries'));
-    }
+    //     return view('admin.Dashboard', compact('notificationData', 'unresolvedInquiryCount', 'unresolvedInquiries'));
+    // }
 
-    public function registerForm(Request $request)
-    {
-        $user = new Account;
-        $prefectures = $this->prefectures;
-        $adminLevels = $this->adminLevels;
+    // public function registerForm(Request $request)
+    // {
+    //     $user = new Account;
+    //     $prefectures = $this->prefectures;
+    //     $adminLevels = $this->adminLevels;
 
-        return view('admin.Register', compact('user', 'prefectures', 'adminLevels'));
-    }
+    //     return view('admin.Register', compact('user', 'prefectures', 'adminLevels'));
+    // }
 
-    public function register(AccountRequest $request)
-    {
-        $user = $this->accountService->register($request->all());
+    // public function register(AccountRequest $request)
+    // {
+    //     $user = $this->accountService->register($request->all());
 
-        if ($user) {
-            session()->flash('registered_message', 'アカウントが正常に登録されました。');
-            session()->flash('registered_email', $user->email);
-            return redirect()->route('admin.list');
-        } else {
-            return redirect()->route('admin.list')->with('error', 'ユーザーの登録に失敗しました。');
-        }
-    }
+    //     if ($user) {
+    //         session()->flash('registered_message', 'アカウントが正常に登録されました。');
+    //         session()->flash('registered_email', $user->email);
+    //         return redirect()->route('admin.list');
+    //     } else {
+    //         return redirect()->route('admin.list')->with('error', 'ユーザーの登録に失敗しました。');
+    //     }
+    // }
 
-    public function accountList()
-    {
-        $users = $this->accountService->accountList();
+    // public function accountList()
+    // {
+    //     $users = $this->accountService->accountList();
 
-        foreach ($users as $user) {
-            $user->prefecture = config('const.prefecture.' . $user->prefecture);
-            $user->admin_level = $user->admin_level == 1 ? '管理者' : ($user->admin_level == 2 ? '社員' : '');
-        }
+    //     foreach ($users as $user) {
+    //         $user->prefecture = config('const.prefecture.' . $user->prefecture);
+    //         $user->admin_level = $user->admin_level == 1 ? '管理者' : ($user->admin_level == 2 ? '社員' : '');
+    //     }
 
-        return view('admin.AccountList', compact('users'));
-    }
+    //     return view('admin.AccountList', compact('users'));
+    // }
 
-    public function update(AccountRequest $request, Account $user)
-    {
-        $this->accountService->update($user, $request->all());
+    // public function update(AccountRequest $request, Account $user)
+    // {
+    //     $this->accountService->update($user, $request->all());
 
-        return redirect()->route('admin.list')->with('success', 'ユーザーが正常に更新されました。');
-    }
+    //     return redirect()->route('admin.list')->with('success', 'ユーザーが正常に更新されました。');
+    // }
 
-    public function edit(Account $user)
-    {
-        $prefectures = $this->prefectures;
-        $adminLevels = $this->adminLevels;
+    // public function edit(Account $user)
+    // {
+    //     $prefectures = $this->prefectures;
+    //     $adminLevels = $this->adminLevels;
 
-        return view('admin.Register', compact('user', 'prefectures', 'adminLevels'));
-    }
+    //     return view('admin.Register', compact('user', 'prefectures', 'adminLevels'));
+    // }
 
-    public function destroy(Account $user)
-    {
-        $this->accountService->destroy($user);
+    // public function destroy(Account $user)
+    // {
+    //     $this->accountService->destroy($user);
 
-        return redirect()->route('admin.list')->with('success', 'ユーザーが正常に削除されました。');
-    }
+    //     return redirect()->route('admin.list')->with('success', 'ユーザーが正常に削除されました。');
+    // }
 }

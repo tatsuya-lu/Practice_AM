@@ -8,9 +8,7 @@ use Illuminate\Http\Request;
 class InquiryService
 {
 
-    public function __construct(private Request $request)
-    {
-    }
+    public function __construct(private Request $request) {}
 
     public function index(Request $request)
     {

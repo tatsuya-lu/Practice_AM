@@ -29,10 +29,12 @@ class InquiryController extends Controller
         }
 
         $unresolvedInquiryCount = $this->inquiryService->unresolvedInquiryCount();
+        $unresolvedInquiries = $this->inquiryService->unresolvedInquiries();
 
         return response()->json([
             'inquiries' => $inquiries,
             'unresolvedInquiryCount' => $unresolvedInquiryCount,
+            'unresolvedInquiries' => $unresolvedInquiries,
             'statusOptions' => $statusOptions
         ]);
     }

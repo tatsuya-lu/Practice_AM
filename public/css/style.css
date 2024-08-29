@@ -822,6 +822,17 @@ select:-moz-focusring {
 
 /*--ここまでお問い合わせフォーム--*/
 
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.pagination button {
+    margin: 0 0.5rem;
+}
+
 /* レスポンシブデザイン */
 @media (max-width: 768px) {
     .dashboard {
