@@ -88,8 +88,10 @@
     <div v-else>
       ユーザーが見つかりません。
     </div>
-    <div class="pagenation">
-      <!-- ページネーションコンポーネントをここに追加 -->
+    <div class="pagination">
+      <button @click="changePage(userStore.currentPage - 1)" :disabled="userStore.currentPage === 1">前へ</button>
+      <span>{{ userStore.currentPage }} / {{ userStore.totalPages }}</span>
+      <button @click="changePage(userStore.currentPage + 1)" :disabled="userStore.currentPage === userStore.totalPages">次へ</button>
     </div>
   </div>
 </template>
@@ -106,6 +108,7 @@ export default {
     const route = useRoute()
     const userStore = useUserStore()
     const successMessage = ref('')
+    const registeredMessage = ref('')
     const registeredEmail = ref('')
     const searchName = ref('')
     const searchAdminLevel = ref('')
@@ -116,9 +119,23 @@ export default {
 
     const users = computed(() => userStore.getUsers)
 
+    const changePage = async (page) => {
+      await userStore.changePage(page, {
+        search_name: searchName.value,
+        search_admin_level: searchAdminLevel.value,
+        search_email: searchEmail.value,
+        sort: sortType.value
+      });
+    };
+
     const fetchUsers = async () => {
-      await userStore.fetchUsers(true)
-    }
+      await userStore.fetchUsers(true, {
+        search_name: searchName.value,
+        search_admin_level: searchAdminLevel.value,
+        search_email: searchEmail.value,
+        sort: sortType.value
+      });
+    };
 
     const fetchFormData = async () => {
       try {
@@ -131,36 +148,13 @@ export default {
     }
 
     const sortUsers = async (newSortType) => {
-      sortType.value = newSortType
-      try {
-        const response = await axios.get('/api/account/list', {
-          params: {
-            sort: newSortType,
-            search_name: searchName.value,
-            search_admin_level: searchAdminLevel.value,
-            search_email: searchEmail.value
-          }
-        })
-        userStore.setUsers(response.data.data || response.data)
-      } catch (error) {
-        console.error('Error sorting users:', error)
-      }
-    }
+      sortType.value = newSortType;
+      await fetchUsers();
+    };
 
     const searchUsers = async () => {
-      try {
-        const response = await axios.get('/api/account/list', {
-          params: {
-            search_name: searchName.value,
-            search_admin_level: searchAdminLevel.value,
-            search_email: searchEmail.value
-          }
-        })
-        userStore.setUsers(response.data.data || response.data)
-      } catch (error) {
-        console.error('Error searching users:', error)
-      }
-    }
+      await fetchUsers();
+    };
 
     const deleteUser = async (userId) => {
       if (confirm('削除します。よろしいですか？')) {
@@ -184,6 +178,7 @@ export default {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
 
       successMessage.value = route.query.success || '';
+      registeredMessage.value = route.query.registered_message || '';
       registeredEmail.value = route.query.registered_email || '';
       router.replace({ query: {} })
 
@@ -202,6 +197,7 @@ export default {
       users,
       fetchUsers,
       successMessage,
+      registeredMessage,
       registeredEmail,
       searchName,
       searchAdminLevel,
@@ -210,6 +206,7 @@ export default {
       searchUsers,
       deleteUser,
       userStore,
+      changePage,
     }
   }
 }

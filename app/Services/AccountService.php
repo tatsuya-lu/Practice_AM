@@ -17,50 +17,29 @@ class AccountService
         $this->imageManager = new ImageManager(new GdDriver());
     }
 
-    public function accountList()
+    public function accountList($params, $perPage = 20)
     {
-        $sort = $this->request->input('sort', 'newest');
-
         $query = Account::query();
 
-        if ($searchName = $this->request->input('search_name')) {
-            $query->where('name', 'LIKE', '%' . $searchName . '%');
+        if (isset($params['search_name'])) {
+            $query->where('name', 'like', '%' . $params['search_name'] . '%');
         }
 
-        if ($searchAdminLevel = $this->request->input('search_admin_level')) {
-            $adminLevelValue = is_numeric($searchAdminLevel) ? $searchAdminLevel : ($searchAdminLevel == '社員' ? 1 : ($searchAdminLevel == '管理者' ? 2 : null));
-            if ($adminLevelValue !== null) {
-                $query->where('admin_level', $adminLevelValue);
-            }
+        if (isset($params['search_admin_level'])) {
+            $query->where('admin_level', $params['search_admin_level']);
         }
 
-        if ($searchEmail = $this->request->input('search_email')) {
-            $query->where('email', 'LIKE', '%' . $searchEmail . '%');
+        if (isset($params['search_email'])) {
+            $query->where('email', 'like', '%' . $params['search_email'] . '%');
         }
 
-        switch ($sort) {
-            case 'newest':
-                $query->orderBy('created_at', 'desc');
-                break;
-            case 'oldest':
-                $query->orderBy('created_at', 'asc');
-                break;
-            default:
-                $query->orderBy('created_at', 'desc');
-                break;
+        if (isset($params['sort'])) {
+            $query->orderBy('created_at', $params['sort'] === 'newest' ? 'desc' : 'asc');
+        } else {
+            $query->orderBy('created_at', 'desc');
         }
 
-        $users = $query->paginate(20);
-
-        return [
-            'data' => $users->items(),
-            'current_page' => $users->currentPage(),
-            'last_page' => $users->lastPage(),
-            'per_page' => $users->perPage(),
-            'total' => $users->total(),
-        ];
-
-        return $users;
+        return $query->paginate($perPage);
     }
 
 

@@ -59,7 +59,8 @@ class AccountController extends Controller
 
     public function apiAccountList(Request $request)
     {
-        $users = $this->accountService->accountList();
+        $perPage = $request->input('per_page', 20);
+        $users = $this->accountService->accountList($request->all(), $perPage);
 
         return response()->json($users);
     }

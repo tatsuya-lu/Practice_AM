@@ -65,8 +65,12 @@
                 </tbody>
             </table>
         </div>
-        <div class="pagenation">
-            <!-- ページネーションコンポーネントをここに追加 -->
+        <div class="pagination">
+            <button @click="changePage(inquiryStore.currentPage - 1)"
+                :disabled="inquiryStore.currentPage === 1">前へ</button>
+            <span>{{ inquiryStore.currentPage }} / {{ inquiryStore.totalPages }}</span>
+            <button @click="changePage(inquiryStore.currentPage + 1)"
+                :disabled="inquiryStore.currentPage === inquiryStore.totalPages">次へ</button>
         </div>
     </div>
 </template>
@@ -87,6 +91,7 @@ export default {
         const searchStatus = ref('');
         const searchCompany = ref('');
         const searchTel = ref('');
+        const sortType = ref('newest');
 
         const inquiries = computed(() => inquiryStore.getInquiries);
 
@@ -94,21 +99,29 @@ export default {
             await inquiryStore.fetchInquiries({
                 search_status: searchStatus.value,
                 search_company: searchCompany.value,
-                search_tel: searchTel.value
+                search_tel: searchTel.value,
+                sort: sortType.value,
+                page: inquiryStore.currentPage
             });
         };
 
-        const sortInquiries = async (sortType) => {
-            await inquiryStore.fetchInquiries({
-                sort: sortType,
-                search_status: searchStatus.value,
-                search_company: searchCompany.value,
-                search_tel: searchTel.value
-            });
+        const sortInquiries = async (newSortType) => {
+            sortType.value = newSortType;
+            await fetchInquiries();
         };
 
         const searchInquiries = () => {
+            inquiryStore.currentPage = 1;
             fetchInquiries();
+        };
+
+        const changePage = async (page) => {
+            await inquiryStore.changePage(page, {
+                search_status: searchStatus.value,
+                search_company: searchCompany.value,
+                search_tel: searchTel.value,
+                sort: sortType.value
+            });
         };
 
         onMounted(async () => {
@@ -135,6 +148,7 @@ export default {
             sortInquiries,
             searchInquiries,
             inquiryStore,
+            changePage,
         };
     }
 }

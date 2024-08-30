@@ -8,16 +8,33 @@ export const useUserStore = defineStore("user", {
         adminLevels: {},
         prefectures: {},
         isMappingsLoaded: false,
+        currentPage: 1,
+        totalPages: 1,
+        perPage: 20,
     }),
     actions: {
-        async fetchUsers(forceRefresh = false) {
+        async fetchUsers(forceRefresh = false, params = {}) {
             if (this.isLoaded && !forceRefresh) return;
             try {
-                const response = await axios.get("/api/account/list");
-                this.users = Array.isArray(response.data) ? response.data : response.data.data;
+                const response = await axios.get("/api/account/list", {
+                    params: {
+                        ...params,
+                        page: this.currentPage,
+                        per_page: this.perPage,
+                    },
+                });
+                this.users = response.data.data;
+                this.currentPage = response.data.current_page;
+                this.totalPages = response.data.last_page;
                 this.isLoaded = true;
             } catch (error) {
                 console.error("Error fetching users:", error);
+            }
+        },
+        async changePage(page, params = {}) {
+            if (page >= 1 && page <= this.totalPages) {
+                this.currentPage = page;
+                await this.fetchUsers(true, params);
             }
         },
         setUsers(users) {

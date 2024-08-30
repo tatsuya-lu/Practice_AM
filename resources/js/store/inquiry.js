@@ -8,6 +8,9 @@ export const useInquiryStore = defineStore("inquiry", {
         isLoaded: false,
         isLoading: false,
         error: null,
+        currentPage: 1,
+        totalPages: 1,
+        perPage: 20,
     }),
     actions: {
         async fetchStatusOptions() {
@@ -24,7 +27,13 @@ export const useInquiryStore = defineStore("inquiry", {
         async fetchInquiries(params = {}) {
             this.isLoading = true;
             try {
-                const response = await axios.get("/api/inquiries", { params });
+                const response = await axios.get("/api/inquiries", {
+                    params: {
+                        ...params,
+                        page: this.currentPage,
+                        per_page: this.perPage,
+                    }
+                });
                 this.inquiries = response.data.inquiries.data.reduce(
                     (acc, inquiry) => {
                         acc[inquiry.id] = inquiry;
@@ -33,12 +42,20 @@ export const useInquiryStore = defineStore("inquiry", {
                     {}
                 );
                 this.statusOptions = response.data.statusOptions;
+                this.currentPage = response.data.inquiries.current_page;
+                this.totalPages = response.data.inquiries.last_page;
                 this.isLoaded = true;
             } catch (error) {
                 console.error("Error fetching inquiries:", error);
                 this.error = error.message;
             } finally {
                 this.isLoading = false;
+            }
+        },
+        async changePage(page, params = {}) {
+            if (page >= 1 && page <= this.totalPages) {
+                this.currentPage = page;
+                await this.fetchInquiries(params);
             }
         },
         async fetchInquiry(id) {
