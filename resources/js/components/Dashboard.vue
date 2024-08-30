@@ -110,6 +110,7 @@ import { ref, onMounted, watch } from "vue";
 import { useRoute } from 'vue-router';
 import { useDashboardStore } from "../store/dashboard";
 import { useInquiryStore } from "../store/inquiry";
+import { useNotificationStore } from "../store/notification";
 import NotificationModal from "./NotificationModal.vue";
 
 export default {
@@ -119,6 +120,7 @@ export default {
     setup() {
         const dashboardStore = useDashboardStore();
         const inquiryStore = useInquiryStore();
+        const notificationStore = useNotificationStore();
         const successMessage = ref("");
         const route = useRoute();
 
@@ -143,6 +145,18 @@ export default {
             await dashboardStore.changeInquiryPage(page);
         };
 
+        const getNotificationStatus = (notificationId) => {
+            return dashboardStore.notificationReadStatuses[notificationId] || notificationStore.globalReadStatus[notificationId] ? "既読済み" : "未読";
+        };
+
+        const getNotificationStatusClass = (notificationId) => {
+            return dashboardStore.notificationReadStatuses[notificationId] || notificationStore.globalReadStatus[notificationId] ? "read" : "unread";
+        };
+
+        const updateNotificationStatus = async (notificationId) => {
+            await dashboardStore.updateNotificationStatus(notificationId);
+        };
+
         const openNotificationModal = (notification) => {
             selectedNotification.value = notification;
             showNotificationModal.value = true;
@@ -153,14 +167,6 @@ export default {
             showNotificationModal.value = false;
         };
 
-        const getNotificationStatus = (notificationId) => {
-            return dashboardStore.notificationReadStatuses[notificationId] ? "既読済み" : "未読";
-        };
-
-        const getNotificationStatusClass = (notificationId) => {
-            return dashboardStore.notificationReadStatuses[notificationId] ? "read" : "unread";
-        };
-
         const formatDate = (dateString) => {
             if (!dateString) return "";
             return new Date(dateString).toLocaleDateString("ja-JP", {
@@ -168,10 +174,6 @@ export default {
                 month: "long",
                 day: "numeric",
             });
-        };
-
-        const updateNotificationStatus = (notificationId) => {
-            dashboardStore.updateNotificationStatus(notificationId);
         };
 
         onMounted(async () => {
@@ -210,6 +212,7 @@ export default {
             nextPage,
             changePage,
             changeInquiryPage,
+            notificationStore,
             updateNotificationStatus,
             showNotificationModal,
             selectedNotification,

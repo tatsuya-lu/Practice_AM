@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import axios from "axios";
+import { useNotificationStore } from "./notification";
 
 export const useDashboardStore = defineStore("dashboard", {
     state: () => ({
@@ -106,10 +107,13 @@ export const useDashboardStore = defineStore("dashboard", {
                     notificationsResponse.data.notifications.total;
                 this.lastPage =
                     notificationsResponse.data.notifications.last_page;
+
+                const notificationStore = useNotificationStore();
                 this.notificationReadStatuses = (
                     readStatusesResponse.data || []
                 ).reduce((acc, id) => {
                     acc[id] = true;
+                    notificationStore.updateGlobalReadStatus(id);
                     return acc;
                 }, {});
                 this.unresolvedInquiryCount =
@@ -184,10 +188,13 @@ export const useDashboardStore = defineStore("dashboard", {
                         per_page: this.inquiryPerPage,
                     },
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        Authorization: `Bearer ${localStorage.getItem(
+                            "token"
+                        )}`,
                     },
                 });
-                this.unresolvedInquiryCount = response.data.unresolvedInquiryCount;
+                this.unresolvedInquiryCount =
+                    response.data.unresolvedInquiryCount;
                 this.unresolvedInquiries = response.data.inquiries.data;
                 this.inquiryTotalPages = response.data.inquiries.last_page;
                 this.isInquiriesLoaded = true;
@@ -205,7 +212,9 @@ export const useDashboardStore = defineStore("dashboard", {
         },
 
         async updateNotificationStatus(notificationId) {
+            const notificationStore = useNotificationStore();
             this.notificationReadStatuses[notificationId] = true;
+            notificationStore.updateGlobalReadStatus(notificationId);
             try {
                 await axios.post(
                     `/api/notifications/${notificationId}/read`,
@@ -221,6 +230,7 @@ export const useDashboardStore = defineStore("dashboard", {
             } catch (error) {
                 console.error("Error updating notification status:", error);
                 this.notificationReadStatuses[notificationId] = false;
+                notificationStore.revertGlobalReadStatus(notificationId);
             }
         },
 

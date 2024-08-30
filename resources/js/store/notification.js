@@ -5,6 +5,7 @@ export const useNotificationStore = defineStore("notification", {
     state: () => ({
         unreadNotifications: [],
         isLoaded: false,
+        globalReadStatus: {},
     }),
     actions: {
         async addNewNotification(notification) {
@@ -26,6 +27,9 @@ export const useNotificationStore = defineStore("notification", {
                     (notification) => notification && notification.id
                 );
                 this.isLoaded = true;
+                this.unreadNotifications.forEach((notification) => {
+                    this.globalReadStatus[notification.id] = false;
+                });
             } catch (error) {
                 console.error("Error fetching unread notifications:", error);
                 this.unreadNotifications = [];
@@ -53,9 +57,24 @@ export const useNotificationStore = defineStore("notification", {
                 this.unreadNotifications = this.unreadNotifications.filter(
                     (n) => n.id !== notificationId
                 );
+                this.updateGlobalReadStatus(notificationId);
             } catch (error) {
                 console.error("Error marking notification as read:", error);
             }
         },
+        updateGlobalReadStatus(notificationId) {
+            this.globalReadStatus[notificationId] = true;
+            this.unreadNotifications = this.unreadNotifications.filter(
+                (n) => n.id !== notificationId
+            );
+        },
+
+        revertGlobalReadStatus(notificationId) {
+            this.globalReadStatus[notificationId] = false;
+            // unreadNotificationsの更新が必要な場合は、ここで再取得するロジックを追加
+        },
+    },
+    getters: {
+        unreadCount: (state) => state.unreadNotifications.length,
     },
 });

@@ -28,8 +28,8 @@
                 <div class="notification-aria" @mouseenter="showNotifications" @mouseleave="hideNotifications">
                     <div class="notification-bell">
                         <i class="far fa-bell"></i>
-                        <span v-if="unreadNotificationsCount > 0" class="notification-count-badge">
-                            {{ unreadNotificationsCount }}
+                        <span v-if="notificationStore.unreadCount > 0" class="notification-count-badge">
+                            {{ notificationStore.unreadCount }}
                         </span>
                     </div>
                     <div v-if="isNotificationVisible" class="notification-list">
@@ -150,11 +150,7 @@ export default {
         };
 
         const markAsRead = async (notification) => {
-            try {
-                await notificationStore.markAsRead(notification.id);
-            } catch (error) {
-                console.error("Error marking notification as read:", error);
-            }
+            await notificationStore.markAsRead(notification.id);
         };
 
         const showNotifications = () => {
@@ -208,6 +204,7 @@ export default {
             isNotificationVisible,
             showNotifications,
             hideNotifications,
+            notificationStore,
             markAsRead,
             formatDate,
             isInitialLoading,
