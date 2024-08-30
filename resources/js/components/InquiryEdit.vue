@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useInquiryStore } from "../store/inquiry";
 import { useDashboardStore } from "../store/dashboard";
@@ -122,11 +122,15 @@ export default {
             }
         };
 
-        onMounted(async () => {
+        const fetchInquiryData = async () => {
             if (!currentInquiry.value) {
                 await inquiryStore.fetchInquiry(route.params.id);
             }
-        });
+        };
+
+        onMounted(fetchInquiryData);
+
+        watch(() => route.params.id, fetchInquiryData);
 
         return {
             inquiryStore,

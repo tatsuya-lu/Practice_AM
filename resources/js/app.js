@@ -44,7 +44,12 @@ const routes = [
     },
     { path: "/account/:id/edit", component: Register, name: "account.edit" },
     { path: "/inquiry/list", component: InquiryList },
-    { path: "/inquiry/:id/edit", component: InquiryEdit, name: "inquiry.edit" },
+    {
+        path: '/inquiry/edit/:id',
+        name: 'inquiry.edit',
+        component: InquiryEdit,
+        meta: { requiresAuth: true }
+    },
 ];
 
 const router = createRouter({

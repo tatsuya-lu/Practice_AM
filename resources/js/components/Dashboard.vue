@@ -49,8 +49,7 @@
 
                 <div class="unresolved-inquiry-list-aria">
                     <p class="sub-title">
-                        未対応のお問い合わせが「
-                        {{ dashboardStore.unresolvedInquiryCount }} 」件あります。
+                        未対応のお問い合わせが「{{ dashboardStore.unresolvedInquiryCount }} 」件あります。
                     </p>
                     <ul v-if="dashboardStore.unresolvedInquiries.length > 0">
                         <li v-for="inquiry in dashboardStore.unresolvedInquiries" :key="inquiry.id">
@@ -60,11 +59,14 @@
                             <div class="notification-title-date">
                                 {{ formatDate(inquiry.created_at) }}
                             </div>
-                            <a :href="'/inquiry/' + inquiry.id + '/edit'">
-                                <div class="notification-content">
-                                    {{ inquiry.body }}
-                                </div>
-                            </a>
+                            <router-link :to="{ name: 'inquiry.edit', params: { id: inquiry.id } }" custom
+                                v-slot="{ navigate }">
+                                <a @click="navigate" @keypress.enter="navigate" role="link">
+                                    <div class="notification-content">
+                                        {{ inquiry.body }}
+                                    </div>
+                                </a>
+                            </router-link>
                         </li>
                     </ul>
                     <p v-else>未対応のお問い合わせはありません。</p>
@@ -107,6 +109,7 @@
 import { ref, onMounted, watch } from "vue";
 import { useRoute } from 'vue-router';
 import { useDashboardStore } from "../store/dashboard";
+import { useInquiryStore } from "../store/inquiry";
 import NotificationModal from "./NotificationModal.vue";
 
 export default {
@@ -115,6 +118,7 @@ export default {
     },
     setup() {
         const dashboardStore = useDashboardStore();
+        const inquiryStore = useInquiryStore();
         const successMessage = ref("");
         const route = useRoute();
 
@@ -176,6 +180,7 @@ export default {
                 await Promise.all([
                     dashboardStore.fetchDashboardData(),
                     dashboardStore.fetchNotificationReadStatuses(),
+                    inquiryStore.fetchInquiries(),
                 ]);
                 console.log("All data fetched successfully");
             } catch (error) {
