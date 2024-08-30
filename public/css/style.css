@@ -657,6 +657,7 @@ table td {
     border-radius: 6px;
     padding: 10px;
     height: 42px;
+    background-color: #fff;
 }
 
 .search-form input[type="submit"] {
