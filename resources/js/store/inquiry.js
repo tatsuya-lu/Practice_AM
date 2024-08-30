@@ -25,16 +25,14 @@ export const useInquiryStore = defineStore("inquiry", {
             }
         },
         async fetchInquiries(params = {}) {
-            if (this.isLoaded && Object.keys(this.inquiries).length > 0) {
-                return;
-            }
+            this.isLoading = true;
             try {
                 const response = await axios.get("/api/inquiries", {
                     params: {
                         ...params,
                         page: this.currentPage,
                         per_page: this.perPage,
-                    }
+                    },
                 });
                 this.inquiries = response.data.inquiries.data.reduce(
                     (acc, inquiry) => {
@@ -50,6 +48,8 @@ export const useInquiryStore = defineStore("inquiry", {
             } catch (error) {
                 console.error("Error fetching inquiries:", error);
                 this.error = error.message;
+            } finally {
+                this.isLoading = false;
             }
         },
         async changePage(page, params = {}) {
