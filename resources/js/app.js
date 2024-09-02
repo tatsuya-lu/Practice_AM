@@ -8,7 +8,6 @@ import { useDashboardStore } from "./store/dashboard";
 import App from "./App.vue";
 import Login from "./components/Login.vue";
 import Dashboard from "./components/Dashboard.vue";
-import NotificationShow from "./components/NotificationShow.vue";
 import NotificationRegister from "./components/NotificationRegister.vue";
 import AccountList from "./components/AccountList.vue";
 import Register from "./components/Register.vue";

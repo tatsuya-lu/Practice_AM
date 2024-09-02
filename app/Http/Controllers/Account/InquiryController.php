@@ -69,22 +69,4 @@ class InquiryController extends Controller
 
         return view('admin.InquiryList', compact('inquiries'));
     }
-
-    public function edit(Post $inquiry)
-    {
-        $statusOptions = Config::get('const.status');
-        $inquiryStatus = $statusOptions[$inquiry->status] ?? $inquiry->status;
-        $inquiry->gender = config('const.gender.' . $inquiry->gender);
-        $inquiry->profession = config('const.profession.' . $inquiry->profession);
-
-        return view('admin.InquiryEdit', compact('inquiry', 'statusOptions', 'inquiryStatus'));
-    }
-
-
-    public function update(InquiryRequest $request, Post $inquiry)
-    {
-        $inquiry->update($request->only(['status', 'comment']));
-
-        return redirect()->route('inquiry.list')->with('success', 'お問い合わせ情報が更新されました。');
-    }
 }

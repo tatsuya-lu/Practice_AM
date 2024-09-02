@@ -91,36 +91,6 @@ class NotificationController extends Controller
         return view('admin.Notification', compact('notification'));
     }
 
-    public function list(Request $request)
-    {
-        $user = $request->user();
-
-        if (!$user) {
-            abort(403, '権限がないためこの操作を実行できません。');
-        }
-
-        return Notification::whereHas('reads', function ($query) use ($user) {
-            $query->where('user_id', $user->id)
-                ->where('read', false);
-        })
-            ->orderBy('id', 'desc')
-            ->paginate(7);
-    }
-
-    public function getReadStatus(Request $request)
-    {
-        $user = $request->user();
-        if (!$user) {
-            return response()->json([], 403);
-        }
-
-        $readNotifications = NotificationRead::where('user_id', $user->id)
-            ->where('read', true)
-            ->pluck('notification_id');
-
-        return response()->json($readNotifications);
-    }
-
     public function markAsRead(Request $request, Notification $notification)
     {
         $user = $request->user();
@@ -135,11 +105,6 @@ class NotificationController extends Controller
         }
 
         return response()->json(['success' => true]);
-    }
-
-    public function create()
-    {
-        return view('admin.NotificationRegister');
     }
 
     public function store(NotificationRequest $request)
