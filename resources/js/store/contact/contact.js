@@ -3,7 +3,7 @@ import axios from "axios";
 
 export const useContactStore = defineStore("contact", {
     state: () => ({
-        from: {
+        form: {
             company: "",
             name: "",
             tel: "",
@@ -46,7 +46,7 @@ export const useContactStore = defineStore("contact", {
                 );
                 return response.data;
             } catch (error) {
-                console.error("Error sending form", error);
+                console.error("Error sending form:", error);
                 throw error;
             }
         },

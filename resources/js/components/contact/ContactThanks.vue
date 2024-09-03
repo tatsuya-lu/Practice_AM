@@ -6,6 +6,7 @@
             <label>会社名</label>
             <p>{{ contactStore.form.company }}</p>
         </div>
+
         <div class="form-item under-line">
             <label>氏名</label>
             <p>{{ contactStore.form.name }}</p>
@@ -28,18 +29,19 @@
 
         <div class="form-item under-line">
             <label>性別</label>
-            <p>{{ contactStore.form.gender }}</p>
+            <p>{{ contactStore.genders[contactStore.form.gender] }}</p>
         </div>
 
         <div class="form-item under-line">
             <label>職業</label>
-            <p>{{ contactStore.form.profession }}</p>
+            <p>{{ contactStore.professions[contactStore.form.profession] }}</p>
         </div>
 
-        <div class="form-item">
-            <label class=" ">お問い合わせ内容</label>
+        <div class="form-item under-line">
+            <label>お問い合わせ内容</label>
             <p>{{ contactStore.form.body }}</p>
         </div>
+
         <a @click.prevent="goToContactForm" href="#"><button type="button" class="form-btn">戻る</button></a>
     </div>
 </template>
@@ -54,6 +56,7 @@ export default {
         const router = useRouter();
 
         const goToContactForm = () => {
+            contactStore.$reset();
             router.push('/contact');
         };
 
