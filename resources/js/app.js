@@ -13,6 +13,9 @@ import AccountList from "./components/AccountList.vue";
 import Register from "./components/Register.vue";
 import InquiryList from "./components/InquiryList.vue";
 import InquiryEdit from "./components/InquiryEdit.vue";
+import ContactForm from "./components/contact/ContactForm.vue";
+import ContactConfirm from "./components/contact/ContactConfirm.vue";
+import ContactThanks from "./components/contact/ContactThanks.vue";
 import axios from "axios";
 axios.defaults.baseURL = "http://localhost:8000";
 axios.defaults.withCredentials = true;
@@ -44,10 +47,25 @@ const routes = [
     { path: "/account/:id/edit", component: Register, name: "account.edit" },
     { path: "/inquiry/list", component: InquiryList },
     {
-        path: '/inquiry/edit/:id',
-        name: 'inquiry.edit',
+        path: "/inquiry/edit/:id",
+        name: "inquiry.edit",
         component: InquiryEdit,
-        meta: { requiresAuth: true }
+        meta: { requiresAuth: true },
+    },
+    {
+        path: "/contact",
+        component: ContactForm,
+        meta: { layout: "empty" },
+    },
+    {
+        path: "/contact/confirm",
+        component: ContactConfirm,
+        meta: { layout: "empty" },
+    },
+    {
+        path: "/contact/thanks",
+        component: ContactThanks,
+        meta: { layout: "empty" },
     },
 ];
 
