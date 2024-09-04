@@ -828,6 +828,8 @@ select:-moz-focusring {
     justify-content: center;
     align-items: center;
     margin-top: 1rem;
+    font-weight: bold;
+    margin: 10px 0;
 }
 
 .pagination button {
