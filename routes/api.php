@@ -8,6 +8,12 @@ use App\Http\Controllers\Account\InquiryController;
 use App\Http\Controllers\Account\NotificationController;
 use App\Http\Controllers\Contact\ContactsController;
 
+Route::prefix('contact')->group(function () {
+    Route::get('/form-data', [ContactsController::class, 'getFormData']);
+    Route::post('/confirm', [ContactsController::class, 'confirm']);
+    Route::post('/send', [ContactsController::class, 'send']);
+});
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -40,10 +46,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/inquiries', [InquiryController::class, 'apiIndex']);
     Route::get('/inquiries/{inquiry}', [InquiryController::class, 'apiShow']);
     Route::put('/inquiries/{inquiry}', [InquiryController::class, 'apiUpdate']);
-});
-
-Route::prefix('contact')->group(function () {
-    Route::get('/form-data', [ContactsController::class, 'getFormData']);
-    Route::post('/confirm', [ContactsController::class, 'confirm']);
-    Route::post('/send', [ContactsController::class, 'send']);
 });

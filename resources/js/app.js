@@ -22,6 +22,21 @@ axios.defaults.withCredentials = true;
 
 const routes = [
     {
+        path: "/contact",
+        component: ContactForm,
+        meta: { layout: "empty" },
+    },
+    {
+        path: "/contact/confirm",
+        component: ContactConfirm,
+        meta: { layout: "empty" },
+    },
+    {
+        path: "/contact/thanks",
+        component: ContactThanks,
+        meta: { layout: "empty" },
+    },
+    {
         path: "/",
         redirect: (to) => {
             return { path: "/dashboard" };
@@ -51,21 +66,6 @@ const routes = [
         name: "inquiry.edit",
         component: InquiryEdit,
         meta: { requiresAuth: true },
-    },
-    {
-        path: "/contact",
-        component: ContactForm,
-        meta: { layout: "empty" },
-    },
-    {
-        path: "/contact/confirm",
-        component: ContactConfirm,
-        meta: { layout: "empty" },
-    },
-    {
-        path: "/contact/thanks",
-        component: ContactThanks,
-        meta: { layout: "empty" },
     },
 ];
 

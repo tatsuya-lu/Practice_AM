@@ -39,12 +39,19 @@ class ContactsController extends Controller
 
     public function send(ContactRequest $request)
     {
-        $inputs = $request->validated();
-        $post = $this->contactService->store($inputs);
+        try {
+            $inputs = $request->validated();
+            $post = $this->contactService->store($inputs);
 
-        return response()->json([
-            'message' => 'Form submitted successfully',
-            'post' => $post
-        ]);
+            return response()->json([
+                'message' => 'Form submitted successfully',
+                'post' => $post
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error submitting form',
+                'errors' => $e->getMessage()
+            ], 422);
+        }
     }
 }

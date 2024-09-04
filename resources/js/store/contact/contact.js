@@ -44,11 +44,15 @@ export const useContactStore = defineStore("contact", {
                     "/api/contact/send",
                     this.form
                 );
+                console.log("Form sent successfully:", response.data);
                 return response.data;
             } catch (error) {
-                console.error("Error sending form:", error);
+                console.error("Error sending form:", error.response.data);
                 throw error;
             }
+        },
+        async initializeStore() {
+            await this.fetchFormData();
         },
     },
 });

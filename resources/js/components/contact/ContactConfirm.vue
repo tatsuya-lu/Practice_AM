@@ -27,12 +27,12 @@
 
             <div class="form-item under-line">
                 <label>性別</label>
-                <p>{{ contactStore.form.gender }}</p>
+                <p>{{ contactStore.genders[contactStore.form.gender] }}</p>
             </div>
 
             <div class="form-item under-line">
                 <label>職業</label>
-                <p>{{ contactStore.form.profession }}</p>
+                <p>{{ contactStore.professions[contactStore.form.profession] }}</p>
             </div>
 
             <div class="form-item">
@@ -50,18 +50,22 @@
 <script>
 import { useContactStore } from '../../store/contact/contact';
 import { useRouter } from 'vue-router';
+import { onMounted } from 'vue';
 
 export default {
     setup() {
         const contactStore = useContactStore();
         const router = useRouter();
 
-        const sendForm = async () => {
+        const submitForm = async () => {
             try {
                 await contactStore.sendForm();
                 router.push('/contact/thanks');
             } catch (error) {
-
+                console.error('Error sending form:', error);
+                if (error.response && error.response.data.errors) {
+                    console.log('Validation errors:', error.response.data.errors);
+                }
             }
         };
 
@@ -69,9 +73,13 @@ export default {
             router.push('/contact');
         };
 
+        onMounted(() => {
+            console.log('ContactConfirm mounted');
+        });
+
         return {
             contactStore,
-            sendForm,
+            submitForm,
             goBack,
         }
     }
