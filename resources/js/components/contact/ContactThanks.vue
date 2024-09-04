@@ -43,6 +43,7 @@
         </div>
 
         <a @click.prevent="goToContactForm" href="#"><button type="button" class="form-btn">戻る</button></a>
+        <router-link to="/dashboard"><button type="button" class="form-btn">ダッシュボードへ戻る</button></router-link>
     </div>
 </template>
 
