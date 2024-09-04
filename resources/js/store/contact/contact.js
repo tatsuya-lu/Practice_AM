@@ -52,7 +52,12 @@ export const useContactStore = defineStore("contact", {
             }
         },
         async initializeStore() {
-            await this.fetchFormData();
+            if (
+                Object.keys(this.genders).length === 0 ||
+                Object.keys(this.professions).length === 0
+            ) {
+                await this.fetchFormData();
+            }
         },
     },
 });

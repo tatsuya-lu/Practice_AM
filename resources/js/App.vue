@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <header v-if="authStore.isLoggedIn">
+        <header v-if="showHeader">
             <div class="header-content-left">
                 <img class="logo" src="/img/testlogo.png" alt="ロゴ画像" />
                 <nav>
@@ -60,6 +60,11 @@
             </transition>
         </router-view>
         <!-- <router-view v-slot="{ Component }">
+            <transition :name="transitionName" mode="out-in">
+                <component :is="Component" :key="$route.fullPath" />
+            </transition>
+        </router-view> -->
+        <!-- <router-view v-slot="{ Component }">
             <component :is="Component" :key="$route.fullPath" />
         </router-view> -->
         <div v-if="isInitialLoading" class="loading-overlay">
@@ -94,6 +99,10 @@ export default {
 
         provide('setInitialLoading', (value) => {
             isInitialLoading.value = value;
+        });
+
+        const showHeader = computed(() => {
+            return authStore.isLoggedIn && router.currentRoute.value.meta.layout !== 'empty';
         });
 
         const user = computed(() => authStore.user || {});
@@ -196,6 +205,7 @@ export default {
 
         return {
             authStore,
+            showHeader,
             user,
             userProfileImage,
             logout,

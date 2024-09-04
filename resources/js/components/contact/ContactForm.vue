@@ -76,8 +76,8 @@ export default {
         const router = useRouter();
         const errors = ref({});
 
-        onMounted(() => {
-            contactStore.fetchFormData();
+        onMounted(async () => {
+            await contactStore.initializeStore();
         });
 
         const submitForm = async () => {

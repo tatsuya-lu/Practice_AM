@@ -24,17 +24,17 @@ const routes = [
     {
         path: "/contact",
         component: ContactForm,
-        meta: { layout: "empty" },
+        meta: { layout: "empty", requiresAuth: false },
     },
     {
         path: "/contact/confirm",
         component: ContactConfirm,
-        meta: { layout: "empty" },
+        meta: { layout: "empty", requiresAuth: false },
     },
     {
         path: "/contact/thanks",
         component: ContactThanks,
-        meta: { layout: "empty" },
+        meta: { layout: "empty", requiresAuth: false },
     },
     {
         path: "/",
@@ -42,7 +42,11 @@ const routes = [
             return { path: "/dashboard" };
         },
     },
-    { path: "/login", component: Login },
+    {
+        path: "/login",
+        component: Login,
+        meta: { layout: "empty", requiresAuth: false },
+    },
     {
         path: "/dashboard",
         component: Dashboard,
