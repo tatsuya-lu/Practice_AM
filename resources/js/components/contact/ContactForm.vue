@@ -75,9 +75,16 @@ export default {
         const contactStore = useContactStore();
         const router = useRouter();
         const errors = ref({});
+        const isLoading = ref(true);
 
         onMounted(async () => {
-            await contactStore.initializeStore();
+            try {
+                await contactStore.prefetchFormData();
+            } catch (error) {
+                console.error('Error initializing contact form:', error);
+            } finally {
+                isLoading.value = false;
+            }
         });
 
         const submitForm = async () => {
@@ -97,7 +104,8 @@ export default {
         return {
             contactStore,
             submitForm,
-            errors
+            errors,
+            isLoading
         };
     }
 }

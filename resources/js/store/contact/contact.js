@@ -59,5 +59,14 @@ export const useContactStore = defineStore("contact", {
                 await this.fetchFormData();
             }
         },
+        async prefetchFormData() {
+            if (
+                Object.keys(this.genders).length === 0 ||
+                Object.keys(this.professions).length === 0
+            ) {
+                await this.fetchFormData();
+            }
+            return true;
+        },
     },
 });

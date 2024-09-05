@@ -94,7 +94,7 @@
                     <router-link to="/inquiry/list"><button>
                             <span class="fa-solid fa-envelopes-bulk"></span>お問い合わせ一覧
                         </button></router-link>
-                    <a href="/contact"><button>
+                    <a href="/contact" @click.prevent="goToContactForm"><button>
                             <span class="fa-solid fa-up-right-from-square"></span>お問い合わせの登録へ
                         </button></a>
                 </div>
@@ -106,11 +106,12 @@
 </template>
 
 <script>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, } from "vue";
 import { useRoute } from 'vue-router';
 import { useDashboardStore } from "../store/dashboard";
 import { useInquiryStore } from "../store/inquiry";
 import { useNotificationStore } from "../store/notification";
+import { useContactStore } from "../store/contact/contact";
 import NotificationModal from "./NotificationModal.vue";
 
 export default {
@@ -121,6 +122,7 @@ export default {
         const dashboardStore = useDashboardStore();
         const inquiryStore = useInquiryStore();
         const notificationStore = useNotificationStore();
+        const contactStore = useContactStore();
         const successMessage = ref("");
         const route = useRoute();
 
@@ -176,6 +178,11 @@ export default {
             });
         };
 
+        const goToContactForm = async () => {
+            await contactStore.prefetchFormData();
+            window.location.href = '/contact';
+        };
+
         onMounted(async () => {
             console.log("Component mounted");
             try {
@@ -218,6 +225,7 @@ export default {
             selectedNotification,
             openNotificationModal,
             closeNotificationModal,
+            goToContactForm,
         };
     },
 };
