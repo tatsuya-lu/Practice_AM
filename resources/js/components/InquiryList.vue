@@ -107,6 +107,7 @@ export default {
 
         const sortInquiries = async (newSortType) => {
             sortType.value = newSortType;
+            inquiryStore.currentPage = 1;
             await fetchInquiries();
         };
 
@@ -149,6 +150,7 @@ export default {
             searchInquiries,
             inquiryStore,
             changePage,
+            sortType,
         };
     }
 }

@@ -3,7 +3,7 @@ import axios from "axios";
 
 export const useInquiryStore = defineStore("inquiry", {
     state: () => ({
-        inquiries: {},
+        inquiries: [],
         statusOptions: {},
         isLoaded: false,
         isLoading: false,
@@ -34,13 +34,7 @@ export const useInquiryStore = defineStore("inquiry", {
                         per_page: this.perPage,
                     },
                 });
-                this.inquiries = response.data.inquiries.data.reduce(
-                    (acc, inquiry) => {
-                        acc[inquiry.id] = inquiry;
-                        return acc;
-                    },
-                    {}
-                );
+                this.inquiries = response.data.inquiries.data;
                 this.statusOptions = response.data.statusOptions;
                 this.currentPage = response.data.inquiries.current_page;
                 this.totalPages = response.data.inquiries.last_page;
@@ -51,6 +45,25 @@ export const useInquiryStore = defineStore("inquiry", {
             } finally {
                 this.isLoading = false;
             }
+        },
+        sortInquiries(sortType) {
+            const sortedInquiries = Object.values(this.inquiries).sort(
+                (a, b) => {
+                    if (sortType === "newest") {
+                        return new Date(b.created_at) - new Date(a.created_at);
+                    } else {
+                        return new Date(a.created_at) - new Date(b.created_at);
+                    }
+                }
+            );
+            this.inquiries = sortedInquiries.reduce((acc, inquiry) => {
+                acc[inquiry.id] = inquiry;
+                return acc;
+            }, {});
+        },
+        addInquiry(inquiry) {
+            this.inquiries[inquiry.id] = inquiry;
+            this.sortInquiries("newest"); // 新しい順にソート
         },
         async changePage(page, params = {}) {
             if (page >= 1 && page <= this.totalPages) {
@@ -99,7 +112,8 @@ export const useInquiryStore = defineStore("inquiry", {
         },
     },
     getters: {
-        getInquiries: (state) => Object.values(state.inquiries),
+        // getInquiries: (state) => Object.values(state.inquiries),
+        getInquiries: (state) => state.inquiries,
         getStatusText: (state) => (statusCode) =>
             state.statusOptions[statusCode] || statusCode,
         getCurrentInquiry: (state) => (id) => state.inquiries[id],
