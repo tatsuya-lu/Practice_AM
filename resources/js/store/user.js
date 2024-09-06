@@ -49,13 +49,15 @@ export const useUserStore = defineStore("user", {
             this.users.unshift(user);
         },
         updateUser(updatedUser) {
-            const index = this.users.findIndex(user => user.id === updatedUser.id);
+            const index = this.users.findIndex(
+                (user) => user.id === updatedUser.id
+            );
             if (index !== -1) {
                 this.users.splice(index, 1, updatedUser);
             }
         },
         removeUser(userId) {
-            this.users = this.users.filter(user => user.id !== userId);
+            this.users = this.users.filter((user) => user.id !== userId);
         },
         async fetchMappings(forceRefresh = false) {
             if (this.isMappingsLoaded && !forceRefresh) return;
@@ -70,9 +72,13 @@ export const useUserStore = defineStore("user", {
         },
         async registerUser(formData) {
             try {
-                const response = await axios.post("/api/account/register", formData, {
-                    headers: { "Content-Type": "multipart/form-data" },
-                });
+                const response = await axios.post(
+                    "/api/account/register",
+                    formData,
+                    {
+                        headers: { "Content-Type": "multipart/form-data" },
+                    }
+                );
                 if (response.data.user) {
                     this.addUser(response.data.user);
                     this.isLoaded = false;
@@ -105,7 +111,11 @@ export const useUserStore = defineStore("user", {
                 if (response.data.user) {
                     this.updateUser(response.data.user);
                 }
-                return { success: true, message: response.data.message, user: response.data.user };
+                return {
+                    success: true,
+                    message: response.data.message,
+                    user: response.data.user,
+                };
             } catch (error) {
                 console.error("Error updating user:", error);
                 return {
@@ -123,15 +133,18 @@ export const useUserStore = defineStore("user", {
             state.isMappingsLoaded
                 ? state.prefectures[prefCode] || prefCode
                 : prefCode,
-        getUserById: (state) => (userId) => state.users.find(user => user.id === userId),
-        getSortedUsers: (state) => (sortType = 'newest') => {
-            return [...state.users].sort((a, b) => {
-                if (sortType === 'newest') {
-                    return new Date(b.created_at) - new Date(a.created_at);
-                } else {
-                    return new Date(a.created_at) - new Date(b.created_at);
-                }
-            });
-        },
+        getUserById: (state) => (userId) =>
+            state.users.find((user) => user.id === userId),
+        getSortedUsers:
+            (state) =>
+            (sortType = "newest") => {
+                return [...state.users].sort((a, b) => {
+                    if (sortType === "newest") {
+                        return new Date(b.created_at) - new Date(a.created_at);
+                    } else {
+                        return new Date(a.created_at) - new Date(b.created_at);
+                    }
+                });
+            },
     },
 });

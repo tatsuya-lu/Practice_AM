@@ -91,7 +91,8 @@
     <div class="pagination">
       <button @click="changePage(userStore.currentPage - 1)" :disabled="userStore.currentPage === 1">前へ</button>
       <span>{{ userStore.currentPage }} / {{ userStore.totalPages }}</span>
-      <button @click="changePage(userStore.currentPage + 1)" :disabled="userStore.currentPage === userStore.totalPages">次へ</button>
+      <button @click="changePage(userStore.currentPage + 1)"
+        :disabled="userStore.currentPage === userStore.totalPages">次へ</button>
     </div>
   </div>
 </template>
@@ -153,6 +154,7 @@ export default {
     };
 
     const searchUsers = async () => {
+      userStore.currentPage = 1;
       await fetchUsers();
     };
 
