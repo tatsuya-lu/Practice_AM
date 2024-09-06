@@ -14,7 +14,6 @@ import Register from "./components/Register.vue";
 import InquiryList from "./components/InquiryList.vue";
 import InquiryEdit from "./components/InquiryEdit.vue";
 import ContactForm from "./components/contact/ContactForm.vue";
-// const ContactForm = () => import('./components/contact/ContactForm.vue');
 import ContactConfirm from "./components/contact/ContactConfirm.vue";
 import ContactThanks from "./components/contact/ContactThanks.vue";
 import axios from "axios";
