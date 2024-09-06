@@ -38,57 +38,5 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
 
-.modal-content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    min-width: 450px;
-    max-width: 80%;
-    max-height: 80%;
-    overflow-y: auto;
-    position: relative;
-}
-
-.close-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 24px;
-    cursor: pointer;
-    background: none;
-    border: none;
-}
-
-.notification-content {
-    margin-top: 20px;
-    white-space: pre-wrap;
-}
-
-.notification-date {
-    margin-top: 20px;
-    font-style: italic;
-}
-
-.modal-fade-enter-active,
-.modal-fade-leave-active {
-    transition: opacity 0.3s ease;
-}
-
-.modal-fade-enter-from,
-.modal-fade-leave-to {
-    opacity: 0;
-}
 </style>

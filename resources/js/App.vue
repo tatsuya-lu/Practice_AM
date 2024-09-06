@@ -59,14 +59,6 @@
                 <component :is="Component" :key="$route.fullPath" />
             </transition>
         </router-view>
-        <!-- <router-view v-slot="{ Component }">
-            <transition :name="transitionName" mode="out-in">
-                <component :is="Component" :key="$route.fullPath" />
-            </transition>
-        </router-view> -->
-        <!-- <router-view v-slot="{ Component }">
-            <component :is="Component" :key="$route.fullPath" />
-        </router-view> -->
         <div v-if="isInitialLoading" class="loading-overlay">
             Loading...
         </div>
@@ -144,7 +136,7 @@ export default {
             await authStore.fetchUser();
             if (authStore.isLoggedIn) {
                 if (router.currentRoute.value.path === "/login") {
-                    await authStore.fetchInitialData();// 初期データ取得メソッドを呼び出し
+                    await authStore.fetchInitialData();
                     await router.push("/dashboard");
                 }
             } else if (router.currentRoute.value.meta.requiresAuth) {
@@ -230,43 +222,5 @@ export default {
 </script>
 
 <style>
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(255, 255, 255, 0.8);
-    z-index: 9999;
-}
 
-.slide-left-enter-active,
-.slide-left-leave-active,
-.slide-right-enter-active,
-.slide-right-leave-active {
-    transition: all 0.2s ease-out;
-}
-
-.slide-left-enter-from {
-    opacity: 0;
-    transform: translateX(30px);
-}
-
-.slide-left-leave-to {
-    opacity: 0;
-    transform: translateX(-30px);
-}
-
-.slide-right-enter-from {
-    opacity: 0;
-    transform: translateX(-30px);
-}
-
-.slide-right-leave-to {
-    opacity: 0;
-    transform: translateX(30px);
-}
 </style>

@@ -49,7 +49,7 @@ export default {
 
                 localStorage.setItem('token', response.data.token);
                 setInitialLoading(true); // ログイン成功時にのみローディングを開始
-                await authStore.fetchInitialData(); // 新しく追加した初期データ取得メソッド
+                await authStore.fetchInitialData();
 
                 if (authStore.isLoggedIn) {
                     await notificationStore.fetchUnreadNotifications();
