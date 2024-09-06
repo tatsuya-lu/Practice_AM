@@ -63,7 +63,7 @@ export const useInquiryStore = defineStore("inquiry", {
         },
         addInquiry(inquiry) {
             this.inquiries[inquiry.id] = inquiry;
-            this.sortInquiries("newest"); // 新しい順にソート
+            this.sortInquiries("newest");
         },
         async changePage(page, params = {}) {
             if (page >= 1 && page <= this.totalPages) {
@@ -112,8 +112,7 @@ export const useInquiryStore = defineStore("inquiry", {
         },
     },
     getters: {
-        // getInquiries: (state) => Object.values(state.inquiries),
-        getInquiries: (state) => state.inquiries,
+        getInquiries: (state) => Object.values(state.inquiries),
         getStatusText: (state) => (statusCode) =>
             state.statusOptions[statusCode] || statusCode,
         getCurrentInquiry: (state) => (id) => state.inquiries[id],
