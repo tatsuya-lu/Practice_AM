@@ -50,14 +50,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="inquiry in inquiries" :key="inquiry.id">
+                    <tr v-for="inquiry in currentPageInquiries" :key="inquiry.id">
                         <td class="table-text-center">
                             <router-link :to="{ name: 'inquiry.edit', params: { id: inquiry.id } }"
                                 class="icon-btn edit-icon">
                                 <span class="fa-solid fa-pen-to-square"></span>
                             </router-link>
                         </td>
-                        <td>{{ inquiry.statusText }}</td>
+                        <td>{{ inquiryStore.getStatusText(inquiry.status) }}</td>
                         <td>{{ inquiry.company }}</td>
                         <td>{{ inquiry.name }}</td>
                         <td>{{ inquiry.tel }}</td>
@@ -110,15 +110,14 @@ export default {
         const searchTel = ref('');
         const sortType = ref('newest');
 
-        const inquiries = computed(() => inquiryStore.getInquiries);
+        const currentPageInquiries = computed(() => inquiryStore.getCurrentPageInquiries);
 
         const fetchInquiries = async () => {
-            await inquiryStore.fetchInquiries({
+            await inquiryStore.fetchInquiries(true, {
                 search_status: searchStatus.value,
                 search_company: searchCompany.value,
                 search_tel: searchTel.value,
-                sort: sortType.value,
-                page: inquiryStore.currentPage
+                sort: sortType.value
             });
         };
 
@@ -177,7 +176,7 @@ export default {
         });
 
         return {
-            inquiries,
+            currentPageInquiries,
             displayedPages,
             successMessage,
             searchStatus,

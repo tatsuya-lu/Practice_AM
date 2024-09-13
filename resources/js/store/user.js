@@ -3,7 +3,7 @@ import axios from "axios";
 
 export const useUserStore = defineStore("user", {
     state: () => ({
-        users: [],
+        users: {},
         isLoaded: false,
         adminLevels: {},
         prefectures: {},
@@ -11,10 +11,15 @@ export const useUserStore = defineStore("user", {
         currentPage: 1,
         totalPages: 1,
         perPage: 20,
+        cachedParams: {},
     }),
     actions: {
         async fetchUsers(forceRefresh = false, params = {}) {
-            if (this.isLoaded && !forceRefresh) return;
+            const pageKey = `${this.currentPage}-${JSON.stringify(params)}`;
+            if (!forceRefresh && this.users[pageKey]) {
+                return;
+            }
+
             try {
                 const response = await axios.get("/api/account/list", {
                     params: {
@@ -23,18 +28,49 @@ export const useUserStore = defineStore("user", {
                         per_page: this.perPage,
                     },
                 });
-                this.users = response.data.data;
+                this.users[pageKey] = response.data.data;
                 this.currentPage = response.data.current_page;
                 this.totalPages = response.data.last_page;
                 this.isLoaded = true;
+                this.cachedParams = params;
+
+                this.prefetchAdjacentPages(params);
             } catch (error) {
                 console.error("Error fetching users:", error);
             }
         },
+        async prefetchAdjacentPages(params) {
+            const adjacentPages = [this.currentPage - 1, this.currentPage + 1];
+            adjacentPages.forEach(async (page) => {
+                if (page > 0 && page <= this.totalPages) {
+                    const pageKey = `${page}-${JSON.stringify(params)}`;
+                    if (!this.users[pageKey]) {
+                        try {
+                            const response = await axios.get(
+                                "/api/account/list",
+                                {
+                                    params: {
+                                        ...params,
+                                        page: page,
+                                        per_page: this.perPage,
+                                    },
+                                }
+                            );
+                            this.users[pageKey] = response.data.data;
+                        } catch (error) {
+                            console.error(
+                                `Error prefetching page ${page}:`,
+                                error
+                            );
+                        }
+                    }
+                }
+            });
+        },
         async changePage(page, params = {}) {
             if (page >= 1 && page <= this.totalPages) {
                 this.currentPage = page;
-                await this.fetchUsers(true, params);
+                await this.fetchUsers(false, params);
             }
         },
         setUsers(users) {
@@ -126,6 +162,12 @@ export const useUserStore = defineStore("user", {
         },
     },
     getters: {
+        getCurrentPageUsers: (state) => {
+            const pageKey = `${state.currentPage}-${JSON.stringify(
+                state.cachedParams
+            )}`;
+            return state.users[pageKey] || [];
+        },
         getUsers: (state) => state.users,
         getAdminLevelLabel: (state) => (level) =>
             state.isMappingsLoaded ? state.adminLevels[level] || level : level,

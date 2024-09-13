@@ -47,7 +47,7 @@
       {{ successMessage }}
     </div>
 
-    <div v-if="users.length > 0" class="table-responsive">
+    <div v-if="currentPageUsers.length > 0" class="table-responsive">
       <table>
         <thead>
           <tr>
@@ -63,7 +63,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="user in users" :key="user.id">
+          <tr v-for="user in currentPageUsers" :key="user.id">
             <td class="table-text-center">
               <router-link :to="{ name: 'account.edit', params: { id: user.id } }" class="icon-btn edit-icon">
                 <span class="fa-solid fa-pen-to-square"></span>
@@ -86,7 +86,7 @@
       </table>
     </div>
     <div v-else>
-      ユーザーが見つかりません。
+      ユーザ情報を読み込んでいます。
     </div>
     <div class="pagination">
       <button @click="changePage(1)" :disabled="userStore.currentPage === 1" class="pagination-button">
@@ -137,6 +137,7 @@ export default {
     const sortType = ref('newest')
 
     const users = computed(() => userStore.getUsers)
+    const currentPageUsers = computed(() => userStore.getCurrentPageUsers)
 
     const displayedPages = computed(() => {
       const currentPage = userStore.currentPage;
@@ -172,8 +173,8 @@ export default {
         search_admin_level: searchAdminLevel.value,
         search_email: searchEmail.value,
         sort: sortType.value
-      });
-    };
+      })
+    }
 
     const fetchFormData = async () => {
       try {
@@ -234,6 +235,7 @@ export default {
     })
 
     return {
+      currentPageUsers,
       users,
       fetchUsers,
       displayedPages,
