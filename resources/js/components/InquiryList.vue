@@ -66,11 +66,28 @@
             </table>
         </div>
         <div class="pagination">
-            <button @click="changePage(inquiryStore.currentPage - 1)"
-                :disabled="inquiryStore.currentPage === 1">前へ</button>
-            <span>{{ inquiryStore.currentPage }} / {{ inquiryStore.totalPages }}</span>
+            <button @click="changePage(1)" :disabled="inquiryStore.currentPage === 1" class="pagination-button">
+                &laquo;
+            </button>
+            <button @click="changePage(inquiryStore.currentPage - 1)" :disabled="inquiryStore.currentPage === 1"
+                class="pagination-button">
+                &lsaquo;
+            </button>
+            <template v-for="page in displayedPages" :key="page">
+                <button v-if="page !== '...'" @click="changePage(page)"
+                    :class="['pagination-button', { 'active': page === inquiryStore.currentPage }]">
+                    {{ page }}
+                </button>
+                <span v-else class="pagination-ellipsis">{{ page }}</span>
+            </template>
             <button @click="changePage(inquiryStore.currentPage + 1)"
-                :disabled="inquiryStore.currentPage === inquiryStore.totalPages">次へ</button>
+                :disabled="inquiryStore.currentPage === inquiryStore.totalPages" class="pagination-button">
+                &rsaquo;
+            </button>
+            <button @click="changePage(inquiryStore.totalPages)"
+                :disabled="inquiryStore.currentPage === inquiryStore.totalPages" class="pagination-button">
+                &raquo;
+            </button>
         </div>
     </div>
 </template>
@@ -116,6 +133,25 @@ export default {
             fetchInquiries();
         };
 
+        const displayedPages = computed(() => {
+            const currentPage = inquiryStore.currentPage;
+            const totalPages = inquiryStore.totalPages;
+            const delta = 2;
+
+            let range = [];
+            for (let i = Math.max(2, currentPage - delta); i <= Math.min(totalPages - 1, currentPage + delta); i++) {
+                range.push(i);
+            }
+
+            if (currentPage - delta > 2) range.unshift("...");
+            if (currentPage + delta < totalPages - 1) range.push("...");
+
+            range.unshift(1);
+            if (totalPages > 1) range.push(totalPages);
+
+            return range;
+        });
+
         const changePage = async (page) => {
             await inquiryStore.changePage(page, {
                 search_status: searchStatus.value,
@@ -142,6 +178,7 @@ export default {
 
         return {
             inquiries,
+            displayedPages,
             successMessage,
             searchStatus,
             searchCompany,

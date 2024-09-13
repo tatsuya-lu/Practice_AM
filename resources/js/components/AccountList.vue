@@ -89,10 +89,28 @@
       ユーザーが見つかりません。
     </div>
     <div class="pagination">
-      <button @click="changePage(userStore.currentPage - 1)" :disabled="userStore.currentPage === 1">前へ</button>
-      <span>{{ userStore.currentPage }} / {{ userStore.totalPages }}</span>
-      <button @click="changePage(userStore.currentPage + 1)"
-        :disabled="userStore.currentPage === userStore.totalPages">次へ</button>
+      <button @click="changePage(1)" :disabled="userStore.currentPage === 1" class="pagination-button">
+        &laquo;
+      </button>
+      <button @click="changePage(userStore.currentPage - 1)" :disabled="userStore.currentPage === 1"
+        class="pagination-button">
+        &lsaquo;
+      </button>
+      <template v-for="page in displayedPages" :key="page">
+        <button v-if="page !== '...'" @click="changePage(page)"
+          :class="['pagination-button', { 'active': page === userStore.currentPage }]">
+          {{ page }}
+        </button>
+        <span v-else class="pagination-ellipsis">{{ page }}</span>
+      </template>
+      <button @click="changePage(userStore.currentPage + 1)" :disabled="userStore.currentPage === userStore.totalPages"
+        class="pagination-button">
+        &rsaquo;
+      </button>
+      <button @click="changePage(userStore.totalPages)" :disabled="userStore.currentPage === userStore.totalPages"
+        class="pagination-button">
+        &raquo;
+      </button>
     </div>
   </div>
 </template>
@@ -119,6 +137,25 @@ export default {
     const sortType = ref('newest')
 
     const users = computed(() => userStore.getUsers)
+
+    const displayedPages = computed(() => {
+      const currentPage = userStore.currentPage;
+      const totalPages = userStore.totalPages;
+      const delta = 2;
+
+      let range = [];
+      for (let i = Math.max(2, currentPage - delta); i <= Math.min(totalPages - 1, currentPage + delta); i++) {
+        range.push(i);
+      }
+
+      if (currentPage - delta > 2) range.unshift("...");
+      if (currentPage + delta < totalPages - 1) range.push("...");
+
+      range.unshift(1);
+      if (totalPages > 1) range.push(totalPages);
+
+      return range;
+    });
 
     const changePage = async (page) => {
       await userStore.changePage(page, {
@@ -150,6 +187,7 @@ export default {
 
     const sortUsers = async (newSortType) => {
       sortType.value = newSortType;
+      userStore.currentPage = 1;
       await fetchUsers();
     };
 
@@ -198,6 +236,7 @@ export default {
     return {
       users,
       fetchUsers,
+      displayedPages,
       successMessage,
       registeredMessage,
       registeredEmail,
