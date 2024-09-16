@@ -124,18 +124,16 @@ export default {
         const fetchUserData = async () => {
             if (isEditing.value) {
                 const userId = parseInt(route.params.id)
-                const userData = userStore.getUserById(userId)
+                let userData = userStore.getUserById(userId)
+                if (!userData) {
+                    await userStore.fetchUsers(true)
+                    userData = userStore.getUserById(userId)
+                }
                 if (userData) {
                     user.value = { ...userData }
                 } else {
-                    await userStore.fetchUsers(true)
-                    const refreshedUserData = userStore.getUserById(userId)
-                    if (refreshedUserData) {
-                        user.value = { ...refreshedUserData }
-                    } else {
-                        console.error('User not found')
-                        router.push({ name: 'account.list' })
-                    }
+                    console.error('User not found')
+                    router.push({ name: 'account.list' })
                 }
             } else {
                 user.value = {}

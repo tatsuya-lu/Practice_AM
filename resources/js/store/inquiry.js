@@ -147,7 +147,6 @@ export const useInquiryStore = defineStore("inquiry", {
         },
     },
     getters: {
-        getInquiries: (state) => Object.values(state.inquiries),
         getCurrentPageInquiries: (state) => {
             const pageKey = `${state.currentPage}-${JSON.stringify(
                 state.cachedParams
@@ -157,6 +156,7 @@ export const useInquiryStore = defineStore("inquiry", {
         getStatusText: (state) => (statusCode) =>
             state.statusOptions[statusCode] || statusCode,
         getCurrentInquiry: (state) => (id) => {
+            id = parseInt(id);
             for (const pageInquiries of Object.values(state.inquiries)) {
                 const inquiry = pageInquiries.find((inq) => inq.id === id);
                 if (inquiry) return inquiry;

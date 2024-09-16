@@ -98,33 +98,37 @@ export default {
         const inquiryStore = useInquiryStore();
         const dashboardStore = useDashboardStore();
         const successMessage = ref('');
+        const currentInquiry = ref(null);
 
-        const currentInquiry = computed(() => {
-            const inquiry = inquiryStore.getCurrentInquiry(route.params.id);
-            return inquiry ? { ...inquiry, statusText: inquiryStore.statusOptions[inquiry.status] } : null;
-        });
+        const fetchInquiryData = async () => {
+            const id = parseInt(route.params.id);
+            let inquiryData = inquiryStore.getCurrentInquiry(id);
+            if (!inquiryData) {
+                await inquiryStore.fetchInquiries(true);
+                inquiryData = inquiryStore.getCurrentInquiry(id);
+            }
+            if (inquiryData) {
+                currentInquiry.value = { ...inquiryData, statusText: inquiryStore.getStatusText(inquiryData.status) };
+            } else {
+                console.error('お問い合わせが見つかりません');
+                router.push({ name: 'inquiry.list' });
+            }
+        };
 
         const updateInquiry = async () => {
             try {
-                const message = await inquiryStore.updateInquiry(route.params.id, currentInquiry.value);
+                const message = await inquiryStore.updateInquiry(currentInquiry.value.id, currentInquiry.value);
                 successMessage.value = message;
 
                 await dashboardStore.fetchUnresolvedInquiries();
-
-                await inquiryStore.fetchInquiries();
+                await inquiryStore.fetchInquiries(true);
 
                 router.push({
                     path: '/inquiry/list',
                     query: { success: 'お問い合わせが更新されました' }
                 });
             } catch (error) {
-                console.error('Error updating inquiry:', error);
-            }
-        };
-
-        const fetchInquiryData = async () => {
-            if (!currentInquiry.value) {
-                await inquiryStore.fetchInquiry(route.params.id);
+                console.error('お問い合わせの更新中にエラーが発生しました:', error);
             }
         };
 

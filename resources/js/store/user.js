@@ -175,12 +175,18 @@ export const useUserStore = defineStore("user", {
             state.isMappingsLoaded
                 ? state.prefectures[prefCode] || prefCode
                 : prefCode,
-        getUserById: (state) => (userId) =>
-            state.users.find((user) => user.id === userId),
+        getUserById: (state) => (userId) => {
+            for (const pageUsers of Object.values(state.users)) {
+                const user = pageUsers.find((user) => user.id === userId);
+                if (user) return user;
+            }
+            return null;
+        },
         getSortedUsers:
             (state) =>
             (sortType = "newest") => {
-                return [...state.users].sort((a, b) => {
+                const allUsers = Object.values(state.users).flat();
+                return [...allUsers].sort((a, b) => {
                     if (sortType === "newest") {
                         return new Date(b.created_at) - new Date(a.created_at);
                     } else {
