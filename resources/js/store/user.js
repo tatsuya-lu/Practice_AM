@@ -132,6 +132,15 @@ export const useUserStore = defineStore("user", {
                 };
             }
         },
+        addUser(user) {
+            const pageKey = `${this.currentPage}-${JSON.stringify(
+                this.cachedParams
+            )}`;
+            if (!this.users[pageKey]) {
+                this.users[pageKey] = [];
+            }
+            this.users[pageKey].unshift(user);
+        },
         async updateUser(userId, formData) {
             try {
                 const response = await axios.post(
@@ -145,7 +154,7 @@ export const useUserStore = defineStore("user", {
                     }
                 );
                 if (response.data.user) {
-                    this.updateUser(response.data.user);
+                    this.updateUserInStore(response.data.user);
                 }
                 return {
                     success: true,
@@ -158,6 +167,20 @@ export const useUserStore = defineStore("user", {
                     success: false,
                     errors: error.response?.data?.errors || {},
                 };
+            }
+        },
+
+        updateUserInStore(updatedUser) {
+            const pageKey = `${this.currentPage}-${JSON.stringify(
+                this.cachedParams
+            )}`;
+            if (this.users[pageKey]) {
+                const index = this.users[pageKey].findIndex(
+                    (user) => user.id === updatedUser.id
+                );
+                if (index !== -1) {
+                    this.users[pageKey].splice(index, 1, updatedUser);
+                }
             }
         },
     },
