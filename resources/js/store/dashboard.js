@@ -19,6 +19,7 @@ export const useDashboardStore = defineStore("dashboard", {
         inquiryCurrentPage: 1,
         inquiryPerPage: 10,
         inquiryTotalPages: 1,
+        cachedNotifications: {},
     }),
 
     getters: {
@@ -60,6 +61,12 @@ export const useDashboardStore = defineStore("dashboard", {
             }
 
             try {
+                if (this.cachedNotifications[this.currentPage] && !force) {
+                    this.notifications =
+                        this.cachedNotifications[this.currentPage];
+                    return;
+                }
+
                 const [
                     dashboardResponse,
                     notificationsResponse,
@@ -103,6 +110,7 @@ export const useDashboardStore = defineStore("dashboard", {
 
                 this.notifications =
                     notificationsResponse.data.notifications.data || [];
+                this.cachedNotifications[this.currentPage] = this.notifications;
                 this.totalNotifications =
                     notificationsResponse.data.notifications.total;
                 this.lastPage =
@@ -175,7 +183,11 @@ export const useDashboardStore = defineStore("dashboard", {
         async changePage(page) {
             if (page >= 1 && page <= this.lastPage) {
                 this.currentPage = page;
-                await this.fetchDashboardData(true);
+                if (this.cachedNotifications[page]) {
+                    this.notifications = this.cachedNotifications[page];
+                } else {
+                    await this.fetchDashboardData(true);
+                }
             }
         },
 
