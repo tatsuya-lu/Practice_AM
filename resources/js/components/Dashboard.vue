@@ -15,8 +15,6 @@
                     <p class="sub-title">お知らせ一覧</p>
                     <template v-if="dashboardStore.validNotifications.length > 0">
                         <ul>
-                            <!-- <template v-for="notification in dashboardStore.validNotifications" :key="notification.id"></template>
-どちらでも動いている？-->
                             <template v-for="notification in dashboardStore.notifications" :key="notification.id">
                                 <li class="notification-title">
                                     {{ notification.title }}
@@ -37,11 +35,33 @@
                             </template>
                         </ul>
                         <div v-if="dashboardStore.totalPages > 1" class="pagination">
+                            <button @click="changePage(1)" :disabled="dashboardStore.currentPage === 1"
+                                class="pagination-button">
+                                &laquo;
+                            </button>
                             <button @click="changePage(dashboardStore.currentPage - 1)"
-                                :disabled="dashboardStore.currentPage === 1">前へ</button>
-                            <span>{{ dashboardStore.currentPage }} / {{ dashboardStore.totalPages }}</span>
+                                :disabled="dashboardStore.currentPage === 1" class="pagination-button">
+                                &lsaquo;
+                            </button>
+                            <template
+                                v-for="page in displayedPages(dashboardStore.currentPage, dashboardStore.totalPages)"
+                                :key="page">
+                                <button v-if="page !== '...'" @click="changePage(page)"
+                                    :class="['pagination-button', { 'active': page === dashboardStore.currentPage }]">
+                                    {{ page }}
+                                </button>
+                                <span v-else class="pagination-ellipsis">{{ page }}</span>
+                            </template>
                             <button @click="changePage(dashboardStore.currentPage + 1)"
-                                :disabled="dashboardStore.currentPage === dashboardStore.totalPages">次へ</button>
+                                :disabled="dashboardStore.currentPage === dashboardStore.totalPages"
+                                class="pagination-button">
+                                &rsaquo;
+                            </button>
+                            <button @click="changePage(dashboardStore.totalPages)"
+                                :disabled="dashboardStore.currentPage === dashboardStore.totalPages"
+                                class="pagination-button">
+                                &raquo;
+                            </button>
                         </div>
                     </template>
                     <p v-else>お知らせはありません。</p>
@@ -71,11 +91,33 @@
                     </ul>
                     <p v-else>未対応のお問い合わせはありません。</p>
                     <div v-if="dashboardStore.inquiryTotalPages > 1" class="pagination">
+                        <button @click="changeInquiryPage(1)" :disabled="dashboardStore.inquiryCurrentPage === 1"
+                            class="pagination-button">
+                            &laquo;
+                        </button>
                         <button @click="changeInquiryPage(dashboardStore.inquiryCurrentPage - 1)"
-                            :disabled="dashboardStore.inquiryCurrentPage === 1">前へ</button>
-                        <span>{{ dashboardStore.inquiryCurrentPage }} / {{ dashboardStore.inquiryTotalPages }}</span>
+                            :disabled="dashboardStore.inquiryCurrentPage === 1" class="pagination-button">
+                            &lsaquo;
+                        </button>
+                        <template
+                            v-for="page in displayedPages(dashboardStore.inquiryCurrentPage, dashboardStore.inquiryTotalPages)"
+                            :key="page">
+                            <button v-if="page !== '...'" @click="changeInquiryPage(page)"
+                                :class="['pagination-button', { 'active': page === dashboardStore.inquiryCurrentPage }]">
+                                {{ page }}
+                            </button>
+                            <span v-else class="pagination-ellipsis">{{ page }}</span>
+                        </template>
                         <button @click="changeInquiryPage(dashboardStore.inquiryCurrentPage + 1)"
-                            :disabled="dashboardStore.inquiryCurrentPage === dashboardStore.inquiryTotalPages">次へ</button>
+                            :disabled="dashboardStore.inquiryCurrentPage === dashboardStore.inquiryTotalPages"
+                            class="pagination-button">
+                            &rsaquo;
+                        </button>
+                        <button @click="changeInquiryPage(dashboardStore.inquiryTotalPages)"
+                            :disabled="dashboardStore.inquiryCurrentPage === dashboardStore.inquiryTotalPages"
+                            class="pagination-button">
+                            &raquo;
+                        </button>
                     </div>
                 </div>
             </div>
@@ -141,6 +183,19 @@ export default {
             if (page >= 1 && page <= dashboardStore.totalPages) {
                 await dashboardStore.changePage(page);
             }
+        };
+
+        const displayedPages = (currentPage, totalPages) => {
+            const delta = 2;
+            let range = [];
+            for (let i = Math.max(2, currentPage - delta); i <= Math.min(totalPages - 1, currentPage + delta); i++) {
+                range.push(i);
+            }
+            if (currentPage - delta > 2) range.unshift("...");
+            if (currentPage + delta < totalPages - 1) range.push("...");
+            range.unshift(1);
+            if (totalPages > 1) range.push(totalPages);
+            return range;
         };
 
         const changeInquiryPage = async (page) => {
@@ -218,6 +273,7 @@ export default {
             prevPage,
             nextPage,
             changePage,
+            displayedPages,
             changeInquiryPage,
             notificationStore,
             updateNotificationStatus,
