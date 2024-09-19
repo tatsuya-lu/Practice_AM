@@ -20,6 +20,8 @@ export const useDashboardStore = defineStore("dashboard", {
         inquiryPerPage: 10,
         inquiryTotalPages: 1,
         cachedNotifications: {},
+        isFetching: false,
+        prefetchedPages: new Set(),
     }),
 
     getters: {
@@ -61,6 +63,8 @@ export const useDashboardStore = defineStore("dashboard", {
             }
 
             try {
+                this.isFetching = true;
+
                 if (this.cachedNotifications[this.currentPage] && !force) {
                     this.notifications =
                         this.cachedNotifications[this.currentPage];
@@ -111,6 +115,8 @@ export const useDashboardStore = defineStore("dashboard", {
                 this.notifications =
                     notificationsResponse.data.notifications.data || [];
                 this.cachedNotifications[this.currentPage] = this.notifications;
+                this.prefetchedPages.add(this.currentPage);
+
                 this.totalNotifications =
                     notificationsResponse.data.notifications.total;
                 this.lastPage =
@@ -124,6 +130,7 @@ export const useDashboardStore = defineStore("dashboard", {
                     notificationStore.updateGlobalReadStatus(id);
                     return acc;
                 }, {});
+
                 this.unresolvedInquiryCount =
                     inquiriesResponse.data.unresolvedInquiryCount;
                 this.unresolvedInquiries =
@@ -133,11 +140,42 @@ export const useDashboardStore = defineStore("dashboard", {
                 this.isInquiriesLoaded = true;
                 this.isReadStatusesLoaded = true;
                 this.lastFetchTime = now;
+
+                this.prefetchNextPage(this.currentPage);
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
                 this.isNotificationsLoaded = false;
                 this.isInquiriesLoaded = false;
                 this.isReadStatusesLoaded = false;
+            } finally {
+                this.isFetching = false;
+            }
+        },
+
+        async prefetchNextPage(currentPage) {
+            const nextPage = currentPage + 1;
+            if (
+                nextPage <= this.lastPage &&
+                !this.prefetchedPages.has(nextPage)
+            ) {
+                try {
+                    const response = await axios.get(
+                        "/api/dashboard/notifications",
+                        {
+                            params: { page: nextPage, per_page: this.perPage },
+                            headers: {
+                                Authorization: `Bearer ${localStorage.getItem(
+                                    "token"
+                                )}`,
+                            },
+                        }
+                    );
+                    this.cachedNotifications[nextPage] =
+                        response.data.notifications.data || [];
+                    this.prefetchedPages.add(nextPage);
+                } catch (error) {
+                    console.error(`Error prefetching page ${nextPage}:`, error);
+                }
             }
         },
 

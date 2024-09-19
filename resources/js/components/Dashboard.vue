@@ -34,6 +34,9 @@
                                 </a>
                             </template>
                         </ul>
+                        <div v-if="dashboardStore.isFetching" class="loading-overlay">
+                            読み込み中...
+                        </div>
                         <div v-if="dashboardStore.totalPages > 1" class="pagination">
                             <button @click="changePage(1)" :disabled="dashboardStore.currentPage === 1"
                                 class="pagination-button">
@@ -247,6 +250,8 @@ export default {
                     inquiryStore.fetchInquiries(),
                 ]);
                 console.log("All data fetched successfully");
+
+                dashboardStore.prefetchNextPage(dashboardStore.currentPage);
             } catch (error) {
                 console.error("Error initializing dashboard:", error);
             }
