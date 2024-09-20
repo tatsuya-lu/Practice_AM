@@ -26,7 +26,7 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
-import { useNotificationStore } from "../store/notification"; 
+import { useNotificationStore } from "../store/notification";
 import { useDashboardStore } from "../store/dashboard";
 
 export default {
@@ -46,16 +46,20 @@ export default {
                 }, {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                 });
+
                 if (response.data.success) {
                     await dashboardStore.addNewNotification(response.data.notification);
                     await notificationStore.addNewNotification(response.data.notification);
-                    router.push('/dashboard');
+                    await router.push({ name: 'dashboard', query: { sort: 'newest', page: 1 } });
+                    await dashboardStore.fetchDashboardData(true);
+                } else {
+                    errors.value = response.data.errors || {};
                 }
             } catch (error) {
-                if (error.response && error.response.data && error.response.data.errors) {
-                    errors.value = error.response.data.errors;
+                if (error.response && error.response.data) {
+                    errors.value = error.response.data.errors || {};
                 } else {
-                    console.error('Error creating notification:', error);
+                    errors.value = { general: ['通知の作成中にエラーが発生しました。'] };
                 }
             }
         };

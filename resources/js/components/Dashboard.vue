@@ -151,7 +151,7 @@
 </template>
 
 <script>
-import { ref, onMounted, watch, } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useRoute } from 'vue-router';
 import { useDashboardStore } from "../store/dashboard";
 import { useInquiryStore } from "../store/inquiry";
@@ -258,11 +258,18 @@ export default {
         });
 
         const fetchData = async () => {
+            const page = parseInt(route.query.page) || 1;
             if (!dashboardStore.isLoaded) {
                 await dashboardStore.fetchDashboardData(true);
             } else {
                 await dashboardStore.fetchUnresolvedInquiries();
             }
+
+            if (route.query.sort === 'newest') {
+                dashboardStore.notifications.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            }
+
+            dashboardStore.changePage(page);
         };
 
         onMounted(fetchData);
@@ -275,6 +282,7 @@ export default {
             getNotificationStatus,
             getNotificationStatusClass,
             formatDate,
+            fetchData,
             prevPage,
             nextPage,
             changePage,
