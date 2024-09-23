@@ -51,7 +51,6 @@ export default {
                     await dashboardStore.addNewNotification(response.data.notification);
                     await notificationStore.addNewNotification(response.data.notification);
                     await router.push({ name: 'dashboard', query: { sort: 'newest', page: 1 } });
-                    await dashboardStore.fetchDashboardData(true);
                 } else {
                     errors.value = response.data.errors || {};
                 }

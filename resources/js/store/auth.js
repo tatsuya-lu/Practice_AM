@@ -1,7 +1,8 @@
 import { defineStore } from "pinia";
 import axios from "axios";
 import { useInquiryStore } from "./inquiry";
-import { useUserStore } from './user'
+import { useUserStore } from "./user";
+import { useDashboardStore } from "./dashboard";
 
 export const useAuthStore = defineStore("auth", {
     state: () => ({
@@ -40,11 +41,13 @@ export const useAuthStore = defineStore("auth", {
         async fetchInitialData() {
             const inquiryStore = useInquiryStore();
             const userStore = useUserStore();
+            const dashboardStore = useDashboardStore();
             await Promise.all([
                 this.fetchUser(),
                 inquiryStore.fetchInquiries(),
                 userStore.fetchUsers(),
                 userStore.fetchMappings(),
+                dashboardStore.prefetchAllPages(),
             ]);
         },
         async ensureAuthenticated() {

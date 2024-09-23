@@ -46,10 +46,40 @@ export const useDashboardStore = defineStore("dashboard", {
 
     actions: {
         async addNewNotification(notification) {
-            this.notifications.unshift(notification);
-            this.notificationReadStatuses[notification.id] = false;
-        },
+            for (let page in this.cachedNotifications) {
+                if (page === "1") {
+                    this.cachedNotifications[page] = [
+                        notification,
+                        ...this.cachedNotifications[page],
+                    ].slice(0, this.perPage);
+                } else {
+                    const prevPage = parseInt(page) - 1;
+                    if (this.cachedNotifications[prevPage]) {
+                        const lastItemFromPrevPage =
+                            this.cachedNotifications[prevPage][
+                                this.perPage - 1
+                            ];
+                        this.cachedNotifications[page] = [
+                            lastItemFromPrevPage,
+                            ...this.cachedNotifications[page].slice(0, -1),
+                        ];
+                    }
+                }
+            }
 
+            this.notificationReadStatuses[notification.id] = false;
+            this.totalNotifications++;
+            if (this.currentPage === 1) {
+                this.notifications = this.cachedNotifications[1];
+            } else {
+                await this.changePage(1);
+            }
+            this.lastPage = Math.ceil(this.totalNotifications / this.perPage);
+
+            if (!this.cachedNotifications[this.lastPage]) {
+                await this.prefetchNextPage(this.lastPage - 1);
+            }
+        },
         async fetchDashboardData(force = false) {
             const now = Date.now();
             const timeSinceLastFetch = now - (this.lastFetchTime || 0);
@@ -114,7 +144,9 @@ export const useDashboardStore = defineStore("dashboard", {
 
                 this.notifications =
                     notificationsResponse.data.notifications.data || [];
-                this.cachedNotifications[this.currentPage] = this.notifications;
+                this.cachedNotifications[this.currentPage] = [
+                    ...this.notifications,
+                ];
                 this.prefetchedPages.add(this.currentPage);
 
                 this.totalNotifications =
@@ -151,7 +183,24 @@ export const useDashboardStore = defineStore("dashboard", {
                 this.isFetching = false;
             }
         },
+        async prefetchAllPages() {
+            if (this.isFetching) return;
 
+            this.isFetching = true;
+            try {
+                await this.fetchDashboardData(true);
+
+                for (let page = 2; page <= this.lastPage; page++) {
+                    if (!this.prefetchedPages.has(page)) {
+                        await this.prefetchNextPage(page - 1);
+                    }
+                }
+            } catch (error) {
+                console.error("Error prefetching all pages:", error);
+            } finally {
+                this.isFetching = false;
+            }
+        },
         async prefetchNextPage(currentPage) {
             const nextPage = currentPage + 1;
             if (
@@ -217,9 +266,8 @@ export const useDashboardStore = defineStore("dashboard", {
                 this.currentPage++;
             }
         },
-
         async changePage(page) {
-            if (page >= 1 && page <= this.lastPage) {
+            if (page >= 1 && page <= this.totalPages) {
                 this.currentPage = page;
                 if (this.cachedNotifications[page]) {
                     this.notifications = this.cachedNotifications[page];

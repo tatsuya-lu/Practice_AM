@@ -250,8 +250,6 @@ export default {
                     inquiryStore.fetchInquiries(),
                 ]);
                 console.log("All data fetched successfully");
-
-                dashboardStore.prefetchNextPage(dashboardStore.currentPage);
             } catch (error) {
                 console.error("Error initializing dashboard:", error);
             }
