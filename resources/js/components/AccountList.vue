@@ -203,6 +203,7 @@ export default {
           await axios.delete(`/api/account/${userId}`);
           userStore.removeUser(userId);
           successMessage.value = 'ユーザーが削除されました';
+          await fetchUsers(true);
         } catch (error) {
           console.error('Error deleting user:', error);
           alert('ユーザーの削除中にエラーが発生しました。');

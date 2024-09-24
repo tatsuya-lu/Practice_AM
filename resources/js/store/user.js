@@ -93,7 +93,9 @@ export const useUserStore = defineStore("user", {
             }
         },
         removeUser(userId) {
-            this.users = this.users.filter((user) => user.id !== userId);
+            for (const pageKey in this.users) {
+                this.users[pageKey] = this.users[pageKey].filter(user => user.id !== userId);
+            }
         },
         async fetchMappings(forceRefresh = false) {
             if (this.isMappingsLoaded && !forceRefresh) return;
@@ -169,7 +171,6 @@ export const useUserStore = defineStore("user", {
                 };
             }
         },
-
         updateUserInStore(updatedUser) {
             const pageKey = `${this.currentPage}-${JSON.stringify(
                 this.cachedParams
