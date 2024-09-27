@@ -60,7 +60,7 @@ export default {
         const submitForm = async () => {
             try {
                 await contactStore.sendForm();
-                router.push('/contact/thanks');
+                router.push('/thanks');
             } catch (error) {
                 console.error('Error sending form:', error);
                 if (error.response && error.response.data.errors) {

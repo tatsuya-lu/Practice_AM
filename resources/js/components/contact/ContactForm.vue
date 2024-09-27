@@ -91,7 +91,7 @@ export default {
             try {
                 errors.value = {};
                 await contactStore.submitForm();
-                router.push('/contact/confirm');
+                router.push('/confirm');
             } catch (error) {
                 if (error.response && error.response.status === 422) {
                     errors.value = error.response.data.errors;
