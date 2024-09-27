@@ -7,6 +7,10 @@ use App\Http\Controllers\Account\NotificationController;
 use App\Http\Controllers\Contact\ContactsController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/contact{any}', function () {
+    return view('layouts.contact');
+})->where('any', '.*');
+
 Route::get('/{any}', function () {
     return view('layouts.app');
 })->where('any', '.*');

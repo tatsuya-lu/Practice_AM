@@ -22,21 +22,6 @@ axios.defaults.withCredentials = true;
 
 const routes = [
     {
-        path: "/contact",
-        component: ContactForm,
-        meta: { layout: "empty", requiresAuth: false },
-    },
-    {
-        path: "/contact/confirm",
-        component: ContactConfirm,
-        meta: { layout: "empty", requiresAuth: false },
-    },
-    {
-        path: "/contact/thanks",
-        component: ContactThanks,
-        meta: { layout: "empty", requiresAuth: false },
-    },
-    {
         path: "/",
         redirect: (to) => {
             return { path: "/dashboard" };
