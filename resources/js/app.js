@@ -66,8 +66,6 @@ const pinia = createPinia();
 router.beforeEach(async (to, from, next) => {
     const authStore = useAuthStore(pinia);
     const userStore = useUserStore(pinia);
-    const dashboardStore = useDashboardStore(pinia);
-    const inquiryStore = useInquiryStore(pinia);
 
     if (!authStore.isLoaded) {
         await authStore.fetchUser();
@@ -76,9 +74,6 @@ router.beforeEach(async (to, from, next) => {
     if (authStore.isLoggedIn) {
         if (!userStore.isMappingsLoaded) {
             await userStore.fetchMappings();
-        }
-        if (to.path === "/dashboard" || !dashboardStore.isReadStatusesLoaded) {
-            await dashboardStore.fetchDashboardData();
         }
     }
 

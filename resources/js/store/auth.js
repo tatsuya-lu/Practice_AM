@@ -37,11 +37,7 @@ export const useAuthStore = defineStore("auth", {
             delete axios.defaults.headers.common["Authorization"];
         },
         async fetchInitialData() {
-            const dashboardStore = useDashboardStore();
-            await Promise.all([
-                this.fetchUser(),
-                dashboardStore.prefetchAllPages(),
-            ]);
+            await this.fetchUser();
         },
         async ensureAuthenticated() {
             if (!this.isLoggedIn) {

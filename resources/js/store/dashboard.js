@@ -57,7 +57,7 @@ export const useDashboardStore = defineStore("dashboard", {
                     if (this.cachedNotifications[prevPage]) {
                         const lastItemFromPrevPage =
                             this.cachedNotifications[prevPage][
-                                this.perPage - 1
+                            this.perPage - 1
                             ];
                         this.cachedNotifications[page] = [
                             lastItemFromPrevPage,
