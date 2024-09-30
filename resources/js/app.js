@@ -13,9 +13,6 @@ import AccountList from "./components/AccountList.vue";
 import Register from "./components/Register.vue";
 import InquiryList from "./components/InquiryList.vue";
 import InquiryEdit from "./components/InquiryEdit.vue";
-import ContactForm from "./components/contact/ContactForm.vue";
-import ContactConfirm from "./components/contact/ContactConfirm.vue";
-import ContactThanks from "./components/contact/ContactThanks.vue";
 import axios from "axios";
 axios.defaults.baseURL = "http://localhost:8000";
 axios.defaults.withCredentials = true;
@@ -77,17 +74,11 @@ router.beforeEach(async (to, from, next) => {
     }
 
     if (authStore.isLoggedIn) {
-        if (!userStore.isLoaded) {
-            await userStore.fetchUsers();
-        }
         if (!userStore.isMappingsLoaded) {
             await userStore.fetchMappings();
         }
         if (to.path === "/dashboard" || !dashboardStore.isReadStatusesLoaded) {
             await dashboardStore.fetchDashboardData();
-        }
-        if (!inquiryStore.isLoaded) {
-            await authStore.fetchInitialData();
         }
     }
 

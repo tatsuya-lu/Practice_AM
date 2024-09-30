@@ -225,7 +225,6 @@ export default {
       router.replace({ query: {} })
 
       await userStore.fetchMappings(true)
-      await fetchFormData()
       await fetchUsers()
     })
 
