@@ -42,8 +42,8 @@
             <p>{{ contactStore.form.body }}</p>
         </div>
 
-        <a @click.prevent="goToContactForm" href="#"><button type="button" class="form-btn">戻る</button></a>
-        <router-link to="/dashboard"><button type="button" class="form-btn">ダッシュボードへ戻る</button></router-link>
+        <a @click.prevent="goToContactForm"><button type="button" class="form-btn">戻る</button></a>
+        <a @click.prevent="goToDashboard"><button type="button" class="form-btn">ダッシュボードへ戻る</button></a>
     </div>
 </template>
 
@@ -61,9 +61,14 @@ export default {
             router.push('/contact');
         };
 
+        const goToDashboard = () => {
+            window.location.href = '/dashboard';
+        };
+
         return {
             contactStore,
-            goToContactForm
+            goToContactForm,
+            goToDashboard
         };
     }
 }
