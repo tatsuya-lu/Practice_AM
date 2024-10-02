@@ -12,7 +12,6 @@ export const useInquiryStore = defineStore("inquiry", {
         totalPages: 1,
         perPage: 20,
         cachedParams: {},
-        totalInquiries: 0,
     }),
     actions: {
         async fetchStatusOptions() {
@@ -27,7 +26,7 @@ export const useInquiryStore = defineStore("inquiry", {
             }
         },
         async fetchInquiries(forceRefresh = false, params = {}) {
-            const pageKey = `${params.page || this.currentPage}-${JSON.stringify(params)}`;
+            const pageKey = `${this.currentPage}-${JSON.stringify(params)}`;
             if (!forceRefresh && this.inquiries[pageKey]) {
                 return;
             }
@@ -37,15 +36,14 @@ export const useInquiryStore = defineStore("inquiry", {
                 const response = await axios.get("/api/inquiries", {
                     params: {
                         ...params,
-                        page: params.page || this.currentPage,
-                        per_page: params.per_page || this.perPage,
+                        page: this.currentPage,
+                        per_page: this.perPage,
                     },
                 });
                 this.inquiries[pageKey] = response.data.inquiries.data;
                 this.statusOptions = response.data.statusOptions;
                 this.currentPage = response.data.inquiries.current_page;
                 this.totalPages = response.data.inquiries.last_page;
-                this.totalInquiries = response.data.inquiries.total;
                 this.isLoaded = true;
                 this.cachedParams = params;
 

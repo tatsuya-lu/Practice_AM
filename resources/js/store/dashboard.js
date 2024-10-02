@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
 import axios from "axios";
 import { useNotificationStore } from "./notification";
-import { InquiryService } from "../services/InquiryService";
 
 export const useDashboardStore = defineStore("dashboard", {
     state: () => ({
@@ -84,7 +83,7 @@ export const useDashboardStore = defineStore("dashboard", {
         async fetchDashboardData(force = false) {
             const now = Date.now();
             const timeSinceLastFetch = now - (this.lastFetchTime || 0);
-        
+
             if (
                 !force &&
                 this.isLoaded &&
@@ -92,19 +91,20 @@ export const useDashboardStore = defineStore("dashboard", {
             ) {
                 return;
             }
-        
+
             try {
                 this.isFetching = true;
-        
+
                 if (this.cachedNotifications[this.currentPage] && !force) {
                     this.notifications =
                         this.cachedNotifications[this.currentPage];
                     return;
                 }
-        
+
                 const [
                     dashboardResponse,
                     notificationsResponse,
+                    inquiriesResponse,
                     readStatusesResponse,
                 ] = await Promise.all([
                     axios.get("/api/dashboard", {
@@ -125,6 +125,14 @@ export const useDashboardStore = defineStore("dashboard", {
                             )}`,
                         },
                     }),
+                    axios.get("/api/inquiries", {
+                        params: { dashboard: true, limit: 5 },
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem(
+                                "token"
+                            )}`,
+                        },
+                    }),
                     axios.get("/api/notifications/read-status", {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem(
@@ -133,19 +141,19 @@ export const useDashboardStore = defineStore("dashboard", {
                         },
                     }),
                 ]);
-        
+
                 this.notifications =
                     notificationsResponse.data.notifications.data || [];
                 this.cachedNotifications[this.currentPage] = [
                     ...this.notifications,
                 ];
                 this.prefetchedPages.add(this.currentPage);
-        
+
                 this.totalNotifications =
                     notificationsResponse.data.notifications.total;
                 this.lastPage =
                     notificationsResponse.data.notifications.last_page;
-        
+
                 const notificationStore = useNotificationStore();
                 this.notificationReadStatuses = (
                     readStatusesResponse.data || []
@@ -154,19 +162,18 @@ export const useDashboardStore = defineStore("dashboard", {
                     notificationStore.updateGlobalReadStatus(id);
                     return acc;
                 }, {});
-        
+
+                this.unresolvedInquiryCount =
+                    inquiriesResponse.data.unresolvedInquiryCount;
+                this.unresolvedInquiries =
+                    inquiriesResponse.data.inquiries.data;
+
                 this.isNotificationsLoaded = true;
+                this.isInquiriesLoaded = true;
                 this.isReadStatusesLoaded = true;
                 this.lastFetchTime = now;
-        
-                this.prefetchNextPage(this.currentPage);
 
-                const { inquiries, totalCount, totalPages } = await InquiryService.fetchUnresolvedInquiries(this.inquiryCurrentPage, this.inquiryPerPage);
-                this.unresolvedInquiryCount = totalCount;
-                this.unresolvedInquiries = inquiries;
-                this.inquiryTotalPages = totalPages;
-                this.isInquiriesLoaded = true;
-        
+                this.prefetchNextPage(this.currentPage);
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
                 this.isNotificationsLoaded = false;
@@ -270,23 +277,35 @@ export const useDashboardStore = defineStore("dashboard", {
             }
         },
 
-        async changeInquiryPage(page) {
-            if (page >= 1 && page <= this.inquiryTotalPages) {
-                this.inquiryCurrentPage = page;
-                await this.fetchUnresolvedInquiries();
-            }
-        },
-        
         async fetchUnresolvedInquiries() {
             try {
-                const { inquiries, totalCount, totalPages } = await InquiryService.fetchUnresolvedInquiries(this.inquiryCurrentPage, this.inquiryPerPage);
-                this.unresolvedInquiryCount = totalCount;
-                this.unresolvedInquiries = inquiries;
-                this.inquiryTotalPages = totalPages;
+                const response = await axios.get("/api/inquiries", {
+                    params: {
+                        dashboard: true,
+                        page: this.inquiryCurrentPage,
+                        per_page: this.inquiryPerPage,
+                    },
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem(
+                            "token"
+                        )}`,
+                    },
+                });
+                this.unresolvedInquiryCount =
+                    response.data.unresolvedInquiryCount;
+                this.unresolvedInquiries = response.data.inquiries.data;
+                this.inquiryTotalPages = response.data.inquiries.last_page;
                 this.isInquiriesLoaded = true;
             } catch (error) {
                 console.error("Error fetching unresolved inquiries:", error);
                 this.isInquiriesLoaded = false;
+            }
+        },
+
+        async changeInquiryPage(page) {
+            if (page >= 1 && page <= this.inquiryTotalPages) {
+                this.inquiryCurrentPage = page;
+                await this.fetchUnresolvedInquiries();
             }
         },
 
