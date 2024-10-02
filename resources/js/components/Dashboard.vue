@@ -244,9 +244,8 @@ export default {
         onMounted(async () => {
             console.log("Dashboard component mounted");
             try {
-                await dashboardStore.fetchDashboardData();
+                await dashboardStore.fetchDashboardData(true);
                 await dashboardStore.fetchNotificationReadStatuses();
-                await inquiryStore.fetchInquiries();
                 console.log("All data fetched successfully");
             } catch (error) {
                 console.error("Error initializing dashboard:", error);
