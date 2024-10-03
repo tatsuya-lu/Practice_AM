@@ -28,13 +28,25 @@ class InquiryController extends Controller
             $inquiry->statusText = $statusOptions[$inquiry->status] ?? $inquiry->status;
         }
 
-        $unresolvedInquiryCount = $this->inquiryService->unresolvedInquiryCount();
-        $unresolvedInquiries = $this->inquiryService->unresolvedInquiries();
-
         return response()->json([
             'inquiries' => $inquiries,
-            'unresolvedInquiryCount' => $unresolvedInquiryCount,
+            'statusOptions' => $statusOptions
+        ]);
+    }
+
+    public function apiDashboardInquiries(Request $request)
+    {
+        $unresolvedInquiries = $this->inquiryService->unresolvedInquiries($request);
+        $unresolvedInquiryCount = $this->inquiryService->unresolvedInquiryCount();
+        $statusOptions = Config::get('const.status');
+
+        foreach ($unresolvedInquiries as $inquiry) {
+            $inquiry->statusText = $statusOptions[$inquiry->status] ?? $inquiry->status;
+        }
+
+        return response()->json([
             'unresolvedInquiries' => $unresolvedInquiries,
+            'unresolvedInquiryCount' => $unresolvedInquiryCount,
             'statusOptions' => $statusOptions
         ]);
     }

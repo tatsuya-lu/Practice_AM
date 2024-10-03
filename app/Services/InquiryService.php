@@ -74,10 +74,25 @@ class InquiryService
         return Post::where('status', 'default')->count();
     }
 
-    public function unresolvedInquiries()
+    public function unresolvedInquiries(Request $request)
     {
-        return Post::where('status', 'default')
-            ->orderBy('created_at', 'desc')
-            ->paginate(5);
+        $limit = $request->input('limit', 10);
+        $sort = $request->input('sort', 'newest');
+
+        $query = Post::where('status', 'default');
+
+        switch ($sort) {
+            case 'newest':
+                $query->orderBy('created_at', 'desc');
+                break;
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
+        return $query->paginate($limit);
     }
 }

@@ -34,7 +34,7 @@ class AccountController extends Controller
     {
         $notificationData = $this->notificationService->getNotificationsForDashboard();
         $unresolvedInquiryCount = $this->inquiryService->unresolvedInquiryCount();
-        $unresolvedInquiries = $this->inquiryService->unresolvedInquiries();
+        $unresolvedInquiries = $this->inquiryService->unresolvedInquiries($request);
 
         return response()->json([
             'notificationData' => $notificationData,

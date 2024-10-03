@@ -84,22 +84,12 @@ export const useDashboardStore = defineStore("dashboard", {
             const now = Date.now();
             const timeSinceLastFetch = now - (this.lastFetchTime || 0);
 
-            if (
-                !force &&
-                this.isLoaded &&
-                timeSinceLastFetch < 15 * 60 * 1000
-            ) {
+            if (!force && this.isLoaded && timeSinceLastFetch < 15 * 60 * 1000) {
                 return;
             }
 
             try {
                 this.isFetching = true;
-
-                if (this.cachedNotifications[this.currentPage] && !force) {
-                    this.notifications =
-                        this.cachedNotifications[this.currentPage];
-                    return;
-                }
 
                 const [
                     dashboardResponse,
@@ -109,9 +99,7 @@ export const useDashboardStore = defineStore("dashboard", {
                 ] = await Promise.all([
                     axios.get("/api/dashboard", {
                         headers: {
-                            Authorization: `Bearer ${localStorage.getItem(
-                                "token"
-                            )}`,
+                            Authorization: `Bearer ${localStorage.getItem("token")}`,
                         },
                     }),
                     axios.get("/api/dashboard/notifications", {
@@ -120,24 +108,21 @@ export const useDashboardStore = defineStore("dashboard", {
                             per_page: this.perPage,
                         },
                         headers: {
-                            Authorization: `Bearer ${localStorage.getItem(
-                                "token"
-                            )}`,
+                            Authorization: `Bearer ${localStorage.getItem("token")}`,
                         },
                     }),
-                    axios.get("/api/inquiries", {
-                        params: { dashboard: true, limit: 5 },
+                    axios.get("/api/dashboard/inquiries", {
+                        params: {
+                            page: this.inquiryCurrentPage,
+                            per_page: this.inquiryPerPage
+                        },
                         headers: {
-                            Authorization: `Bearer ${localStorage.getItem(
-                                "token"
-                            )}`,
+                            Authorization: `Bearer ${localStorage.getItem("token")}`,
                         },
                     }),
                     axios.get("/api/notifications/read-status", {
                         headers: {
-                            Authorization: `Bearer ${localStorage.getItem(
-                                "token"
-                            )}`,
+                            Authorization: `Bearer ${localStorage.getItem("token")}`,
                         },
                     }),
                 ]);
@@ -163,10 +148,9 @@ export const useDashboardStore = defineStore("dashboard", {
                     return acc;
                 }, {});
 
-                this.unresolvedInquiryCount =
-                    inquiriesResponse.data.unresolvedInquiryCount;
-                this.unresolvedInquiries =
-                    inquiriesResponse.data.inquiries.data;
+                this.unresolvedInquiryCount = inquiriesResponse.data.unresolvedInquiryCount;
+                this.unresolvedInquiries = inquiriesResponse.data.unresolvedInquiries.data;
+                this.inquiryTotalPages = inquiriesResponse.data.unresolvedInquiries.last_page;
 
                 this.isNotificationsLoaded = true;
                 this.isInquiriesLoaded = true;
@@ -279,22 +263,18 @@ export const useDashboardStore = defineStore("dashboard", {
 
         async fetchUnresolvedInquiries() {
             try {
-                const response = await axios.get("/api/inquiries", {
+                const response = await axios.get("/api/dashboard/inquiries", {
                     params: {
-                        dashboard: true,
                         page: this.inquiryCurrentPage,
                         per_page: this.inquiryPerPage,
                     },
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem(
-                            "token"
-                        )}`,
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
                 });
-                this.unresolvedInquiryCount =
-                    response.data.unresolvedInquiryCount;
-                this.unresolvedInquiries = response.data.inquiries.data;
-                this.inquiryTotalPages = response.data.inquiries.last_page;
+                this.unresolvedInquiryCount = response.data.unresolvedInquiryCount;
+                this.unresolvedInquiries = response.data.unresolvedInquiries.data;
+                this.inquiryTotalPages = response.data.unresolvedInquiries.last_page;
                 this.isInquiriesLoaded = true;
             } catch (error) {
                 console.error("Error fetching unresolved inquiries:", error);
