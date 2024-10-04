@@ -37,9 +37,4 @@ class LoginController extends Controller
         $request->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'ログアウトしました。']);
     }
-
-    public function show()
-    {
-        return view('admin.login');
-    }
 }

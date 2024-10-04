@@ -71,14 +71,14 @@ class InquiryController extends Controller
         return response()->json(['message' => 'お問い合わせ情報が更新されました。']);
     }
 
-    public function index()
-    {
-        $inquiries = $this->inquiryService->index();
+    // public function index()
+    // {
+    //     $inquiries = $this->inquiryService->index();
 
-        foreach ($inquiries as $inquiry) {
-            $inquiry->status = config('const.status')[$inquiry->status] ?? $inquiry->status;
-        }
+    //     foreach ($inquiries as $inquiry) {
+    //         $inquiry->status = config('const.status')[$inquiry->status] ?? $inquiry->status;
+    //     }
 
-        return view('admin.InquiryList', compact('inquiries'));
-    }
+    //     return view('admin.InquiryList', compact('inquiries'));
+    // }
 }
