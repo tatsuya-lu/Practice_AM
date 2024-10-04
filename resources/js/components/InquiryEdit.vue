@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useInquiryStore } from "../store/inquiry";
 import { useDashboardStore } from "../store/dashboard";
@@ -145,7 +145,3 @@ export default {
     }
 }
 </script>
-
-<style scoped>
-/* ここにコンポーネント固有のスタイルを追加 */
-</style>

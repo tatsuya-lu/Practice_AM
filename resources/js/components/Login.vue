@@ -48,7 +48,7 @@ export default {
                 });
 
                 localStorage.setItem('token', response.data.token);
-                setInitialLoading(true); // ログイン成功時にのみローディングを開始
+                setInitialLoading(true);
                 await authStore.fetchInitialData();
 
                 if (authStore.isLoggedIn) {
@@ -64,7 +64,7 @@ export default {
                     : { error: 'ログインに失敗しました。' };
             } finally {
                 isLoading.value = false;
-                setInitialLoading(false); // ログイン処理完了時にローディングを終了
+                setInitialLoading(false);
             }
         };
 
@@ -78,9 +78,3 @@ export default {
     }
 }
 </script>
-
-<style scoped>
-.login-container {
-    /* スタイルをここに追加 */
-}
-</style>

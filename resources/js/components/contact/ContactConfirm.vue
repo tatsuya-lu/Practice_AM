@@ -70,7 +70,7 @@ export default {
         };
 
         const goBack = () => {
-            router.push('/contact');
+            router.push('/');
         };
 
         onMounted(() => {

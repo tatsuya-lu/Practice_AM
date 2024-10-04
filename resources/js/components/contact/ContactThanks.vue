@@ -58,7 +58,7 @@ export default {
 
         const goToContactForm = () => {
             contactStore.$reset();
-            router.push('/contact');
+            router.push('/');
         };
 
         const goToDashboard = () => {

@@ -14,17 +14,6 @@ export const useInquiryStore = defineStore("inquiry", {
         cachedParams: {},
     }),
     actions: {
-        async fetchStatusOptions() {
-            if (Object.keys(this.statusOptions).length > 0) return;
-            try {
-                const response = await axios.get(
-                    "/api/inquiries/status-options"
-                );
-                this.statusOptions = response.data.statusOptions;
-            } catch (error) {
-                console.error("Error fetching status options:", error);
-            }
-        },
         async fetchInquiries(forceRefresh = false, params = {}) {
             const pageKey = `${this.currentPage}-${JSON.stringify(params)}`;
             if (!forceRefresh && this.inquiries[pageKey]) {

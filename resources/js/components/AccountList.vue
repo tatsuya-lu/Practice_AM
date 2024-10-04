@@ -132,8 +132,6 @@ export default {
     const searchName = ref('')
     const searchAdminLevel = ref('')
     const searchEmail = ref('')
-    const adminLevels = ref({})
-    const prefectures = ref({})
     const sortType = ref('newest')
 
     const users = computed(() => userStore.getUsers)
@@ -214,7 +212,6 @@ export default {
       registeredEmail.value = route.query.registered_email || '';
       router.replace({ query: {} })
 
-      await userStore.fetchMappings(true)
       await fetchUsers()
     })
 
