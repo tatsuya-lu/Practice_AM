@@ -176,7 +176,6 @@ export default {
         onMounted(async () => {
             await checkAuth();
             await fetchNotifications();
-            await userStore.fetchMappings();
         });
 
         onUnmounted(() => {
