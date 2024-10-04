@@ -176,16 +176,6 @@ export default {
       })
     }
 
-    const fetchFormData = async () => {
-      try {
-        const response = await axios.get('/api/form-data')
-        adminLevels.value = response.data.adminLevels
-        prefectures.value = response.data.prefectures
-      } catch (error) {
-        console.error('Error fetching form data:', error)
-      }
-    }
-
     const sortUsers = async (newSortType) => {
       sortType.value = newSortType;
       userStore.currentPage = 1;
