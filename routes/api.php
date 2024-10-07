@@ -44,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Inquiry routes
     Route::get('/inquiries', [InquiryController::class, 'apiIndex']);
+    Route::get('/inquiries/form-data', [InquiryController::class, 'apiFormData']);
     Route::get('/inquiries/{inquiry}', [InquiryController::class, 'apiShow']);
     Route::put('/inquiries/{inquiry}', [InquiryController::class, 'apiUpdate']);
 

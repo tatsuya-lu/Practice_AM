@@ -11,11 +11,14 @@ use App\Services\InquiryService;
 
 class InquiryController extends Controller
 {
-
+    protected $genders;
+    protected $professions;
     protected $inquiryService;
 
     public function __construct(InquiryService $inquiryService)
     {
+        $this->genders = config('const.gender');
+        $this->professions = config('const.profession');
         $this->inquiryService = $inquiryService;
     }
 
@@ -71,14 +74,11 @@ class InquiryController extends Controller
         return response()->json(['message' => 'お問い合わせ情報が更新されました。']);
     }
 
-    // public function index()
-    // {
-    //     $inquiries = $this->inquiryService->index();
-
-    //     foreach ($inquiries as $inquiry) {
-    //         $inquiry->status = config('const.status')[$inquiry->status] ?? $inquiry->status;
-    //     }
-
-    //     return view('admin.InquiryList', compact('inquiries'));
-    // }
+    public function apiFormData()
+    {
+        return response()->json([
+            'genders' => $this->genders,
+            'professions' => $this->professions
+        ]);
+    }
 }

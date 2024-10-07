@@ -73,12 +73,11 @@
 
                 <div class="info-item">
                     <label for="gender">性別</label>
-                    <p>{{ currentInquiry.gender }}</p>
+                    <p>{{ inquiryStore.getGenderText(currentInquiry.gender) }}</p>
                 </div>
-
                 <div class="info-item">
                     <label for="profession">職業</label>
-                    <p>{{ currentInquiry.profession }}</p>
+                    <p>{{ inquiryStore.getProfessionText(currentInquiry.profession) }}</p>
                 </div>
             </div>
         </div>
@@ -132,7 +131,12 @@ export default {
             }
         };
 
-        onMounted(fetchInquiryData);
+        onMounted(async () => {
+            if (!inquiryStore.isFormDataLoaded) {
+                await inquiryStore.fetchFormData();
+            }
+            await fetchInquiryData();
+        });
 
         watch(() => route.params.id, fetchInquiryData);
 

@@ -5,7 +5,10 @@ export const useInquiryStore = defineStore("inquiry", {
     state: () => ({
         inquiries: [],
         statusOptions: {},
+        genders: {},
+        professions: {},
         isLoaded: false,
+        isFormDataLoaded: false,
         isLoading: false,
         error: null,
         currentPage: 1,
@@ -18,6 +21,10 @@ export const useInquiryStore = defineStore("inquiry", {
             const pageKey = `${this.currentPage}-${JSON.stringify(params)}`;
             if (!forceRefresh && this.inquiries[pageKey]) {
                 return;
+            }
+
+            if (!this.isFormDataLoaded) {
+                await this.fetchFormData();
             }
 
             this.isLoading = true;
@@ -108,6 +115,22 @@ export const useInquiryStore = defineStore("inquiry", {
                 this.isLoading = false;
             }
         },
+        async fetchFormData() {
+            if (this.isFormDataLoaded) return;
+
+            this.isLoading = true;
+            try {
+                const response = await axios.get("/api/inquiries/form-data");
+                this.genders = response.data.genders;
+                this.professions = response.data.professions;
+                this.isFormDataLoaded = true;
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+                this.error = error.message;
+            } finally {
+                this.isLoading = false;
+            }
+        },
         async updateInquiry(id, data) {
             this.isLoading = true;
             try {
@@ -144,6 +167,10 @@ export const useInquiryStore = defineStore("inquiry", {
         },
         getStatusText: (state) => (statusCode) =>
             state.statusOptions[statusCode] || statusCode,
+        getGenderText: (state) => (genderCode) =>
+            state.genders[genderCode] || genderCode,
+        getProfessionText: (state) => (professionCode) =>
+            state.professions[professionCode] || professionCode,
         getCurrentInquiry: (state) => (id) => {
             id = parseInt(id);
             for (const pageInquiries of Object.values(state.inquiries)) {
